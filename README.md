@@ -1,69 +1,227 @@
-# Central Agents Instruction Catalog
+# Agents.md
 
-Единый публичный каталог агентских инструкций для переиспользования в нескольких репозиториях.
+**Централизованная система инструкций для AI-агентов разработки.**
 
-## Canonical Entry Points
+Перестаньте копировать `AGENTS.md` в каждый репозиторий.
 
-- `AGENTS.md` — стартовая точка и приоритет правил.
-- `instructions/governance/routing-matrix.md` — канонический алгоритм маршрутизации (`core -> context -> profile -> governance`).
-- `instructions/core/quest-governance.md` — обязательный `SPEC -> EXEC` gate для инженерных изменений.
+Вместо этого:
 
-## Repository Structure
+* храните инструкции для агентов **в одном месте**
+* подключайте их из проектов
+* обновляйте правила **один раз → применяются везде**
 
-- `instructions/core/` — базовые правила взаимодействия, тестирования и QUEST-режима.
-- `instructions/contexts/` — контексты выполнения (debug, testing, performance, visual feedback).
-- `instructions/profiles/` — технологические и типовые профили изменений.
-- `instructions/governance/` — контракт документов, маршрутизация, версионирование и commit policy.
-- `instructions/onboarding/` — шаблоны и quick start для подключения в репозитории-потребители.
-- `specs/_template.md` — канонический шаблон спецификации.
-- `scripts/` — валидатор структуры/ссылок и тест валидатора.
+Проще говоря:
 
-## How Routing Works
+> `Agents.md` — это **`.editorconfig` для AI-агентов**.
 
-1. Прочитать `AGENTS.md`.
-2. Открыть `instructions/governance/routing-matrix.md`.
-3. Определить тип задачи и собрать instruction stack.
-4. Для `SPEC`-фазы применять `spec-linter` и `spec-rubric`.
+---
 
-## Using In Another Repository
+# Зачем это нужно
 
-1. Склонировать каталог рядом с проектом:
+При использовании AI-агентов (Codex, Cursor, Claude Code, Copilot и др.)
+в проектах обычно появляется файл `AGENTS.md` с правилами работы:
 
-```bash
-git clone https://github.com/<owner>/<repo>.git .agents-catalog
+* правила коммитов
+* требования к тестам
+* правила отладки
+* архитектурные ограничения
+
+Со временем возникает проблема:
+
+```
+один файл
+в 10 репозиториях
+с 10 разными версиями
 ```
 
-2. Указать путь к каталогу:
+Изменение правил превращается в боль.
 
-```powershell
-$env:AGENTS_ROOT = "C:\path\to\agents-catalog"
+Этот репозиторий решает проблему с помощью
+**централизованного каталога инструкций для агентов**.
+
+---
+
+# Общая архитектура
+
+Проекты **не дублируют инструкции**, а ссылаются на центральный каталог.
+
+```mermaid
+flowchart TD
+
+RepoA[Проект A]
+RepoB[Проект B]
+RepoC[Проект C]
+
+Router[routing-matrix.md]
+
+Core[core правила]
+Contexts[контекстные правила]
+Profiles[технологические профили]
+
+RepoA --> Router
+RepoB --> Router
+RepoC --> Router
+
+Router --> Core
+Router --> Contexts
+Router --> Profiles
 ```
 
-3. В репозитории-потребителе создать:
-- `AGENTS.md` по шаблону `instructions/onboarding/AGENTS.consumer.template.md`.
-- `AGENTS.override.md` при необходимости локальных ужесточений MUST.
+---
 
-4. Проверить, что локальный `AGENTS.md` ссылается на `<AGENTS_ROOT>\AGENTS.md`, без дублирования правил.
+# Структура репозитория
 
-## Quality Gate
+```
+instructions/
+ ├─ core/          # базовые правила
+ │
+ ├─ contexts/      # контексты выполнения
+ │   ├─ debug
+ │   ├─ testing
+ │   ├─ performance
+ │   └─ visual-feedback
+ │
+ ├─ profiles/      # технологические профили
+ │
+ ├─ governance/    # правила маршрутизации и политики
+ │   ├─ routing-matrix.md
+ │   ├─ versioning-policy.md
+ │   └─ document-contract.md
+ │
+ └─ onboarding/    # шаблоны подключения
 
-Перед завершением изменений запускать:
+scripts/           # валидация инструкций
+specs/             # шаблоны спецификаций
+```
 
-```powershell
+---
+
+# Канонические точки входа
+
+Основные файлы системы:
+
+* `AGENTS.md` — основная точка входа
+* `instructions/governance/routing-matrix.md` — алгоритм маршрутизации инструкций
+* `instructions/core/quest-governance.md` — gate `SPEC → EXEC` для инженерных изменений
+
+---
+
+# Как работает маршрутизация инструкций
+
+Агент загружает инструкции в следующем порядке:
+
+```
+core → context → profile → governance
+```
+
+Алгоритм работы:
+
+1. Прочитать `AGENTS.md`
+2. Открыть `routing-matrix.md`
+3. Определить тип задачи
+4. Собрать стек инструкций
+
+---
+
+# Быстрый старт
+
+## 1. Склонировать каталог инструкций
+
+```
+git clone https://github.com/Kibnet/Agents.md.git .agents
+```
+
+---
+
+## 2. Подключить его к проекту
+
+Создайте в своём репозитории файл `AGENTS.md`:
+
+```
+# AGENTS
+
+Основные инструкции для агента находятся здесь:
+
+../.agents/AGENTS.md
+```
+
+Теперь агент будет читать правила из общего каталога.
+
+---
+
+# Локальные переопределения
+
+Если проекту нужны дополнительные ограничения, можно создать:
+
+```
+AGENTS.override.md
+```
+
+В нём можно добавить **локальные правила**,
+не дублируя весь набор инструкций.
+
+---
+
+# Проверка качества
+
+Перед завершением изменений можно запустить валидацию:
+
+```
 pwsh -File scripts/validate-instructions.ps1
 pwsh -File scripts/test-validate-instructions.ps1
 ```
 
-Политики:
+---
 
-- `instructions/governance/versioning-policy.md`
-- `instructions/governance/document-contract.md`
-- `CHANGELOG.md`
+# CI-валидация
 
-## CI
+В репозитории настроен workflow:
 
-В репозитории добавлен workflow:
+```
+.github/workflows/validate-instructions.yml
+```
 
-- `.github/workflows/validate-instructions.yml`
+Он проверяет инструкции при:
 
-Он запускает валидацию на `push` и `pull_request`.
+* `push`
+* `pull request`
+
+---
+
+# Поддерживаемые AI-инструменты
+
+Каталог рассчитан на использование с агентами, которые читают `AGENTS.md`, например:
+
+* Codex CLI
+* Cursor
+* Claude Code
+* GitHub Copilot Agents
+* Windsurf
+
+---
+
+# Философия проекта
+
+Цели:
+
+* единый каталог инструкций для AI-агентов
+* повторное использование правил между репозиториями
+* единый инженерный workflow
+* версионирование и управление правилами
+
+---
+
+# Участие в развитии
+
+Приветствуются улучшения:
+
+* алгоритма маршрутизации
+* технологических профилей
+* контекстных инструкций
+* скриптов валидации
+
+---
+
+# Лицензия
+
+MIT
