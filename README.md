@@ -1,63 +1,69 @@
 # Central Agents Instruction Catalog
 
-Единый каталог правил для Codex-агента, который можно подключать в любых репозиториях.
+Единый публичный каталог агентских инструкций для переиспользования в нескольких репозиториях.
 
-## Что внутри
+## Canonical Entry Points
 
-- `AGENTS.md` — единая точка входа для маршрутизации.
-- `instructions/` — структурированные правила:
-  - `core/` — базовые правила.
-  - `contexts/` — контексты технологий и задач.
-  - `profiles/` — технологические/проектные профили.
-  - `governance/` — порядок версии, приоритетов и навигации.
-  - `onboarding/` — шаблоны подключения в другие репозитории.
-- `specs/_template.md` — шаблон спецификации `SPEC`.
-- `instructions/core/quest-mode.md`, `instructions/core/quest-prompt-spec.md`, `instructions/core/quest-prompt-exec.md` — рабочие правила и шаблоны для режима `QUEST`.
-- `instructions/governance/spec-linter.md`, `instructions/governance/spec-rubric.md` — чеклисты и шкалы оценки `SPEC`.
-- `scripts/` — валидация каталога инструкций.
+- `AGENTS.md` — стартовая точка и приоритет правил.
+- `instructions/governance/routing-matrix.md` — канонический алгоритм маршрутизации (`core -> context -> profile -> governance`).
+- `instructions/core/quest-governance.md` — обязательный `SPEC -> EXEC` gate для инженерных изменений.
 
-## Быстрый старт
+## Repository Structure
 
-1. Подключить каталог в репозиторий-потребитель.
-2. Создать локальный `AGENTS.md` на основе шаблона из `instructions/onboarding/AGENTS.consumer.template.md`.
-3. При необходимости создать `AGENTS.override.md`.
-4. Проверить валидность ссылок и структуры:
+- `instructions/core/` — базовые правила взаимодействия, тестирования и QUEST-режима.
+- `instructions/contexts/` — контексты выполнения (debug, testing, performance, visual feedback).
+- `instructions/profiles/` — технологические и типовые профили изменений.
+- `instructions/governance/` — контракт документов, маршрутизация, версионирование и commit policy.
+- `instructions/onboarding/` — шаблоны и quick start для подключения в репозитории-потребители.
+- `specs/_template.md` — канонический шаблон спецификации.
+- `scripts/` — валидатор структуры/ссылок и тест валидатора.
+
+## How Routing Works
+
+1. Прочитать `AGENTS.md`.
+2. Открыть `instructions/governance/routing-matrix.md`.
+3. Определить тип задачи и собрать instruction stack.
+4. Для `SPEC`-фазы применять `spec-linter` и `spec-rubric`.
+
+## Using In Another Repository
+
+1. Склонировать каталог рядом с проектом:
+
+```bash
+git clone https://github.com/<owner>/<repo>.git .agents-catalog
+```
+
+2. Указать путь к каталогу:
+
+```powershell
+$env:AGENTS_ROOT = "C:\path\to\agents-catalog"
+```
+
+3. В репозитории-потребителе создать:
+- `AGENTS.md` по шаблону `instructions/onboarding/AGENTS.consumer.template.md`.
+- `AGENTS.override.md` при необходимости локальных ужесточений MUST.
+
+4. Проверить, что локальный `AGENTS.md` ссылается на `<AGENTS_ROOT>\AGENTS.md`, без дублирования правил.
+
+## Quality Gate
+
+Перед завершением изменений запускать:
 
 ```powershell
 pwsh -File scripts/validate-instructions.ps1
 pwsh -File scripts/test-validate-instructions.ps1
 ```
 
-## Как использовать в другом репозитории
+Политики:
 
-### 1) Склонируйте этот каталог рядом с проектом
+- `instructions/governance/versioning-policy.md`
+- `instructions/governance/document-contract.md`
+- `CHANGELOG.md`
 
-```bash
-git clone https://github.com/<owner>/<repo>.git .agents-catalog
-```
+## CI
 
-### 2) Укажите путь в локальном `AGENTS.md`
+В репозитории добавлен workflow:
 
-```powershell
-# Пример для локального AGENTS.md
-$env:AGENTS_ROOT = "C:\path\to\agents-catalog"
-```
+- `.github/workflows/validate-instructions.yml`
 
-В шаблоне `AGENTS` укажите ссылку на `<AGENTS_ROOT>\AGENTS.md`.
-
-### 3) Проверьте подключение
-
-- Убедитесь, что локальный `AGENTS.md` содержит только ссылку на центральный каталог.
-- Если нужны локальные доп. требования, добавьте их в `AGENTS.override.md` (только ужесточение MUST).
-
-## Quality Gate
-
-- Все правки в `instructions/` должны проходить проверки:
-  - `scripts/validate-instructions.ps1`
-  - `scripts/test-validate-instructions.ps1`
-- Версионирование изменений валидационно описано в `instructions/governance/versioning-policy.md`.
-- Обновления фиксируйте в `CHANGELOG.md`.
-
-## GitHub публикация
-
-Для публичного репозитория рекомендуется включить GitHub Actions workflow, который запускает оба скрипта проверки на `push`/`pull_request` (в репозитории добавлен стандартный workflow `validate-instructions.yml`).
+Он запускает валидацию на `push` и `pull_request`.
