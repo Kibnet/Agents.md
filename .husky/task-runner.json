@@ -1,0 +1,25 @@
+{
+   "tasks": [
+      {
+         "name": "Validate instruction catalog",
+         "command": "pwsh",
+         "args": [ "-NoProfile", "-File", "scripts/validate-instructions.ps1" ],
+         "include": [
+            "AGENTS.md",
+            "CHANGELOG.md",
+            "instructions/**/*.md",
+            "scripts/validate-instructions.ps1",
+            "scripts/test-validate-instructions.ps1"
+         ]
+      },
+      {
+         "name": "Test instruction validator",
+         "command": "pwsh",
+         "args": [ "-NoProfile", "-File", "scripts/test-validate-instructions.ps1" ],
+         "include": [
+            "scripts/validate-instructions.ps1",
+            "scripts/test-validate-instructions.ps1"
+         ]
+      }
+   ]
+}
