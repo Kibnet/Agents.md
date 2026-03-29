@@ -58,10 +58,16 @@ $requiredPaths = @(
     "instructions/onboarding/AGENTS.override.template.md",
     "instructions/profiles/domain-logic-extraction.md",
     "instructions/profiles/product-system-design.md",
+    "instructions/profiles/business-process-automation.md",
     "instructions/profiles/refactor-architecture.md",
     "instructions/profiles/refactor-mechanical.md",
     "instructions/profiles/rendering-pipeline.md",
     "instructions/profiles/ui-feature-parity.md",
+    "prompts/business-process-automation/01-expert-interview-simulation.md",
+    "prompts/business-process-automation/02-as-is-process-modeling.md",
+    "prompts/business-process-automation/03-automation-opportunities-analysis.md",
+    "prompts/business-process-automation/04-to-be-process-design.md",
+    "prompts/business-process-automation/05-ai-agent-skill-graph.md",
     "scripts/validate-instructions.ps1",
     "scripts/test-validate-instructions.ps1"
 )

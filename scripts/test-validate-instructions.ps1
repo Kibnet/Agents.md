@@ -45,6 +45,8 @@ try {
     $seedPaths = @(
         "AGENTS.md",
         "CHANGELOG.md",
+        "README.md",
+        "prompts",
         "specs",
         "instructions",
         "scripts"

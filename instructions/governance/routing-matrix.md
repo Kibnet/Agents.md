@@ -19,6 +19,7 @@
 - Использовать не более двух profile-документов одновременно:
   - один профиль стека приложения;
   - один профиль типа изменений (если нужен).
+- Для аналитических задач без выраженного технологического стека допускается использовать один профиль сценария без `stack profile`, если результатом являются process artifacts, а не код.
 - При конфликте между profile-документами приоритет у более специфичного MUST для текущей задачи.
 
 ## SHOULD
@@ -46,8 +47,8 @@ Get-ChildItem instructions/profiles
    - `catalog-governance`, `consumer-onboarding`, `delivery-task`.
 2. Подключить базовый набор (`core`) по типу задачи.
 3. Выбрать один `context` по типу выполнения.
-4. Выбрать один профиль технологического стека (`stack profile`).
-5. При необходимости добавить один профиль типа изменения (`overlay profile`).
+4. Выбрать один профиль технологического стека (`stack profile`), если задача привязана к реализации в конкретном стеке.
+5. При необходимости добавить один профиль типа изменения (`overlay profile`) или использовать один профиль сценария для аналитической задачи без стековой привязки.
 6. Добавить governance overlays по триггерам задачи.
 
 ## Базовый набор по типу задачи
@@ -86,6 +87,7 @@ Get-ChildItem instructions/profiles
 | UI feature parity | `ui-feature-parity` |
 | Rendering / preview pipeline | `rendering-pipeline` |
 | Проектирование подсистемы | `product-system-design` |
+| Анализ и автоматизация бизнес-процесса | `business-process-automation` |
 | Вынос доменной логики | `domain-logic-extraction` |
 | Архитектурный рефакторинг | `refactor-architecture` |
 | Механический рефакторинг | `refactor-mechanical` |
@@ -108,6 +110,7 @@ Get-ChildItem instructions/profiles
 | RavenDB изменение индекса | `quest-governance + collaboration-baseline + testing-baseline + testing-dotnet + dotnet-ravendb` |
 | UI parity между desktop и web | `quest-governance + collaboration-baseline + testing-baseline + (testing-dotnet/testing-frontend) + stack profile + ui-feature-parity` |
 | Производительность render-пайплайна | `quest-governance + collaboration-baseline + testing-baseline + performance-optimization + stack profile + rendering-pipeline` |
+| Проектирование автоматизации бизнес-процесса | `quest-governance + collaboration-baseline + business-process-automation` |
 
 ## Связанные документы
 
@@ -116,3 +119,4 @@ Get-ChildItem instructions/profiles
 - [instructions/governance/versioning-policy.md](./versioning-policy.md)
 - [instructions/core/quest-mode.md](../core/quest-mode.md)
 - [instructions/core/quest-governance.md](../core/quest-governance.md)
+- [instructions/profiles/business-process-automation.md](../profiles/business-process-automation.md)
