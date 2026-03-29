@@ -26,7 +26,7 @@
 
 - Выбирать минимальный достаточный набор документов без дублирования.
 - При неоднозначности сначала проверять `document-contract.md`, затем профиль приложения/технологии.
-- Фиксировать выбранный набор документов в спецификации (`specs`) перед реализацией.
+- Фиксировать выбранный набор документов в спецификации (`specs`) перед реализацией, если задача проходит через `SPEC gate`.
 
 ## MAY
 
@@ -44,7 +44,7 @@ Get-ChildItem instructions/profiles
 ## Алгоритм выбора документов
 
 1. Классифицировать задачу:
-   - `catalog-governance`, `consumer-onboarding`, `delivery-task`.
+   - `catalog-governance`, `consumer-onboarding`, `delivery-task`, `guided-artifact-workflow`.
 2. Подключить базовый набор (`core`) по типу задачи.
 3. Выбрать один `context` по типу выполнения.
 4. Выбрать один профиль технологического стека (`stack profile`), если задача привязана к реализации в конкретном стеке.
@@ -58,6 +58,7 @@ Get-ChildItem instructions/profiles
 | `catalog-governance` | `quest-governance`, `collaboration-baseline` |
 | `consumer-onboarding` | `collaboration-baseline` |
 | `delivery-task` | `quest-governance`, `collaboration-baseline`; + `testing-baseline` при изменении поведения |
+| `guided-artifact-workflow` | `collaboration-baseline` |
 
 ## Выбор context по типу выполнения
 
@@ -111,6 +112,7 @@ Get-ChildItem instructions/profiles
 | UI parity между desktop и web | `quest-governance + collaboration-baseline + testing-baseline + (testing-dotnet/testing-frontend) + stack profile + ui-feature-parity` |
 | Производительность render-пайплайна | `quest-governance + collaboration-baseline + testing-baseline + performance-optimization + stack profile + rendering-pipeline` |
 | Проектирование автоматизации бизнес-процесса | `quest-governance + collaboration-baseline + business-process-automation` |
+| Проведение интервью / AS-IS / TO-BE / skill graph по шагам | `collaboration-baseline + business-process-automation` |
 
 ## Связанные документы
 

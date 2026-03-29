@@ -57,6 +57,7 @@ Router[routing-matrix.md]
 Core[core правила]
 Contexts[контекстные правила]
 Profiles[технологические профили]
+Prompts[prompt templates]
 
 RepoA --> Router
 RepoB --> Router
@@ -65,6 +66,7 @@ RepoC --> Router
 Router --> Core
 Router --> Contexts
 Router --> Profiles
+Router --> Prompts
 ```
 
 ---
@@ -90,6 +92,10 @@ instructions/
  │
  └─ onboarding/    # шаблоны подключения
 
+prompts/           # канонические prompt templates для guided workflows
+ └─ business-process-automation/
+                    # интервью -> AS-IS -> точки автоматизации -> TO-BE -> skill graph
+
 scripts/           # валидация инструкций
 specs/             # шаблоны спецификаций
 ```
@@ -103,6 +109,7 @@ specs/             # шаблоны спецификаций
 * `AGENTS.md` — основная точка входа
 * `instructions/governance/routing-matrix.md` — алгоритм маршрутизации инструкций
 * `instructions/core/quest-governance.md` — gate `SPEC → EXEC` для инженерных изменений
+* `instructions/profiles/business-process-automation.md` — сценарный профиль для пошаговой автоматизации бизнес-процессов
 
 ---
 
@@ -118,8 +125,44 @@ core → context → profile → governance
 
 1. Прочитать `AGENTS.md`
 2. Открыть `routing-matrix.md`
-3. Определить тип задачи
+3. Определить тип задачи:
+   * `catalog-governance`
+   * `consumer-onboarding`
+   * `delivery-task`
+   * `guided-artifact-workflow`
 4. Собрать стек инструкций
+
+Важно:
+
+* `SPEC gate` применяется к инженерным изменениям каталога, кода, инфраструктуры и канонических файлов проекта
+* guided workflow с пользовательскими артефактами может идти без `SPEC gate`, если агент не меняет канонические файлы
+* для аналитических задач без выраженного стека можно использовать сценарный профиль без `stack profile`
+
+Примеры:
+
+* инженерная задача по каталогу: `quest-governance + collaboration-baseline + governance overlays`
+* пошаговый анализ бизнес-процесса: `collaboration-baseline + business-process-automation`
+
+---
+
+# Guided Workflows
+
+Каталог поддерживает не только правила для инженерных изменений, но и готовые сценарии пошаговой аналитической работы.
+
+Сейчас в репозитории есть канонический guided workflow:
+
+* `business-process-automation`
+
+Этот сценарий ведёт агента по цепочке:
+
+1. синтетическое интервью с экспертом
+2. моделирование `AS-IS`
+3. анализ точек автоматизации
+4. проектирование `TO-BE`
+5. построение skill graph ИИ-агента
+
+Шаблоны шагов лежат в `prompts/business-process-automation/`.
+Если пользователь просит выдавать артефакты по шагам, агент должен сохранять каждый шаг отдельным файлом и ждать подтверждения перед продолжением.
 
 ---
 
