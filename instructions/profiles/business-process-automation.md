@@ -28,6 +28,10 @@
 - Не проектировать `TO-BE`, пока не зафиксированы `AS-IS` и точки автоматизации.
 - Не строить skill graph напрямую из `AS-IS`, если задача именно про целевого ИИ-агента.
 - Нормализовать роли, системы, артефакты и метрики между шагами, чтобы следующий шаблон использовал тот же словарь сущностей.
+- Для шагов 2, 4 и 5 перед выдачей Mermaid-артефакта обязательно прогонять результат через Mermaid lint/validator.
+- Если Mermaid lint/validator сообщает ошибку синтаксиса или рендеринга, автоматически исправлять диаграмму и повторять проверку до успешного результата.
+- Не считать Mermaid-артефакт готовым, пока Mermaid lint/validator не подтвердил его корректность.
+- Если Mermaid lint/validator недоступен в среде выполнения, считать шаг заблокированным и не выдавать непроверенный Mermaid-артефакт как готовый результат.
 
 ## SHOULD
 
@@ -35,7 +39,7 @@
 - Задавать уточняющие вопросы только если без них нельзя подготовить следующий артефакт приемлемого качества.
 - Явно отделять факты из входных данных от аналитических предположений.
 - Останавливать workflow на том артефакте, который реально нужен пользователю, если полный цикл не требуется.
-- Для Mermaid-артефактов выполнять self-check на валидность синтаксиса перед выдачей результата.
+- Для Mermaid-артефактов предпочитать официальный syntax validation через `mermaid.parse(...)`; если он недоступен, использовать доступный render-check через `@mermaid-js/mermaid-cli` (`mmdc`) или эквивалентный Mermaid validator.
 
 ## MAY
 
@@ -51,6 +55,9 @@ Get-Content -Raw prompts\business-process-automation\02-as-is-process-modeling.m
 Get-Content -Raw prompts\business-process-automation\03-automation-opportunities-analysis.md
 Get-Content -Raw prompts\business-process-automation\04-to-be-process-design.md
 Get-Content -Raw prompts\business-process-automation\05-ai-agent-skill-graph.md
+
+# Пример внешней проверки Mermaid через доступный validator
+npx -p @mermaid-js/mermaid-cli mmdc -i .\artifact.mmd -o .\artifact.svg
 ```
 
 ## Канонический Workflow
@@ -58,10 +65,10 @@ Get-Content -Raw prompts\business-process-automation\05-ai-agent-skill-graph.md
 | Шаг | Когда запускать | Шаблон | Required Input | Output Contract |
 |---|---|---|---|---|
 | 1. Интервью с экспертом | Нет структурированного описания процесса | [01-expert-interview-simulation](../../prompts/business-process-automation/01-expert-interview-simulation.md) | Описание процесса, контекст, ограничения | Markdown-таблица `AS-IS` с фиксированными колонками |
-| 2. Моделирование AS-IS | Есть таблица процесса | [02-as-is-process-modeling](../../prompts/business-process-automation/02-as-is-process-modeling.md) | Таблица шага 1 или эквивалентная таблица | Валидный Mermaid `sequenceDiagram` для текущего процесса |
+| 2. Моделирование AS-IS | Есть таблица процесса | [02-as-is-process-modeling](../../prompts/business-process-automation/02-as-is-process-modeling.md) | Таблица шага 1 или эквивалентная таблица | Валидный Mermaid `sequenceDiagram` для текущего процесса после успешного lint/validation |
 | 3. Анализ точек автоматизации | Есть подтвержденный `AS-IS` | [03-automation-opportunities-analysis](../../prompts/business-process-automation/03-automation-opportunities-analysis.md) | Mermaid `AS-IS` диаграмма | Таблица точек автоматизации и `Quick Wins` |
-| 4. Проектирование TO-BE | Есть `AS-IS` и список точек автоматизации | [04-to-be-process-design](../../prompts/business-process-automation/04-to-be-process-design.md) | Mermaid `AS-IS` + таблица шага 3 | Валидный Mermaid `sequenceDiagram` целевого процесса |
-| 5. Построение skill graph | Есть подтвержденный `TO-BE` | [05-ai-agent-skill-graph](../../prompts/business-process-automation/05-ai-agent-skill-graph.md) | Mermaid `TO-BE` диаграмма | Валидный Mermaid `graph TD` граф навыков |
+| 4. Проектирование TO-BE | Есть `AS-IS` и список точек автоматизации | [04-to-be-process-design](../../prompts/business-process-automation/04-to-be-process-design.md) | Mermaid `AS-IS` + таблица шага 3 | Валидный Mermaid `sequenceDiagram` целевого процесса после успешного lint/validation |
+| 5. Построение skill graph | Есть подтвержденный `TO-BE` | [05-ai-agent-skill-graph](../../prompts/business-process-automation/05-ai-agent-skill-graph.md) | Mermaid `TO-BE` диаграмма | Валидный Mermaid `graph TD` граф навыков после успешного lint/validation |
 
 ## Правила переходов между шагами
 
@@ -69,6 +76,7 @@ Get-Content -Raw prompts\business-process-automation\05-ai-agent-skill-graph.md
 - Если пользователь приносит артефакт извне, агент должен явно признать его входом текущего шага и проверить его пригодность.
 - Каждому следующему шагу передается только тот артефакт, который заявлен в `Output Contract` предыдущего шага.
 - Если задача дошла до `TO-BE`, нельзя подменять его свободным narrative-текстом при построении skill graph; нужен именно формальный целевой артефакт.
+- Если Mermaid-артефакт не проходит lint/validation, агент обязан исправить текущий артефакт и не переходить к следующему шагу, пока проверка не станет успешной.
 
 ## Связанные документы
 

@@ -2,6 +2,20 @@
 
 All notable changes to this instruction catalog are documented in this file.
 
+## [1.1.2] - 2026-03-30
+
+### Changed
+
+- Обновлен [business-process-automation.md](instructions/profiles/business-process-automation.md):
+  - Mermaid-артефакты шагов 2, 4 и 5 теперь обязаны проходить через `Mermaid lint/validator`;
+  - добавлен обязательный цикл автоисправления `lint -> fix -> relint` до успешной проверки;
+  - запрещена выдача Mermaid-артефакта как готового результата, если validator недоступен или проверка не пройдена.
+- Обновлены prompt templates:
+  - [02-as-is-process-modeling.md](prompts/business-process-automation/02-as-is-process-modeling.md);
+  - [04-to-be-process-design.md](prompts/business-process-automation/04-to-be-process-design.md);
+  - [05-ai-agent-skill-graph.md](prompts/business-process-automation/05-ai-agent-skill-graph.md).
+  Для всех Mermaid-генерирующих шагов зафиксирован обязательный внешний lint/validation и повторное автоматическое исправление ошибок до корректной диаграммы.
+
 ## [1.1.1] - 2026-03-29
 
 ### Changed
