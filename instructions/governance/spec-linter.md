@@ -63,4 +63,4 @@
 
 - [instructions/core/quest-governance.md](../core/quest-governance.md)
 - [instructions/governance/spec-rubric.md](./spec-rubric.md)
-- [specs/_template.md](../../specs/_template.md)
+- [templates/specs/_template.md](../../templates/specs/_template.md)

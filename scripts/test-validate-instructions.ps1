@@ -47,6 +47,7 @@ try {
         "CHANGELOG.md",
         "README.md",
         "prompts",
+        "templates",
         "specs",
         "instructions",
         "scripts"
@@ -112,6 +113,32 @@ try {
     }
     finally {
         Set-Content -Path $referenceFile -Value $original -Encoding UTF8
+    }
+
+    # Scenario 6: missing canonical spec template
+    $templateFile = Join-Path $scenarioRoot "templates/specs/_template.md"
+    $original = Get-Content -Path $templateFile -Raw
+    try {
+        Remove-Item -Path $templateFile -Force
+        if (-not (Invoke-Validation -ScenarioName "отсутствует canonical spec template" -ScenarioPath $scenarioRoot -ShouldPass $false)) {
+            $failed = $true
+        }
+    }
+    finally {
+        Set-Content -Path $templateFile -Value $original -Encoding UTF8
+    }
+
+    # Scenario 7: deprecated template path reference in active docs
+    $deprecatedPathFile = Join-Path $scenarioRoot "README.md"
+    $original = Get-Content -Path $deprecatedPathFile -Raw
+    try {
+        Add-Content -Path $deprecatedPathFile -Value "`nСтарый путь template: specs/_template.md" -Encoding UTF8
+        if (-not (Invoke-Validation -ScenarioName "устаревший template path" -ScenarioPath $scenarioRoot -ShouldPass $false)) {
+            $failed = $true
+        }
+    }
+    finally {
+        Set-Content -Path $deprecatedPathFile -Value $original -Encoding UTF8
     }
 }
 finally {

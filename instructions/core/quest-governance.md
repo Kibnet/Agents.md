@@ -13,7 +13,10 @@
 
 ## MUST
 
-- Перед реализацией создать спецификацию в `specs/` по шаблону `specs/_template.md`.
+- Перед реализацией создать рабочую спецификацию в локальном `./specs/` репозитория задачи.
+- Для шаблона спецификации использовать canonical путь `templates/specs/_template.md` из каталога инструкций, откуда был загружен текущий instruction stack.
+- Не использовать локальный template из репозитория задачи как source template.
+- Если canonical template не найден в центральном каталоге, остановиться на фазе `SPEC` и явно указать, что consumer-onboarding настроен неполно.
 - Выбрать профиль из `instructions/profiles/*` и явно зафиксировать его в спецификации.
 - Прогнать самопроверку по `instructions/governance/spec-linter.md`.
 - Оценить спецификацию по `instructions/governance/spec-rubric.md`.
@@ -34,13 +37,13 @@
 ## MAY
 
 - Уточнять шаблон спецификации под проект, если сохраняется обязательная структура.
-- Добавлять проектные шаблоны спецификации в `specs/`, если это снижает риск ошибок.
+- Добавлять project-specific шаблоны спецификации только в центральный каталог `templates/specs/`, если это снижает риск ошибок.
 
 ## Команды
 
 ```powershell
 # Создать новую спецификацию
-Copy-Item specs/_template.md specs/YYYY-MM-DD-short-name.md
+Copy-Item <AGENTS_ROOT>\templates\specs\_template.md .\specs\YYYY-MM-DD-short-name.md
 
 # Проверка качества (ручная по документам)
 Get-Content instructions/governance/spec-linter.md
@@ -55,4 +58,4 @@ Get-Content instructions/governance/review-loops.md
 - [instructions/governance/spec-linter.md](../governance/spec-linter.md)
 - [instructions/governance/spec-rubric.md](../governance/spec-rubric.md)
 - [instructions/governance/review-loops.md](../governance/review-loops.md)
-- [specs/_template.md](../../specs/_template.md)
+- [templates/specs/_template.md](../../templates/specs/_template.md)

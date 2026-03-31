@@ -12,7 +12,10 @@
 
 ## MUST
 
-- Перед любым изменением в каталоге создавать/обновлять специальную спецификацию в `specs/` по `specs/_template.md`.
+- Перед любым изменением создавать/обновлять рабочую спецификацию в локальном `./specs/` репозитория задачи.
+- Для шаблона использовать canonical путь `templates/specs/_template.md` из каталога инструкций, откуда загружены текущие правила.
+- Не использовать локальный template из репозитория задачи как source template.
+- Если canonical template не найден в центральном каталоге, останавливать фазу `SPEC` с явным сообщением о сломанном onboarding-контракте.
 - Выбрать профиль из `instructions/profiles/*` и зафиксировать его в спецификации.
 - До фразы пользователя `Спеку подтверждаю` код не писать и не менять файлы проекта.
 - На фазе SPEC использовать `instructions/governance/spec-linter.md`, `instructions/governance/spec-rubric.md` и `instructions/governance/review-loops.md`.
@@ -35,7 +38,7 @@
 ## Команды
 
 ```powershell
-Get-Content .\specs\_template.md
+Get-Content <AGENTS_ROOT>\templates\specs\_template.md
 Get-Content .\instructions\governance\spec-linter.md
 Get-Content .\instructions\governance\spec-rubric.md
 Get-Content .\instructions\governance\review-loops.md
@@ -44,7 +47,7 @@ Get-Content .\instructions\governance\review-loops.md
 ## Связанные документы
 
 - [instructions/core/quest-governance.md](./quest-governance.md)
-- [specs/_template.md](../../specs/_template.md)
+- [templates/specs/_template.md](../../templates/specs/_template.md)
 - [instructions/governance/spec-linter.md](../governance/spec-linter.md)
 - [instructions/governance/spec-rubric.md](../governance/spec-rubric.md)
 - [instructions/governance/review-loops.md](../governance/review-loops.md)

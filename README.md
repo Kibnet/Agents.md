@@ -44,6 +44,7 @@
 # Общая архитектура
 
 Проекты **не дублируют инструкции**, а ссылаются на центральный каталог.
+То же правило распространяется на базовый шаблон спеки: canonical `_template.md` живёт в центральном каталоге по отдельному пути `templates/specs/_template.md`, а локальный `specs/` остаётся только каталогом рабочих спецификаций.
 
 ```mermaid
 flowchart TD
@@ -98,7 +99,8 @@ prompts/           # канонические prompt templates для guided wor
                     # интервью -> AS-IS -> точки автоматизации -> TO-BE -> skill graph
 
 scripts/           # валидация инструкций
-specs/             # шаблоны спецификаций
+templates/         # canonical templates
+specs/             # рабочие спецификации
 ```
 
 ---
@@ -188,12 +190,23 @@ git clone https://github.com/Kibnet/Agents.md.git .agents
 ```
 # AGENTS
 
-Основные инструкции для агента находятся здесь:
+Этот репозиторий использует центральный каталог инструкций:
 
-../.agents/AGENTS.md
+- <AGENTS_ROOT>\AGENTS.md
+
+Для QUEST-задач:
+
+- рабочие spec-файлы создаются в локальном `.\specs\`
+- canonical template всегда берётся из `<AGENTS_ROOT>\templates\specs\_template.md`
 ```
 
-Теперь агент будет читать правила из общего каталога.
+Где `<AGENTS_ROOT>` указывает на каталог с централизованными инструкциями, например:
+
+```
+$env:AGENTS_ROOT = "$PWD\.agents"
+```
+
+Теперь агент будет читать правила из общего каталога, а для `QUEST` брать canonical spec template из этого же central root по пути `templates/specs/_template.md`.
 
 ---
 

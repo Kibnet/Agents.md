@@ -15,6 +15,8 @@
 - Указать в нем источник через переменную пути каталога (например, `$env:AGENTS_ROOT\AGENTS.md`).
 - Если нужны проектные уточнения, добавлять только `AGENTS.override.md` (только ужесточение MUST).
 - Проверить, что локальный `AGENTS.md` не дублирует центральные правила.
+- Для `QUEST`-задач сохранять рабочие spec-файлы в локальном `./specs/` репозитория-потребителя.
+- Для `QUEST`-задач всегда использовать central template `$env:AGENTS_ROOT\templates\specs\_template.md`.
 
 ## SHOULD
 
@@ -35,7 +37,8 @@ $env:AGENTS_ROOT = "/path/to/agents-catalog"
 
 # 1) В репозитории-потребителе создать AGENTS.md по шаблону
 # 2) При необходимости создать AGENTS.override.md
-# 3) Проверить, что ссылки на центральный каталог валидны
+# 3) Для QUEST использовать центральный $env:AGENTS_ROOT\templates\specs\_template.md
+# 4) Проверить, что ссылки на центральный каталог валидны
 ```
 
 ## 2) Пример быстрого подключения из внешнего репозитория
@@ -46,6 +49,7 @@ $env:AGENTS_ROOT = "$PWD\.agents-catalog"
 ```
 
 В локальном `AGENTS.md` укажите `<AGENTS_ROOT>\AGENTS.md`.
+Для `QUEST`-workflow агент создаёт итоговую спецификацию в локальном `.\specs\`, а canonical template берёт из `<AGENTS_ROOT>\templates\specs\_template.md`.
 
 ## Связанные документы
 

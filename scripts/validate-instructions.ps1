@@ -31,6 +31,7 @@ Add-Info "Проверка каталога: $resolvedRoot"
 $requiredPaths = @(
     "AGENTS.md",
     "CHANGELOG.md",
+    "templates/specs/_template.md",
     "instructions/core/quest-governance.md",
     "instructions/core/quest-mode.md",
     "instructions/core/quest-prompt-spec.md",
@@ -169,6 +170,29 @@ foreach ($mdFile in $legacyScanFiles) {
         foreach ($hit in $hits) {
             Add-Error "Обнаружена ссылка/упоминание legacy-файла '$legacyName' в $($mdFile.FullName):$($hit.LineNumber)"
         }
+    }
+}
+
+$deprecatedTemplatePathPattern = '(?<!templates/)specs/_template\.md'
+$activeTemplateScanFiles = New-Object System.Collections.Generic.List[System.IO.FileInfo]
+$readmeFile = Join-Path $resolvedRoot "README.md"
+if (Test-Path $readmeFile) {
+    $activeTemplateScanFiles.Add((Get-Item $readmeFile))
+}
+if (Test-Path $agentsIndex) {
+    $activeTemplateScanFiles.Add((Get-Item $agentsIndex))
+}
+if (Test-Path $instructionsRoot) {
+    Get-ChildItem -Path $instructionsRoot -Recurse -File -Filter *.md | ForEach-Object {
+        $activeTemplateScanFiles.Add($_)
+    }
+}
+
+foreach ($mdFile in $activeTemplateScanFiles) {
+    $rawContent = Get-Content -Path $mdFile.FullName -Raw
+    $normalizedContent = $rawContent -replace '\\', '/'
+    if ([regex]::IsMatch($normalizedContent, $deprecatedTemplatePathPattern)) {
+        Add-Error "Обнаружена активная ссылка на устаревший template path 'specs/_template.md' в $($mdFile.FullName)"
     }
 }
 

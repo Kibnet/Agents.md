@@ -2,6 +2,28 @@
 
 All notable changes to this instruction catalog are documented in this file.
 
+## [1.2.2] - 2026-04-01
+
+### Changed
+
+- Canonical template спецификации перенесён из `specs/_template.md` в `templates/specs/_template.md`, чтобы развести namespace рабочих spec-файлов и source template.
+- Обновлены [quest-governance.md](instructions/core/quest-governance.md), [quest-mode.md](instructions/core/quest-mode.md), [quest-prompt-spec.md](instructions/core/quest-prompt-spec.md), onboarding-документы и [README.md](README.md):
+  - `specs/` теперь означает только каталог рабочих спецификаций;
+  - для `QUEST` template всегда берётся из central `templates/specs/_template.md`;
+  - local override `./specs/_template.md` больше не является частью контракта.
+- Обновлены validator и его тесты:
+  - canonical template path теперь обязателен;
+  - active references на старый путь `specs/_template.md` в `AGENTS.md`, `README.md` и `instructions/*` считаются ошибкой.
+
+## [1.2.1] - 2026-03-31
+
+### Changed
+
+- Уточнен cross-repo contract резолва spec template для consumer-репозиториев:
+  - в [quest-governance.md](instructions/core/quest-governance.md), [quest-mode.md](instructions/core/quest-mode.md) и [quest-prompt-spec.md](instructions/core/quest-prompt-spec.md) теперь явно разделены локальный путь сохранения рабочей спеки и источник шаблона;
+  - в [quick-start.md](instructions/onboarding/quick-start.md) и [AGENTS.consumer.template.md](instructions/onboarding/AGENTS.consumer.template.md) добавлен canonical fallback с локального `./specs/_template.md` на центральный `<AGENTS_ROOT>/specs/_template.md`;
+  - [README.md](README.md) синхронизирован с onboarding-контрактом, чтобы агент не ожидал обязательный локальный `_template.md` в consumer-репозитории.
+
 ## [1.2.0] - 2026-03-31
 
 ### Added
@@ -21,7 +43,7 @@ All notable changes to this instruction catalog are documented in this file.
   - `exec`-prompt теперь требует цикл `implement -> test -> review -> fix/retest`;
   - исправлена ссылка на секцию результатов quality gate в шаблоне спеки: с `15` на `19`;
   - финальный `EXEC`-отчёт теперь включает блок `Review`.
-- Обновлены [routing-matrix.md](instructions/governance/routing-matrix.md), [specs/_template.md](specs/_template.md), [README.md](README.md) и [scripts/validate-instructions.ps1](scripts/validate-instructions.ps1):
+- Обновлены [routing-matrix.md](instructions/governance/routing-matrix.md), template спеки, [README.md](README.md) и [scripts/validate-instructions.ps1](scripts/validate-instructions.ps1):
   - новый governance overlay подключён в маршрутизации `QUEST`;
   - шаблон спеки теперь явно фиксирует `Post-SPEC Review`;
   - validator считает `review-loops.md` обязательным документом каталога;

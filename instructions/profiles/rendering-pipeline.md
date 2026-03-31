@@ -39,5 +39,4 @@ npm run test
 - [instructions/contexts/performance-optimization.md](../contexts/performance-optimization.md)
 - [instructions/governance/spec-linter.md](../governance/spec-linter.md)
 - [instructions/governance/spec-rubric.md](../governance/spec-rubric.md)
-- [specs/_template.md](../../specs/_template.md)
-
+- [templates/specs/_template.md](../../templates/specs/_template.md)

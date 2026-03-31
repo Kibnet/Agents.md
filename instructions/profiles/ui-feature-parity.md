@@ -41,5 +41,4 @@ dotnet test --filter "FullyQualifiedName~UITests"
 - [instructions/contexts/testing-frontend.md](../contexts/testing-frontend.md)
 - [instructions/governance/spec-linter.md](../governance/spec-linter.md)
 - [instructions/governance/spec-rubric.md](../governance/spec-rubric.md)
-- [specs/_template.md](../../specs/_template.md)
-
+- [templates/specs/_template.md](../../templates/specs/_template.md)

@@ -38,5 +38,4 @@ npm test
 - [instructions/core/quest-governance.md](../core/quest-governance.md)
 - [instructions/governance/spec-linter.md](../governance/spec-linter.md)
 - [instructions/governance/spec-rubric.md](../governance/spec-rubric.md)
-- [specs/_template.md](../../specs/_template.md)
-
+- [templates/specs/_template.md](../../templates/specs/_template.md)

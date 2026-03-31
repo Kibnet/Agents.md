@@ -62,4 +62,4 @@
 
 - [instructions/core/quest-governance.md](../core/quest-governance.md)
 - [instructions/governance/spec-linter.md](./spec-linter.md)
-- [specs/_template.md](../../specs/_template.md)
+- [templates/specs/_template.md](../../templates/specs/_template.md)
