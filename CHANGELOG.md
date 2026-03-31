@@ -2,6 +2,31 @@
 
 All notable changes to this instruction catalog are documented in this file.
 
+## [1.2.0] - 2026-03-31
+
+### Added
+
+- Добавлен новый governance-документ [review-loops.md](instructions/governance/review-loops.md):
+  - обязателен `post-SPEC review` до запроса подтверждения спеки;
+  - обязателен `post-EXEC review` до финального отчёта;
+  - зафиксировано правило выбора: агент сам принимает uniquely best option и спрашивает человека только при реальной неоднозначности.
+
+### Changed
+
+- Обновлены [quest-mode.md](instructions/core/quest-mode.md) и [quest-governance.md](instructions/core/quest-governance.md):
+  - post-review loops стали обязательной частью `QUEST` workflow;
+  - после review агент обязан автоматически вносить объективно лучшие правки и повторять затронутые проверки.
+- Обновлены prompt templates [quest-prompt-spec.md](instructions/core/quest-prompt-spec.md) и [quest-prompt-exec.md](instructions/core/quest-prompt-exec.md):
+  - `spec`-prompt теперь требует цикл `draft -> lint/rubric -> review -> refine`;
+  - `exec`-prompt теперь требует цикл `implement -> test -> review -> fix/retest`;
+  - исправлена ссылка на секцию результатов quality gate в шаблоне спеки: с `15` на `19`;
+  - финальный `EXEC`-отчёт теперь включает блок `Review`.
+- Обновлены [routing-matrix.md](instructions/governance/routing-matrix.md), [specs/_template.md](specs/_template.md), [README.md](README.md) и [scripts/validate-instructions.ps1](scripts/validate-instructions.ps1):
+  - новый governance overlay подключён в маршрутизации `QUEST`;
+  - шаблон спеки теперь явно фиксирует `Post-SPEC Review`;
+  - validator считает `review-loops.md` обязательным документом каталога;
+  - README синхронизирован с новым каноническим workflow.
+
 ## [1.1.2] - 2026-03-30
 
 ### Changed

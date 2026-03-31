@@ -17,15 +17,19 @@
 - Выбрать профиль из `instructions/profiles/*` и явно зафиксировать его в спецификации.
 - Прогнать самопроверку по `instructions/governance/spec-linter.md`.
 - Оценить спецификацию по `instructions/governance/spec-rubric.md`.
+- Выполнить `post-SPEC review` по `instructions/governance/review-loops.md` и встроить в spec все улучшения, которые не требуют выбора пользователя.
 - Если итог по рубрике < 21, явно пометить автономное выполнение как рискованное и предложить снижение рисков.
 - До утверждения спецификации пользователем не выполнять реализацию.
 - После утверждения реализовывать строго в границах `Non-Goals` и ограничений.
+- После реализации и обязательных проверок выполнить `post-EXEC review`, исправить критичные и высокоуверенные проблемы, повторить затронутые проверки и только затем завершать задачу.
+- Если review приводит к нескольким жизнеспособным вариантам без uniquely best option, явно сравнить варианты и запросить решение у пользователя.
 
 ## SHOULD
 
 - Формулировать одну корневую проблему на одну спецификацию.
 - Фиксировать измеримые критерии приемки и команды проверки.
 - Для значимых изменений декомпозировать реализацию на этапы с явным порядком.
+- Кратко фиксировать результат `post-SPEC review` в секции quality gate спецификации, а результат `post-EXEC review` в итоговом отчёте.
 
 ## MAY
 
@@ -41,6 +45,7 @@ Copy-Item specs/_template.md specs/YYYY-MM-DD-short-name.md
 # Проверка качества (ручная по документам)
 Get-Content instructions/governance/spec-linter.md
 Get-Content instructions/governance/spec-rubric.md
+Get-Content instructions/governance/review-loops.md
 ```
 
 ## Связанные документы
@@ -49,4 +54,5 @@ Get-Content instructions/governance/spec-rubric.md
 - [instructions/core/quest-mode.md](./quest-mode.md)
 - [instructions/governance/spec-linter.md](../governance/spec-linter.md)
 - [instructions/governance/spec-rubric.md](../governance/spec-rubric.md)
+- [instructions/governance/review-loops.md](../governance/review-loops.md)
 - [specs/_template.md](../../specs/_template.md)

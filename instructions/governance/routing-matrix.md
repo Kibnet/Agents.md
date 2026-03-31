@@ -98,7 +98,8 @@ Get-ChildItem instructions/profiles
 | Триггер | Governance |
 |---|---|
 | Изменение правил/структуры `instructions/*` | `document-contract`, `versioning-policy` |
-| QUEST: фаза SPEC | `quest-mode`, `spec-linter`, `spec-rubric` |
+| QUEST: фаза SPEC | `quest-mode`, `spec-linter`, `spec-rubric`, `review-loops` |
+| QUEST: фаза EXEC | `quest-mode`, `review-loops` |
 | Коммиты и changelog | `commit-message-policy`, `versioning-policy` |
 | Подключение каталога в потребительский репозиторий | `onboarding/quick-start`, `onboarding/AGENTS.consumer.template`, `onboarding/AGENTS.override.template` |
 
@@ -121,4 +122,5 @@ Get-ChildItem instructions/profiles
 - [instructions/governance/versioning-policy.md](./versioning-policy.md)
 - [instructions/core/quest-mode.md](../core/quest-mode.md)
 - [instructions/core/quest-governance.md](../core/quest-governance.md)
+- [instructions/governance/review-loops.md](./review-loops.md)
 - [instructions/profiles/business-process-automation.md](../profiles/business-process-automation.md)

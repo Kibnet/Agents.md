@@ -52,6 +52,7 @@ $requiredPaths = @(
     "instructions/governance/versioning-policy.md",
     "instructions/governance/spec-linter.md",
     "instructions/governance/spec-rubric.md",
+    "instructions/governance/review-loops.md",
     "instructions/governance/commit-message-policy.md",
     "instructions/onboarding/quick-start.md",
     "instructions/onboarding/AGENTS.consumer.template.md",

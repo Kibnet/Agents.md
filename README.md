@@ -87,6 +87,7 @@ instructions/
  │
  ├─ governance/    # правила маршрутизации и политики
  │   ├─ routing-matrix.md
+ │   ├─ review-loops.md
  │   ├─ versioning-policy.md
  │   └─ document-contract.md
  │
@@ -109,6 +110,7 @@ specs/             # шаблоны спецификаций
 * `AGENTS.md` — основная точка входа
 * `instructions/governance/routing-matrix.md` — алгоритм маршрутизации инструкций
 * `instructions/core/quest-governance.md` — gate `SPEC → EXEC` для инженерных изменений
+* `instructions/governance/review-loops.md` — обязательные auto-review loops после `SPEC` и `EXEC`
 * `instructions/profiles/business-process-automation.md` — сценарный профиль для пошаговой автоматизации бизнес-процессов
 
 ---
@@ -135,6 +137,9 @@ core → context → profile → governance
 Важно:
 
 * `SPEC gate` применяется к инженерным изменениям каталога, кода, инфраструктуры и канонических файлов проекта
+* внутри `QUEST` после черновика спеки обязателен цикл `draft → lint/rubric → post-review → refine`
+* внутри `QUEST` после исполнения обязателен цикл `implement → test → post-review → fix/retest → report`
+* если review находит uniquely best option, агент обязан выбрать его сам; пользователя спрашивают только при реальной неоднозначности
 * guided workflow с пользовательскими артефактами может идти без `SPEC gate`, если агент не меняет канонические файлы
 * для аналитических задач без выраженного стека можно использовать сценарный профиль без `stack profile`
 
