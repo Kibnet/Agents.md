@@ -8,16 +8,17 @@
 - Маршрутизация по ситуациям: базовые правила, контекст выполнения, проектный профиль.
 - Подключение внешних репозиториев без копирования больших наборов инструкций.
 
-## Порядок приоритета правил
+## Канонические Owner-Документы
 
-При конфликте применяется следующий порядок:
+Точную модель выбора документов и разрешения конфликтов определяет:
 
-1. Более строгий `MUST` имеет приоритет.
-2. [instructions/core/quest-governance.md](instructions/core/quest-governance.md)
-3. `instructions/core/*`
-4. `instructions/contexts/*`
-5. `instructions/profiles/*`
-6. Локальный `AGENTS.override.md` в репозитории-потребителе (только ужесточение, без ослабления MUST).
+- [instructions/governance/routing-matrix.md](instructions/governance/routing-matrix.md)
+
+Дополнительно:
+
+1. Для applicability и quality gate `QUEST` использовать [instructions/core/quest-governance.md](instructions/core/quest-governance.md).
+2. Для фазового поведения `QUEST`, включая допустимые мутации файлов на `SPEC` и `EXEC`, использовать [instructions/core/quest-mode.md](instructions/core/quest-mode.md).
+3. Локальный `AGENTS.override.md` в репозитории-потребителе может только ужесточать центральные MUST.
 
 ## Routing
 
@@ -27,9 +28,9 @@
 
 Короткий порядок работы:
 
-1. Прочитать `AGENTS.md` и определить приоритет правил.
+1. Прочитать `AGENTS.md` как entry point.
 2. Открыть `instructions/governance/routing-matrix.md` и выбрать сценарий.
-3. Подключить `core -> context -> profile -> governance` по алгоритму матрицы.
+3. Собрать instruction stack и разрешать конфликты только по алгоритму матрицы.
 
 ## Подключение в другой репозиторий
 

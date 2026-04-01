@@ -76,7 +76,21 @@ try {
         Set-Content -Path $targetFile -Value $original -Encoding UTF8
     }
 
-    # Scenario 3: broken markdown link
+    # Scenario 3: missing commands section
+    $commandsFile = Join-Path $scenarioRoot "instructions/core/quest-mode.md"
+    $original = Get-Content -Path $commandsFile -Raw
+    try {
+        $modified = $original -replace "## Команды", "## COMMANDS_REMOVED"
+        Set-Content -Path $commandsFile -Value $modified -Encoding UTF8
+        if (-not (Invoke-Validation -ScenarioName "отсутствует секция команды" -ScenarioPath $scenarioRoot -ShouldPass $false)) {
+            $failed = $true
+        }
+    }
+    finally {
+        Set-Content -Path $commandsFile -Value $original -Encoding UTF8
+    }
+
+    # Scenario 4: broken markdown link
     $linkFile = Join-Path $scenarioRoot "instructions/governance/routing-matrix.md"
     $original = Get-Content -Path $linkFile -Raw
     try {
@@ -89,7 +103,7 @@ try {
         Set-Content -Path $linkFile -Value $original -Encoding UTF8
     }
 
-    # Scenario 4: legacy reference
+    # Scenario 5: legacy reference
     $legacyFile = Join-Path $scenarioRoot "instructions/core/testing-baseline.md"
     $original = Get-Content -Path $legacyFile -Raw
     try {
@@ -102,7 +116,7 @@ try {
         Set-Content -Path $legacyFile -Value $original -Encoding UTF8
     }
 
-    # Scenario 5: unresolved reference link
+    # Scenario 6: unresolved reference link
     $referenceFile = Join-Path $scenarioRoot "instructions/governance/versioning-policy.md"
     $original = Get-Content -Path $referenceFile -Raw
     try {
@@ -115,7 +129,7 @@ try {
         Set-Content -Path $referenceFile -Value $original -Encoding UTF8
     }
 
-    # Scenario 6: missing canonical spec template
+    # Scenario 7: missing canonical spec template
     $templateFile = Join-Path $scenarioRoot "templates/specs/_template.md"
     $original = Get-Content -Path $templateFile -Raw
     try {
@@ -128,7 +142,7 @@ try {
         Set-Content -Path $templateFile -Value $original -Encoding UTF8
     }
 
-    # Scenario 7: deprecated template path reference in active docs
+    # Scenario 8: deprecated template path reference in active docs
     $deprecatedPathFile = Join-Path $scenarioRoot "README.md"
     $original = Get-Content -Path $deprecatedPathFile -Raw
     try {

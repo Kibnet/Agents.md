@@ -12,15 +12,16 @@
 ## MUST
 
 - Начинать с `AGENTS.md` как единой точки маршрутизации.
-- Применять приоритет: строгий MUST -> core -> contexts -> profiles -> local override.
+- Использовать этот документ как канонический source of truth для:
+  - порядка сборки central instruction stack;
+  - модели разрешения конфликтов между документами.
 - Для каждой задачи фиксировать минимум один core-документ и при необходимости один context + один profile.
-- Собирать instruction stack в фиксированном порядке:
-  - `base core` -> `task context` -> `stack profile` -> `change profile` (опционально) -> `governance`.
 - Использовать не более двух profile-документов одновременно:
   - один профиль стека приложения;
   - один профиль типа изменений (если нужен).
 - Для аналитических задач без выраженного технологического стека допускается использовать один профиль сценария без `stack profile`, если результатом являются process artifacts, а не код.
-- При конфликте между profile-документами приоритет у более специфичного MUST для текущей задачи.
+- Summary-документы (`AGENTS.md`, `README.md`) считать только точками входа и обзором; они не вводят отдельную conflict model поверх owner-документов.
+- Локальный `AGENTS.override.md` в репозитории-потребителе применять только после central stack и только для ужесточения MUST.
 
 ## SHOULD
 
@@ -41,7 +42,7 @@ Get-ChildItem instructions/contexts
 Get-ChildItem instructions/profiles
 ```
 
-## Алгоритм выбора документов
+## Stack Assembly Order
 
 1. Классифицировать задачу:
    - `catalog-governance`, `consumer-onboarding`, `delivery-task`, `guided-artifact-workflow`.
@@ -50,6 +51,17 @@ Get-ChildItem instructions/profiles
 4. Выбрать один профиль технологического стека (`stack profile`), если задача привязана к реализации в конкретном стеке.
 5. При необходимости добавить один профиль типа изменения (`overlay profile`) или использовать один профиль сценария для аналитической задачи без стековой привязки.
 6. Добавить governance overlays по триггерам задачи.
+7. Если задача выполняется в consumer-репозитории и есть локальный `AGENTS.override.md`, применить его после central stack как дополнительное ужесточение.
+
+## Conflict Resolution Model
+
+1. Если один `MUST` строже другого, приоритет у более строгого `MUST`.
+2. Если строгость сопоставима, приоритет у более специфичного документа для текущего artifact, workflow или технологического стека.
+3. Для маршрутизации, состава stack и governance overlays owner-документом является этот `routing-matrix.md`.
+4. Для фазового поведения `QUEST`, включая допустимые мутации файлов на `SPEC` и `EXEC`, owner-документом является `instructions/core/quest-mode.md`.
+5. Для обязательности `QUEST` и quality gate owner-документом является `instructions/core/quest-governance.md`.
+6. Для структуры документов `instructions/*` owner-документом является `instructions/governance/document-contract.md`.
+7. Локальный `AGENTS.override.md` может только ужесточать центральные правила и не может ослаблять центральный `MUST`.
 
 ## Базовый набор по типу задачи
 

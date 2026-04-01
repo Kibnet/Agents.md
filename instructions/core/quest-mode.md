@@ -17,9 +17,11 @@
 - Не использовать локальный template из репозитория задачи как source template.
 - Если canonical template не найден в центральном каталоге, останавливать фазу `SPEC` с явным сообщением о сломанном onboarding-контракте.
 - Выбрать профиль из `instructions/profiles/*` и зафиксировать его в спецификации.
-- До фразы пользователя `Спеку подтверждаю` код не писать и не менять файлы проекта.
+- На фазе `SPEC` разрешено изменять только текущую рабочую спецификацию в локальном `./specs/`.
+- До фразы пользователя `Спеку подтверждаю` запрещено менять код, инфраструктуру, `instructions/*`, `prompts/*`, `templates/*`, `scripts/*`, `README.md`, `CHANGELOG.md` и другие файлы проекта вне текущей рабочей спецификации.
 - На фазе SPEC использовать `instructions/governance/spec-linter.md`, `instructions/governance/spec-rubric.md` и `instructions/governance/review-loops.md`.
 - Перед запросом подтверждения спецификации выполнять `post-SPEC review`, вносить объективно лучшие правки в spec и повторять затронутые quality gate проверки.
+- Фразу пользователя `Спеку подтверждаю` считать единственным переходом из фазы `SPEC` в фазу `EXEC`.
 - На фазе EXEC реализовывать только в границах `Non-Goals` и ограничений спецификации.
 - Перед финальным отчётом выполнять `post-EXEC review`, исправлять критичные и высокоуверенные проблемы, повторять затронутые проверки и только потом завершать задачу.
 - Если review упирается в несколько жизнеспособных вариантов без единственного оптимального решения, запрашивать решение у пользователя.
@@ -47,6 +49,8 @@ Get-Content .\instructions\governance\review-loops.md
 ## Связанные документы
 
 - [instructions/core/quest-governance.md](./quest-governance.md)
+- [instructions/core/quest-prompt-spec.md](./quest-prompt-spec.md)
+- [instructions/core/quest-prompt-exec.md](./quest-prompt-exec.md)
 - [templates/specs/_template.md](../../templates/specs/_template.md)
 - [instructions/governance/spec-linter.md](../governance/spec-linter.md)
 - [instructions/governance/spec-rubric.md](../governance/spec-rubric.md)

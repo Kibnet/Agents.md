@@ -92,7 +92,6 @@
 - Почему выбранное решение лучше в контексте этой задачи:
 
 ## 19. Результат quality gate и review
-Вставить:
 - чеклист из SPEC-LINTER.md;
 - итог по SPEC-RUBRIC.md;
 - краткий Post-SPEC Review:

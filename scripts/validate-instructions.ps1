@@ -7,18 +7,11 @@ $ErrorActionPreference = "Stop"
 
 $resolvedRoot = (Resolve-Path $RootPath).Path
 $errors = New-Object System.Collections.Generic.List[string]
-$warnings = New-Object System.Collections.Generic.List[string]
 
 function Add-Error {
     param([string]$Message)
     $errors.Add($Message)
     Write-Host "FAIL: $Message" -ForegroundColor Red
-}
-
-function Add-Warning {
-    param([string]$Message)
-    $warnings.Add($Message)
-    Write-Host "WARN: $Message" -ForegroundColor Yellow
 }
 
 function Add-Info {
@@ -105,6 +98,7 @@ else {
         "## MUST",
         "## SHOULD",
         "## MAY",
+        "## Команды",
         "## Связанные документы"
     )
 
@@ -122,10 +116,6 @@ else {
             if ($content -notmatch "(?m)^$escaped\s*$") {
                 Add-Error "В файле $($file.FullName) отсутствует секция '$heading'"
             }
-        }
-
-        if ($content -notmatch "(?m)^## Команды\s*$") {
-            Add-Warning "В файле $($file.FullName) нет секции '## Команды'"
         }
     }
 }
@@ -418,10 +408,6 @@ foreach ($mdFile in $markdownFiles) {
             Add-Error "Ссылка на reference id '$usage' без определения в файле $($mdFile.FullName)"
         }
     }
-}
-
-if ($warnings.Count -gt 0) {
-    Add-Info "Предупреждений: $($warnings.Count)"
 }
 
 if ($errors.Count -gt 0) {

@@ -76,31 +76,25 @@ Router --> Prompts
 
 ```
 instructions/
- ├─ core/          # базовые правила
- │
+ ├─ core/          # базовые правила и QUEST owner-документы
  ├─ contexts/      # контексты выполнения
- │   ├─ debug
- │   ├─ testing
- │   ├─ performance
- │   └─ visual-feedback
- │
- ├─ profiles/      # технологические профили
- │
- ├─ governance/    # правила маршрутизации и политики
- │   ├─ routing-matrix.md
- │   ├─ review-loops.md
- │   ├─ versioning-policy.md
- │   └─ document-contract.md
- │
+ │   ├─ debug-dotnet-mcp-coreclr.md
+ │   ├─ performance-optimization.md
+ │   ├─ testing-dotnet.md
+ │   ├─ testing-frontend.md
+ │   └─ visual-feedback.md
+ ├─ profiles/      # технологические и сценарные профили
+ ├─ governance/    # routing, quality gate и политики каталога
  └─ onboarding/    # шаблоны подключения
 
 prompts/           # канонические prompt templates для guided workflows
  └─ business-process-automation/
-                    # интервью -> AS-IS -> точки автоматизации -> TO-BE -> skill graph
 
 scripts/           # валидация инструкций
-templates/         # canonical templates
-specs/             # рабочие спецификации
+templates/
+ └─ specs/
+    └─ _template.md
+specs/             # рабочие спецификации изменений каталога
 ```
 
 ---
@@ -112,6 +106,7 @@ specs/             # рабочие спецификации
 * `AGENTS.md` — основная точка входа
 * `instructions/governance/routing-matrix.md` — алгоритм маршрутизации инструкций
 * `instructions/core/quest-governance.md` — gate `SPEC → EXEC` для инженерных изменений
+* `instructions/core/quest-mode.md` — owner фазового поведения `QUEST`
 * `instructions/governance/review-loops.md` — обязательные auto-review loops после `SPEC` и `EXEC`
 * `instructions/profiles/business-process-automation.md` — сценарный профиль для пошаговой автоматизации бизнес-процессов
 
@@ -119,13 +114,9 @@ specs/             # рабочие спецификации
 
 # Как работает маршрутизация инструкций
 
-Агент загружает инструкции в следующем порядке:
+Точный алгоритм выбора документов, порядок сборки stack и модель разрешения конфликтов определены только в [instructions/governance/routing-matrix.md](instructions/governance/routing-matrix.md).
 
-```
-core → context → profile → governance
-```
-
-Алгоритм работы:
+Короткий порядок работы:
 
 1. Прочитать `AGENTS.md`
 2. Открыть `routing-matrix.md`
@@ -134,11 +125,16 @@ core → context → profile → governance
    * `consumer-onboarding`
    * `delivery-task`
    * `guided-artifact-workflow`
-4. Собрать стек инструкций
+4. Собрать central stack по `routing-matrix.md`
+5. Если в consumer-репозитории есть `AGENTS.override.md`, применить только его ужесточающие правила
+6. Если задача идёт через `QUEST`, использовать:
+   * [instructions/core/quest-governance.md](instructions/core/quest-governance.md) для applicability и quality gate
+   * [instructions/core/quest-mode.md](instructions/core/quest-mode.md) для фазового поведения `SPEC` и `EXEC`
 
 Важно:
 
 * `SPEC gate` применяется к инженерным изменениям каталога, кода, инфраструктуры и канонических файлов проекта
+* на фазе `SPEC` рабочая spec в локальном `./specs/` может обновляться до подтверждения пользователя; остальные файлы менять нельзя
 * внутри `QUEST` после черновика спеки обязателен цикл `draft → lint/rubric → post-review → refine`
 * внутри `QUEST` после исполнения обязателен цикл `implement → test → post-review → fix/retest → report`
 * если review находит uniquely best option, агент обязан выбрать его сам; пользователя спрашивают только при реальной неоднозначности

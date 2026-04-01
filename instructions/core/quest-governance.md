@@ -18,14 +18,14 @@
 - Не использовать локальный template из репозитория задачи как source template.
 - Если canonical template не найден в центральном каталоге, остановиться на фазе `SPEC` и явно указать, что consumer-onboarding настроен неполно.
 - Выбрать профиль из `instructions/profiles/*` и явно зафиксировать его в спецификации.
+- Считать `instructions/core/quest-mode.md` каноническим owner-документом для фазового поведения `QUEST`, включая допустимые мутации файлов на `SPEC` и `EXEC`.
 - Прогнать самопроверку по `instructions/governance/spec-linter.md`.
 - Оценить спецификацию по `instructions/governance/spec-rubric.md`.
 - Выполнить `post-SPEC review` по `instructions/governance/review-loops.md` и встроить в spec все улучшения, которые не требуют выбора пользователя.
 - Если итог по рубрике < 21, явно пометить автономное выполнение как рискованное и предложить снижение рисков.
 - До утверждения спецификации пользователем не выполнять реализацию.
 - После утверждения реализовывать строго в границах `Non-Goals` и ограничений.
-- После реализации и обязательных проверок выполнить `post-EXEC review`, исправить критичные и высокоуверенные проблемы, повторить затронутые проверки и только затем завершать задачу.
-- Если review приводит к нескольким жизнеспособным вариантам без uniquely best option, явно сравнить варианты и запросить решение у пользователя.
+- После реализации и обязательных проверок применять `post-EXEC review` и правила завершения задачи по `instructions/core/quest-mode.md` и `instructions/governance/review-loops.md`.
 
 ## SHOULD
 
@@ -36,13 +36,13 @@
 
 ## MAY
 
-- Уточнять шаблон спецификации под проект, если сохраняется обязательная структура.
-- Добавлять project-specific шаблоны спецификации только в центральный каталог `templates/specs/`, если это снижает риск ошибок.
+- Использовать `instructions/core/quest-prompt-spec.md` и `instructions/core/quest-prompt-exec.md` как prompt-обёртки поверх этого governance-контракта.
+- Добавлять доменные проверки в spec quality gate, если это повышает воспроизводимость решения.
 
 ## Команды
 
 ```powershell
-# Создать новую спецификацию
+# Создать или обновить рабочую спецификацию
 Copy-Item <AGENTS_ROOT>\templates\specs\_template.md .\specs\YYYY-MM-DD-short-name.md
 
 # Проверка качества (ручная по документам)
@@ -55,6 +55,8 @@ Get-Content instructions/governance/review-loops.md
 
 - [AGENTS.md](../../AGENTS.md)
 - [instructions/core/quest-mode.md](./quest-mode.md)
+- [instructions/core/quest-prompt-spec.md](./quest-prompt-spec.md)
+- [instructions/core/quest-prompt-exec.md](./quest-prompt-exec.md)
 - [instructions/governance/spec-linter.md](../governance/spec-linter.md)
 - [instructions/governance/spec-rubric.md](../governance/spec-rubric.md)
 - [instructions/governance/review-loops.md](../governance/review-loops.md)

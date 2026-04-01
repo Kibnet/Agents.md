@@ -2,6 +2,22 @@
 
 All notable changes to this instruction catalog are documented in this file.
 
+## [1.2.3] - 2026-04-01
+
+### Changed
+
+- Нормализован routing contract:
+  - [routing-matrix.md](instructions/governance/routing-matrix.md) теперь явно разделяет `Stack Assembly Order` и `Conflict Resolution Model`;
+  - [AGENTS.md](AGENTS.md) и [README.md](README.md) сведены к роли summary/entry-point и больше не формулируют конкурирующий точный приоритет правил.
+- Синхронизирован `QUEST` contract:
+  - [quest-mode.md](instructions/core/quest-mode.md) теперь является явным owner-документом фазового поведения `SPEC` и `EXEC`;
+  - на фазе `SPEC` разрешено менять только рабочую spec в локальном `./specs/`, остальные файлы до подтверждения пользователя запрещены;
+  - [quest-governance.md](instructions/core/quest-governance.md), [quest-prompt-spec.md](instructions/core/quest-prompt-spec.md) и [quest-prompt-exec.md](instructions/core/quest-prompt-exec.md) синхронизированы с этим owner-контрактом и больше не дублируют полную фазовую механику.
+- Синхронизирован документный контракт и validator:
+  - [document-contract.md](instructions/governance/document-contract.md) теперь явно требует секцию `## Команды` для всех документов `instructions/*`;
+  - [validate-instructions.ps1](scripts/validate-instructions.ps1) теперь считает отсутствие `## Команды` ошибкой;
+  - [test-validate-instructions.ps1](scripts/test-validate-instructions.ps1) получил regression scenario на отсутствие секции `## Команды`.
+
 ## [1.2.2] - 2026-04-01
 
 ### Changed
