@@ -18,6 +18,7 @@
 - Не использовать локальный template из репозитория задачи как source template.
 - Если canonical template не найден в центральном каталоге, остановиться на фазе `SPEC` и явно указать, что consumer-onboarding настроен неполно.
 - Выбрать профиль из `instructions/profiles/*` и явно зафиксировать его в спецификации.
+- Вести в рабочей спецификации финальный раздел `Журнал действий агента` по canonical template и пополнять его инкрементально после каждого значимого блока работ.
 - Считать `instructions/core/quest-mode.md` каноническим owner-документом для фазового поведения `QUEST`, включая допустимые мутации файлов на `SPEC` и `EXEC`.
 - Прогнать самопроверку по `instructions/governance/spec-linter.md`.
 - Оценить спецификацию по `instructions/governance/spec-rubric.md`.

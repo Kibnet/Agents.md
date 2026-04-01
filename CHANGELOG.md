@@ -2,6 +2,15 @@
 
 All notable changes to this instruction catalog are documented in this file.
 
+## [2.0.0] - 2026-04-01
+
+### Changed
+
+- Расширен canonical `QUEST` spec contract:
+  - [templates/specs/_template.md](templates/specs/_template.md) теперь заканчивается обязательным разделом `Журнал действий агента` с инкрементально заполняемой таблицей;
+  - журнал теперь различает ожидаемую передачу решения человеку и фактическое human-in-the-loop обращение / решение человека;
+  - [quest-governance.md](instructions/core/quest-governance.md) и [quest-mode.md](instructions/core/quest-mode.md) теперь явно требуют вести этот журнал после каждого значимого блока работ на фазах `SPEC` и `EXEC`.
+
 ## [1.2.3] - 2026-04-01
 
 ### Changed
