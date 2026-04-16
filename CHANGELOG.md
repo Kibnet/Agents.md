@@ -2,6 +2,27 @@
 
 All notable changes to this instruction catalog are documented in this file.
 
+## [2.1.0] - 2026-04-16
+
+### Added
+
+- Добавлены cross-cutting owner-документы:
+  - [commenting-policy.md](instructions/governance/commenting-policy.md) для правил полезного комментирования, cleanup комментариев и doc-comments;
+  - [refactoring-policy.md](instructions/governance/refactoring-policy.md) для общего процесса рефакторинга;
+  - [refactor-local.md](instructions/profiles/refactor-local.md) как overlay-профиль локального структурного рефакторинга.
+
+### Changed
+
+- Усилен baseline и routing catalog:
+  - [collaboration-baseline.md](instructions/core/collaboration-baseline.md) теперь явно требует не оставлять ложные комментарии и кратко фиксирует правила самодокументируемого кода, полезных комментариев и локального refactor;
+  - [routing-matrix.md](instructions/governance/routing-matrix.md) теперь маршрутизирует `commenting-policy` и `refactoring-policy`, а также знает новый overlay `refactor-local`.
+- Усилен `QUEST` review/spec contract:
+  - [review-loops.md](instructions/governance/review-loops.md) теперь требует в `post-EXEC review` отдельно проверять устаревшие комментарии, скрытые functional changes под видом refactor и неподтверждённые performance tradeoff;
+  - [templates/specs/_template.md](templates/specs/_template.md) теперь подсказывает фиксировать скрытые зависимости, characterization tests и baseline-замеры там, где это релевантно.
+- Синхронизированы профильные и quality-gate документы:
+  - [refactor-architecture.md](instructions/profiles/refactor-architecture.md) и [refactor-mechanical.md](instructions/profiles/refactor-mechanical.md) теперь явно опираются на общий [refactoring-policy.md](instructions/governance/refactoring-policy.md);
+  - [validate-instructions.ps1](scripts/validate-instructions.ps1) теперь считает новые owner-documents и `refactor-local.md` обязательной частью каталога.
+
 ## [2.0.0] - 2026-04-01
 
 ### Changed

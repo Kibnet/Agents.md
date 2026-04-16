@@ -16,7 +16,7 @@
 - В `post-SPEC review` проверять как минимум: полноту границ, противоречия, пропущенные acceptance criteria, скрытые риски, альтернативы и недоопределённые решения.
 - Если `post-SPEC review` выявил проблему с однозначным исправлением, агент обязан сам обновить спецификацию и повторить затронутые quality gate проверки.
 - После реализации и обязательных проверок выполнять `post-EXEC review` до финального отчёта.
-- В `post-EXEC review` проверять как минимум: отклонения от спеки, регрессии, пропущенные тесты, критичные edge cases, небезопасные допущения и незавершённые follow-up, которые на самом деле нужно исправить сейчас.
+- В `post-EXEC review` проверять как минимум: отклонения от спеки, регрессии, пропущенные тесты, критичные edge cases, небезопасные допущения, устаревшие или ложные комментарии, скрытые функциональные изменения под видом refactor, неподтверждённые performance tradeoff и незавершённые follow-up, которые на самом деле нужно исправить сейчас.
 - Если `post-EXEC review` выявил критичную или высокоуверенную проблему с понятным исправлением, агент обязан исправить её, повторить затронутые проверки и только затем завершать задачу.
 - Если review требует выбора между несколькими жизнеспособными и materially different вариантами, агент обязан:
   - перечислить варианты;
@@ -27,6 +27,7 @@
 ## SHOULD
 
 - Кратко фиксировать результат `post-SPEC review` в самой спецификации.
+- Если задача включала рефакторинг или cleanup комментариев, явно отражать это в `post-EXEC review`.
 - В итоговом отчёте `EXEC` явно отделять исправленные review-находки от остаточных рисков.
 - После значимых правок по результатам review делать ещё один короткий sanity-pass перед завершением.
 
@@ -46,13 +47,15 @@
 ### Post-EXEC Review
 - Статус: PASS / NEEDS-FIX / ASK-HUMAN
 - Что исправлено до завершения:
+- Что проверено дополнительно для refactor / comments:
 - Остаточные риски / follow-ups:
 ```
 
 ## Связанные документы
 
+- [instructions/governance/commenting-policy.md](./commenting-policy.md)
+- [instructions/governance/refactoring-policy.md](./refactoring-policy.md)
 - [instructions/core/quest-mode.md](../core/quest-mode.md)
 - [instructions/core/quest-governance.md](../core/quest-governance.md)
 - [instructions/core/quest-prompt-spec.md](../core/quest-prompt-spec.md)
 - [instructions/core/quest-prompt-exec.md](../core/quest-prompt-exec.md)
-

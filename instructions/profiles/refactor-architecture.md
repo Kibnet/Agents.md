@@ -12,6 +12,7 @@
 
 ## MUST
 
+- Соблюдать общий процесс из `instructions/governance/refactoring-policy.md`.
 - Составить схему зависимостей до и после изменений.
 - Зафиксировать список публичных API и точки миграции.
 - Проверить совместимость и обратную совместимость контрактов.
@@ -36,6 +37,7 @@ dotnet test
 ## Связанные документы
 
 - [instructions/core/quest-governance.md](../core/quest-governance.md)
+- [instructions/governance/refactoring-policy.md](../governance/refactoring-policy.md)
 - [instructions/governance/spec-linter.md](../governance/spec-linter.md)
 - [instructions/governance/spec-rubric.md](../governance/spec-rubric.md)
 - [templates/specs/_template.md](../../templates/specs/_template.md)

@@ -17,11 +17,14 @@
 - Не менять публичный API без явного согласования.
 - Для изменений поведения сопровождать работу автоматическими тестами.
 - При обнаружении ошибки сначала воспроизводить проблему тестом, затем исправлять.
+- Не оставлять после изменений ложные или устаревшие комментарии и docstring.
 
 ## SHOULD
 
 - Предлагать альтернативы, если есть существенные tradeoff.
 - Выполнять минимально-достаточные изменения, избегая лишнего рефакторинга.
+- Сначала делать код максимально самодокументируемым; комментарии использовать только для скрытого контекста: межфайловых связей, инвариантов, side effects, workaround и границ безопасного изменения.
+- Выполнять локальный refactor только если он снижает когнитивную сложность или связанность; не ухудшать понятность ради гипотетической микрооптимизации.
 - Явно отделять факты от предположений в отчете.
 
 ## MAY
@@ -41,4 +44,6 @@ rg -n "MUST|SHOULD|MAY" instructions
 
 - [AGENTS.md](../../AGENTS.md)
 - [instructions/core/testing-baseline.md](./testing-baseline.md)
+- [instructions/governance/commenting-policy.md](../governance/commenting-policy.md)
+- [instructions/governance/refactoring-policy.md](../governance/refactoring-policy.md)
 - [instructions/governance/document-contract.md](../governance/document-contract.md)

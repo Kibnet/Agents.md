@@ -61,7 +61,9 @@ Get-ChildItem instructions/profiles
 4. Для фазового поведения `QUEST`, включая допустимые мутации файлов на `SPEC` и `EXEC`, owner-документом является `instructions/core/quest-mode.md`.
 5. Для обязательности `QUEST` и quality gate owner-документом является `instructions/core/quest-governance.md`.
 6. Для структуры документов `instructions/*` owner-документом является `instructions/governance/document-contract.md`.
-7. Локальный `AGENTS.override.md` может только ужесточать центральные правила и не может ослаблять центральный `MUST`.
+7. Для полезных комментариев и cleanup комментариев owner-документом является `instructions/governance/commenting-policy.md`.
+8. Для общего процесса рефакторинга owner-документом является `instructions/governance/refactoring-policy.md`.
+9. Локальный `AGENTS.override.md` может только ужесточать центральные правила и не может ослаблять центральный `MUST`.
 
 ## Базовый набор по типу задачи
 
@@ -102,6 +104,7 @@ Get-ChildItem instructions/profiles
 | Проектирование подсистемы | `product-system-design` |
 | Анализ и автоматизация бизнес-процесса | `business-process-automation` |
 | Вынос доменной логики | `domain-logic-extraction` |
+| Локальный структурный рефакторинг | `refactor-local` |
 | Архитектурный рефакторинг | `refactor-architecture` |
 | Механический рефакторинг | `refactor-mechanical` |
 
@@ -110,6 +113,8 @@ Get-ChildItem instructions/profiles
 | Триггер | Governance |
 |---|---|
 | Изменение правил/структуры `instructions/*` | `document-contract`, `versioning-policy` |
+| Любой рефакторинг кода | `refactoring-policy` |
+| Целенаправленное массовое комментирование / cleanup комментариев | `commenting-policy` |
 | QUEST: фаза SPEC | `quest-mode`, `spec-linter`, `spec-rubric`, `review-loops` |
 | QUEST: фаза EXEC | `quest-mode`, `review-loops` |
 | Коммиты и changelog | `commit-message-policy`, `versioning-policy` |
@@ -126,13 +131,18 @@ Get-ChildItem instructions/profiles
 | Производительность render-пайплайна | `quest-governance + collaboration-baseline + testing-baseline + performance-optimization + stack profile + rendering-pipeline` |
 | Проектирование автоматизации бизнес-процесса | `quest-governance + collaboration-baseline + business-process-automation` |
 | Проведение интервью / AS-IS / TO-BE / skill graph по шагам | `collaboration-baseline + business-process-automation` |
+| Локальный рефакторинг модуля | `quest-governance + collaboration-baseline + stack profile + refactor-local + refactoring-policy` |
+| Массовое улучшение комментариев в hotspot-участках | `quest-governance + collaboration-baseline + stack profile + commenting-policy` |
 
 ## Связанные документы
 
 - [AGENTS.md](../../AGENTS.md)
+- [instructions/governance/commenting-policy.md](./commenting-policy.md)
 - [instructions/governance/document-contract.md](./document-contract.md)
+- [instructions/governance/refactoring-policy.md](./refactoring-policy.md)
 - [instructions/governance/versioning-policy.md](./versioning-policy.md)
 - [instructions/core/quest-mode.md](../core/quest-mode.md)
 - [instructions/core/quest-governance.md](../core/quest-governance.md)
 - [instructions/governance/review-loops.md](./review-loops.md)
 - [instructions/profiles/business-process-automation.md](../profiles/business-process-automation.md)
+- [instructions/profiles/refactor-local.md](../profiles/refactor-local.md)
