@@ -3,6 +3,7 @@
 ## Когда применять
 
 - Нужно запустить/вести runtime- или test-debug в .NET через VS Code CoreCLR и MCP debug server.
+- Нужно отловить runtime/test exception, снять stack trace и inspect состояния в живой сессии.
 - Нужно работать со stack trace, переменными, breakpoint и пошаговым выполнением.
 - Нужно диагностировать проблемы debug-сессии.
 
@@ -13,6 +14,7 @@
 
 ## MUST
 
+- Для runtime/test-debug и отлова исключений использовать MCP-first workflow; если в среде есть готовый MCP-инструмент вроде `Killer Bug`, начинать с него.
 - Перед сессией проверить health MCP endpoint и корректность launch config.
 - Перед началом новой сессии закрыть stale session (`debug_stop`) и проверить breakpoints.
 - Запускать отладку через `debug_startWithConfig` по явному имени конфигурации.
@@ -21,6 +23,7 @@
 
 ## SHOULD
 
+- Для exception-driven debugging по возможности включать break on first-chance/unhandled exception через доступный MCP workflow.
 - Предпочитать стратегию `continue + breakpoints`, а не line-by-line stepping.
 - Использовать условные breakpoints в горячих циклах.
 - После шага/continue проверять актуальный stack/frame перед интерпретацией состояния.
@@ -33,13 +36,20 @@
 ## Команды
 
 ```powershell
+# Предпочтительный entry point для runtime/test exception capture:
+# MCP workflow / tool вроде Killer Bug, если он доступен в среде
+
 # Pre-flight
 Invoke-WebRequest <MCP_BASE_URL>/health -UseBasicParsing
+
+# TUnit / Microsoft.Testing.Platform discovery
+dotnet run --project <path-to-tests.csproj> -- --list-tests
+dotnet test <path-to-tests.csproj> -- --list-tests
 
 # Сценарий test UID discovery
 dotnet test --project <tests.csproj> --list-tests
 & "<path-to-tests.exe>" --list-tests --diagnostic --diagnostic-output-directory <tmp-dir> --disable-logo --no-progress
-rg -n "DisplayName = <Exact test display name>" <tmp-dir>\*.diag -S
+rg -n "<Exact test display name>|<Exact test UID>" <tmp-dir>\*.diag -S
 
 # MCP operations (через tools)
 debug_listConfigs

@@ -18,7 +18,7 @@
 
 1. Для applicability и quality gate `QUEST` использовать [instructions/core/quest-governance.md](instructions/core/quest-governance.md).
 2. Для фазового поведения `QUEST`, включая допустимые мутации файлов на `SPEC` и `EXEC`, использовать [instructions/core/quest-mode.md](instructions/core/quest-mode.md).
-3. Локальный `AGENTS.override.md` в репозитории-потребителе может только ужесточать центральные MUST.
+3. Локальный `AGENTS.override.md` в репозитории-потребителе применять только после central stack как дополнительные локальные инструкции поверх него; он не заменяет центральный `AGENTS.md` и может только ужесточать центральные MUST.
 
 ## Routing
 
@@ -31,6 +31,7 @@
 1. Прочитать `AGENTS.md` как entry point.
 2. Открыть `instructions/governance/routing-matrix.md` и выбрать сценарий.
 3. Собрать instruction stack и разрешать конфликты только по алгоритму матрицы.
+4. Если в consumer-репозитории есть `AGENTS.override.md`, применить его после central stack как дополнительные локальные инструкции поверх него.
 
 ## Подключение в другой репозиторий
 

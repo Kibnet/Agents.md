@@ -2,6 +2,28 @@
 
 All notable changes to this instruction catalog are documented in this file.
 
+## [2.1.2] - 2026-04-24
+
+### Changed
+
+- Уточнен эксплуатационный routing/onboarding contract:
+  - [AGENTS.md](AGENTS.md), [routing-matrix.md](instructions/governance/routing-matrix.md), [quick-start.md](instructions/onboarding/quick-start.md), [AGENTS.consumer.template.md](instructions/onboarding/AGENTS.consumer.template.md) и [AGENTS.override.template.md](instructions/onboarding/AGENTS.override.template.md) теперь явно формулируют, что локальный `AGENTS.override.md` применяется только после central stack как дополнительные локальные инструкции поверх него, а не заменяет центральные правила.
+- Усилен UI testing contract для UI-поведения:
+  - [ui-automation-testing.md](instructions/profiles/ui-automation-testing.md) теперь применяется к багфиксам и фичам, затрагивающим UI behavior, visual flows и UI-facing state changes при наличии существующего UI test suite, требует обновлять/добавлять релевантное покрытие и запускать релевантные UI tests или явно объяснять, почему запуск невозможен;
+  - [routing-matrix.md](instructions/governance/routing-matrix.md) синхронизирован с этим overlay.
+- Добавлен явный `.NET` workflow для `TUnit`:
+  - [testing-dotnet.md](instructions/contexts/testing-dotnet.md) теперь различает VSTest-совместимые проекты и `TUnit`/`Microsoft.Testing.Platform`, требует для `TUnit` использовать `--treenode-filter` и `--list-tests`, а не VSTest `--filter`, и показывает примеры targeted/full runs.
+- Усилен MCP-first debug contract:
+  - [debug-dotnet-mcp-coreclr.md](instructions/contexts/debug-dotnet-mcp-coreclr.md) теперь явно требует использовать MCP для runtime/test-debug и отлова исключений и приводит `Killer Bug` как пример предпочтительного entry point, если такой инструмент доступен в среде.
+
+## [2.1.1] - 2026-04-17
+
+### Changed
+
+- Уточнен контракт языка комментариев:
+  - [commenting-policy.md](instructions/governance/commenting-policy.md) теперь требует перед массовым комментированием или переписыванием комментариев определить принятый язык комментариев в репозитории и приводит новые/изменяемые комментарии к этой конвенции;
+  - [AGENTS.override.template.md](instructions/onboarding/AGENTS.override.template.md) теперь показывает минимальный пример локального `MUST` для явной фиксации языка комментариев в consumer-репозитории.
+
 ## [2.1.0] - 2026-04-16
 
 ### Added

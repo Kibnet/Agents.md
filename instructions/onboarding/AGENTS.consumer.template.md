@@ -13,6 +13,7 @@
 - Сохранить смысл шаблона: локальный файл должен быть указателем, а не копией центральных правил.
 - Указать путь к центральному `AGENTS.md` через каталог-переменную (например, `<AGENTS_ROOT>\AGENTS.md`).
 - Явно подсказать, что для `QUEST` рабочие spec-файлы создаются локально, а canonical template всегда берётся из `<AGENTS_ROOT>\templates\specs\_template.md`.
+- Явно подсказать, что локальный `AGENTS.override.md` применяется только после central stack как дополнительные локальные инструкции поверх него и не заменяет central `AGENTS.md`.
 
 ## SHOULD
 
@@ -37,8 +38,8 @@
 - canonical template всегда берётся из `<AGENTS_ROOT>\templates\specs\_template.md`
 
 Порядок применения:
-1. Центральный `AGENTS.md`
-2. Локальный `AGENTS.override.md` (только ужесточение MUST)
+1. Центральный `AGENTS.md` -> central stack
+2. Локальный `AGENTS.override.md` -> дополнительные локальные инструкции поверх central stack; только ужесточение MUST
 ```
 
 ## Связанные документы

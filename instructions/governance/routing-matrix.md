@@ -21,7 +21,7 @@
   - один профиль типа изменений (если нужен).
 - Для аналитических задач без выраженного технологического стека допускается использовать один профиль сценария без `stack profile`, если результатом являются process artifacts, а не код.
 - Summary-документы (`AGENTS.md`, `README.md`) считать только точками входа и обзором; они не вводят отдельную conflict model поверх owner-документов.
-- Локальный `AGENTS.override.md` в репозитории-потребителе применять только после central stack и только для ужесточения MUST.
+- Локальный `AGENTS.override.md` в репозитории-потребителе применять только после central stack как дополнительные локальные инструкции поверх него; он не заменяет central stack и может только ужесточать MUST.
 
 ## SHOULD
 
@@ -51,7 +51,7 @@ Get-ChildItem instructions/profiles
 4. Выбрать один профиль технологического стека (`stack profile`), если задача привязана к реализации в конкретном стеке.
 5. При необходимости добавить один профиль типа изменения (`overlay profile`) или использовать один профиль сценария для аналитической задачи без стековой привязки.
 6. Добавить governance overlays по триггерам задачи.
-7. Если задача выполняется в consumer-репозитории и есть локальный `AGENTS.override.md`, применить его после central stack как дополнительное ужесточение.
+7. Если задача выполняется в consumer-репозитории и есть локальный `AGENTS.override.md`, применить его после central stack как дополнительные локальные инструкции поверх него и использовать только для ужесточения central `MUST`.
 
 ## Conflict Resolution Model
 
@@ -63,7 +63,7 @@ Get-ChildItem instructions/profiles
 6. Для структуры документов `instructions/*` owner-документом является `instructions/governance/document-contract.md`.
 7. Для полезных комментариев и cleanup комментариев owner-документом является `instructions/governance/commenting-policy.md`.
 8. Для общего процесса рефакторинга owner-документом является `instructions/governance/refactoring-policy.md`.
-9. Локальный `AGENTS.override.md` может только ужесточать центральные правила и не может ослаблять центральный `MUST`.
+9. Локальный `AGENTS.override.md` не заменяет central stack, может только ужесточать центральные правила и не может ослаблять центральный `MUST`.
 
 ## Базовый набор по типу задачи
 
@@ -80,7 +80,7 @@ Get-ChildItem instructions/profiles
 |---|---|
 | .NET тестирование/валидация | `testing-dotnet` |
 | Frontend тестирование/валидация | `testing-frontend` |
-| .NET runtime/test debug | `debug-dotnet-mcp-coreclr` |
+| .NET runtime/test debug, exception capture, live inspection | `debug-dotnet-mcp-coreclr` |
 | Оптимизация производительности | `performance-optimization` |
 | Визуальная обратная связь (скриншот/видео окна) | `visual-feedback` |
 
@@ -98,7 +98,7 @@ Get-ChildItem instructions/profiles
 
 | Тип изменения | Overlay profile |
 |---|---|
-| UI automation / e2e | `ui-automation-testing` |
+| UI behavior / automation / e2e (если в репозитории есть UI test suite) | `ui-automation-testing` |
 | UI feature parity | `ui-feature-parity` |
 | Rendering / preview pipeline | `rendering-pipeline` |
 | Проектирование подсистемы | `product-system-design` |
@@ -125,7 +125,8 @@ Get-ChildItem instructions/profiles
 | Ситуация | Минимальный стек |
 |---|---|
 | .NET backend фича | `quest-governance + collaboration-baseline + testing-baseline + testing-dotnet + dotnet-backend-api` |
-| Frontend багфикс UI flow | `quest-governance + collaboration-baseline + testing-baseline + testing-frontend + frontend-spa-typescript + ui-automation-testing` |
+| Frontend багфикс UI flow при существующих e2e | `quest-governance + collaboration-baseline + testing-baseline + testing-frontend + frontend-spa-typescript + ui-automation-testing` |
+| .NET desktop багфикс UI flow при существующих headless/UI tests | `quest-governance + collaboration-baseline + testing-baseline + testing-dotnet + dotnet-desktop-client + ui-automation-testing` |
 | RavenDB изменение индекса | `quest-governance + collaboration-baseline + testing-baseline + testing-dotnet + dotnet-ravendb` |
 | UI parity между desktop и web | `quest-governance + collaboration-baseline + testing-baseline + (testing-dotnet/testing-frontend) + stack profile + ui-feature-parity` |
 | Производительность render-пайплайна | `quest-governance + collaboration-baseline + testing-baseline + performance-optimization + stack profile + rendering-pipeline` |
