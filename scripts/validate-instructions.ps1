@@ -25,6 +25,7 @@ $requiredPaths = @(
     "AGENTS.md",
     "CHANGELOG.md",
     "templates/specs/_template.md",
+    "instructions/core/model-behavior-baseline.md",
     "instructions/core/quest-governance.md",
     "instructions/core/quest-mode.md",
     "instructions/core/quest-prompt-spec.md",

@@ -13,6 +13,7 @@
 
 - Вести рабочее общение на русском языке.
 - Поддерживать объяснимость: кратко фиксировать контекст, причины решений и последствия.
+- Соблюдать `instructions/core/model-behavior-baseline.md` для outcome-first формулировок, stop rules и управления verbosity/reasoning, если более специфичный owner-документ не задаёт более строгий инвариант.
 - Сохранять стиль и структуру проекта при изменениях.
 - Не менять публичный API без явного согласования.
 - Для изменений поведения сопровождать работу автоматическими тестами.
@@ -43,6 +44,7 @@ rg -n "MUST|SHOULD|MAY" instructions
 ## Связанные документы
 
 - [AGENTS.md](../../AGENTS.md)
+- [instructions/core/model-behavior-baseline.md](./model-behavior-baseline.md)
 - [instructions/core/testing-baseline.md](./testing-baseline.md)
 - [instructions/governance/commenting-policy.md](../governance/commenting-policy.md)
 - [instructions/governance/refactoring-policy.md](../governance/refactoring-policy.md)

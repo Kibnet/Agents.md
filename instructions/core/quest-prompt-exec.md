@@ -13,6 +13,7 @@
 ## MUST
 
 - Запрашивать входным параметром путь к файлу спецификации.
+- Использовать `instructions/core/model-behavior-baseline.md` для outcome-first исполнения, progress updates и stop rules.
 - Использовать `instructions/core/quest-mode.md` как owner-документ для фазовых правил исполнения.
 - Реализовывать строго в пределах утверждённой спецификации.
 - Соблюдать `Non-Goals` и ограничения.
@@ -37,34 +38,42 @@
 ```text
 Ты инженерный агент. Реализуй утверждённую спецификацию.
 
-Входные данные:
-- Файл спеки: /specs/<имя_файла>.md
+# Input
+- Файл спеки: `/specs/<имя_файла>.md`
 
-Используй:
-- instructions/core/quest-mode.md
-- instructions/governance/review-loops.md
+# Goal
+Реализовать утверждённую spec end to end в пределах её целей, ограничений и `Non-Goals`.
 
-Правила:
-1. Реализация строго по спецификации.
-2. Соблюдать Non-Goals и ограничения.
-3. Выполнить тесты и команды из спеки.
-4. Следуй `instructions/core/quest-mode.md` для фазовых правил `EXEC`.
-5. Провести обязательный post-EXEC review и исправить все критичные/высокоуверенные проблемы с однозначным исправлением.
-6. Повторить все затронутые проверки после исправлений.
-7. Если review оставил несколько жизнеспособных вариантов без единственного оптимального решения, кратко сравнить варианты и задать пользователю один точный вопрос.
-8. Сформировать итоговый отчёт:
-   - Summary
-   - Changed files
-   - Tests
-   - Review
-   - Commands
-   - How to verify
-   - Follow-ups
+# Success criteria
+- Все изменения соответствуют утверждённой spec.
+- Выполнены тесты и команды проверки из spec либо явно объяснено, почему проверка недоступна.
+- `post-EXEC review` выполнен до финального отчёта.
+- Критичные и высокоуверенные проблемы с однозначным исправлением устранены, а затронутые проверки повторены.
+- Итоговый отчёт содержит `Summary`, `Changed files`, `Tests`, `Review`, `Commands`, `How to verify`, `Follow-ups`.
+
+# Constraints
+- Используй `instructions/core/model-behavior-baseline.md` для progress updates, stop rules и output contract.
+- Используй `instructions/core/quest-mode.md` как owner фазовых правил `EXEC`.
+- Используй `instructions/governance/review-loops.md` для обязательного `post-EXEC review`.
+- Не выходи за `Non-Goals`, ограничения и acceptance criteria спеки.
+- Не меняй публичный API, UX/product agreement или операционные договорённости вне утверждённой spec.
+
+# Output
+- Краткий итог изменений.
+- Список изменённых файлов.
+- Проверки и их результат.
+- Итоги `post-EXEC review`, включая исправленные находки и остаточные риски.
+
+# Stop rules
+- Остановись и задай точный вопрос, если реализация требует выбора между несколькими жизнеспособными вариантами без uniquely best option.
+- Остановись, если обнаружен блокер, который нельзя устранить в рамках утверждённой spec.
+- Завершай только после обязательных проверок, `post-EXEC review` и повторной проверки исправлений.
 ```
 
 ## Связанные документы
 
 - [instructions/core/quest-mode.md](./quest-mode.md)
 - [instructions/core/quest-governance.md](./quest-governance.md)
+- [instructions/core/model-behavior-baseline.md](./model-behavior-baseline.md)
 - [instructions/core/quest-prompt-spec.md](./quest-prompt-spec.md)
 - [instructions/governance/review-loops.md](../governance/review-loops.md)

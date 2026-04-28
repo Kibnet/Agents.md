@@ -2,6 +2,24 @@
 
 All notable changes to this instruction catalog are documented in this file.
 
+## [2.2.0] - 2026-04-27
+
+### Added
+
+- Добавлен core owner-документ [model-behavior-baseline.md](instructions/core/model-behavior-baseline.md) для ближайшего использования каталога с `gpt-5.5`:
+  - фиксирует outcome-first contract, критерии успеха, ограничения, output contract и stop rules;
+  - задаёт правила для verbosity/reasoning guidance, progress updates, validation loops, retrieval/tool budgets, current date и `phase` handling.
+
+### Changed
+
+- Синхронизирован central stack под GPT-5.5:
+  - [routing-matrix.md](instructions/governance/routing-matrix.md), [AGENTS.md](AGENTS.md), [README.md](README.md) и [collaboration-baseline.md](instructions/core/collaboration-baseline.md) теперь подключают `model-behavior-baseline` как обязательный core baseline;
+  - [validate-instructions.ps1](scripts/validate-instructions.ps1) считает новый core-документ обязательной частью каталога.
+- Обновлены `QUEST` prompt wrappers и quality gates:
+  - [quest-prompt-spec.md](instructions/core/quest-prompt-spec.md) и [quest-prompt-exec.md](instructions/core/quest-prompt-exec.md) теперь используют структуру `Goal / Success criteria / Constraints / Output / Stop rules`, сохраняя строгие `SPEC`/`EXEC` инварианты;
+  - [templates/specs/_template.md](templates/specs/_template.md) теперь содержит целевую модель, outcome contract, stop rules и правило `Не применимо` для нерелевантных секций;
+  - [review-loops.md](instructions/governance/review-loops.md) теперь проверяет prompt-quality риски GPT-5.5: лишние абсолютные правила, отсутствие output/evidence contract, stop rules и validation evidence.
+
 ## [2.1.2] - 2026-04-24
 
 ### Changed

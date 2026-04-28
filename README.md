@@ -56,6 +56,7 @@ RepoC[Проект C]
 Router[routing-matrix.md]
 
 Core[core правила]
+Model[GPT-5.5 behavior]
 Contexts[контекстные правила]
 Profiles[технологические профили]
 Prompts[prompt templates]
@@ -65,6 +66,7 @@ RepoB --> Router
 RepoC --> Router
 
 Router --> Core
+Core --> Model
 Router --> Contexts
 Router --> Profiles
 Router --> Prompts
@@ -105,6 +107,7 @@ specs/             # рабочие спецификации изменений 
 
 * `AGENTS.md` — основная точка входа
 * `instructions/governance/routing-matrix.md` — алгоритм маршрутизации инструкций
+* `instructions/core/model-behavior-baseline.md` — owner поведения целевой модели `gpt-5.5`: outcome-first, stop rules, verbosity/reasoning guidance
 * `instructions/core/quest-governance.md` — gate `SPEC → EXEC` для инженерных изменений
 * `instructions/core/quest-mode.md` — owner фазового поведения `QUEST`
 * `instructions/governance/review-loops.md` — обязательные auto-review loops после `SPEC` и `EXEC`
@@ -125,7 +128,7 @@ specs/             # рабочие спецификации изменений 
    * `consumer-onboarding`
    * `delivery-task`
    * `guided-artifact-workflow`
-4. Собрать central stack по `routing-matrix.md`
+4. Собрать central stack по `routing-matrix.md`, включая `model-behavior-baseline` как обязательный core baseline для `gpt-5.5`
 5. Если в consumer-репозитории есть `AGENTS.override.md`, применить только его ужесточающие правила
 6. Если задача идёт через `QUEST`, использовать:
    * [instructions/core/quest-governance.md](instructions/core/quest-governance.md) для applicability и quality gate
@@ -134,6 +137,7 @@ specs/             # рабочие спецификации изменений 
 Важно:
 
 * `SPEC gate` применяется к инженерным изменениям каталога, кода, инфраструктуры и канонических файлов проекта
+* `model-behavior-baseline` применяется ко всем сценариям и задаёт GPT-5.5 style: outcome-first цель, критерии успеха, ограничения, output contract и stop rules
 * на фазе `SPEC` рабочая spec в локальном `./specs/` может обновляться до подтверждения пользователя; остальные файлы менять нельзя
 * внутри `QUEST` после черновика спеки обязателен цикл `draft → lint/rubric → post-review → refine`
 * внутри `QUEST` после исполнения обязателен цикл `implement → test → post-review → fix/retest → report`
@@ -143,8 +147,8 @@ specs/             # рабочие спецификации изменений 
 
 Примеры:
 
-* инженерная задача по каталогу: `quest-governance + collaboration-baseline + governance overlays`
-* пошаговый анализ бизнес-процесса: `collaboration-baseline + business-process-automation`
+* инженерная задача по каталогу: `model-behavior-baseline + quest-governance + collaboration-baseline + governance overlays`
+* пошаговый анализ бизнес-процесса: `model-behavior-baseline + collaboration-baseline + business-process-automation`
 
 ---
 

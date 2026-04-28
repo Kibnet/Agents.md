@@ -13,6 +13,7 @@
 ## MUST
 
 - Использовать:
+  - `instructions/core/model-behavior-baseline.md`
   - `instructions/core/quest-governance.md`
   - `instructions/core/quest-mode.md`
   - canonical `templates/specs/_template.md` из каталога текущих инструкций
@@ -42,39 +43,49 @@
 ## Команды
 
 ```text
-Ты инженерный агент. Запусти QUEST MODE.
+Ты инженерный агент. Запусти QUEST MODE для подготовки спецификации.
 
-Используй:
+# Goal
+Создать или обновить рабочую спецификацию в локальном `specs/`, достаточную для безопасного перехода к `EXEC`.
+
+# Success criteria
+- Выбран и кратко обоснован профиль из `instructions/profiles`.
+- Spec создана из canonical `templates/specs/_template.md` каталога текущих инструкций.
+- Spec содержит цель, границы, acceptance criteria, проверочные команды, риски, stop rules и список файлов.
+- SPEC-LINTER, SPEC-RUBRIC и post-SPEC review выполнены, а результаты зафиксированы в секции 19.
+- Если блокирующих вопросов нет, пользователь получает точную фразу подтверждения: "Спеку подтверждаю".
+
+# Constraints
+- Используй outcome-first contract из `instructions/core/model-behavior-baseline.md`.
 - instructions/core/quest-governance.md
 - instructions/core/quest-mode.md
 - canonical /templates/specs/_template.md из каталога текущих инструкций
 - instructions/governance/spec-linter.md
 - instructions/governance/spec-rubric.md
 - instructions/governance/review-loops.md
+- На фазе `SPEC` меняй только текущую рабочую spec; не трогай код, инфраструктуру, `instructions/*`, `prompts/*`, `templates/*`, `scripts/*`, `README.md`, `CHANGELOG.md` и другие файлы проекта.
+- Не используй локальный template репозитория задачи как source template.
+- Задавай уточняющие вопросы только если без ответа нельзя написать проверяемую spec.
+- Если canonical template не найден, остановись и явно укажи, что consumer-onboarding настроен неполно.
 
-Задача:
+# Output
+- Путь созданной/обновлённой spec.
+- Краткое резюме выбранного профиля, quality gate результата и оставшихся blockers.
+- Запрос подтверждения только если spec готова: "Спеку подтверждаю".
+
+# Stop rules
+- Остановись и спроси пользователя, если post-SPEC review оставил несколько жизнеспособных вариантов без uniquely best option.
+- Остановись, если итог SPEC-RUBRIC < 21 и недостающие данные нельзя восстановить из репозитория.
+- Не переходи к `EXEC` до явной фразы пользователя "Спеку подтверждаю".
+
+# User task
 <ОПИСАНИЕ ИДЕИ ПОЛЬЗОВАТЕЛЯ>
-
-Инструкции:
-1. Выбери подходящий профиль из instructions/profiles (кратко обоснуй).
-2. Задай уточняющие вопросы, только если без них нельзя написать хорошую спеку.
-3. Создай или обнови рабочую спецификацию в локальном /specs.
-4. Для source template используй только canonical /templates/specs/_template.md из каталога текущих инструкций.
-5. Следуй `instructions/core/quest-mode.md`: на фазе `SPEC` меняй только текущую рабочую spec и не трогай остальные файлы проекта до пользовательского подтверждения.
-6. Не используй локальный template репозитория задачи как source template.
-7. Если canonical template не найден в центральном каталоге, остановись и явно укажи, что consumer-onboarding настроен неполно.
-8. Прогони SPEC-LINTER и вставь результат в секцию 19.
-9. Оцени спецификацию по SPEC-RUBRIC.md. Укажи итоговый балл и слабые места. Если итог < 21 — явно укажи, что спека НЕ готова к автономному выполнению и запроси необходимые детали, чтобы повысить балл.
-10. Проведи обязательный post-SPEC review: найди пробелы, противоречия, недостающие acceptance criteria, риски и неоптимальные решения. Все исправления с однозначно лучшим вариантом внеси в spec сам.
-11. Если после review спека существенно изменилась, повторно прогони SPEC-LINTER и SPEC-RUBRIC и обнови секцию 19.
-12. Если после review остаётся несколько жизнеспособных вариантов без единственного оптимального решения, кратко сравни варианты и задай пользователю один точный вопрос.
-13. Если к автономному выполнению готово и блокирующих вопросов нет, запроси подтверждение фразой: "Спеку подтверждаю".
-14. До подтверждения пользователя не начинай `EXEC` и не меняй файлы вне рабочей спеки.
 ```
 
 ## Связанные документы
 
 - [instructions/core/quest-governance.md](./quest-governance.md)
 - [instructions/core/quest-mode.md](./quest-mode.md)
+- [instructions/core/model-behavior-baseline.md](./model-behavior-baseline.md)
 - [instructions/core/quest-prompt-exec.md](./quest-prompt-exec.md)
 - [instructions/governance/review-loops.md](../governance/review-loops.md)

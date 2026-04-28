@@ -15,6 +15,7 @@
 - Использовать этот документ как канонический source of truth для:
   - порядка сборки central instruction stack;
   - модели разрешения конфликтов между документами.
+- Для каждой задачи подключать `instructions/core/model-behavior-baseline.md` как обязательный core baseline поведения целевой модели `gpt-5.5`.
 - Для каждой задачи фиксировать минимум один core-документ и при необходимости один context + один profile.
 - Использовать не более двух profile-документов одновременно:
   - один профиль стека приложения;
@@ -46,7 +47,7 @@ Get-ChildItem instructions/profiles
 
 1. Классифицировать задачу:
    - `catalog-governance`, `consumer-onboarding`, `delivery-task`, `guided-artifact-workflow`.
-2. Подключить базовый набор (`core`) по типу задачи.
+2. Подключить `model-behavior-baseline` и базовый набор (`core`) по типу задачи.
 3. Выбрать один `context` по типу выполнения.
 4. Выбрать один профиль технологического стека (`stack profile`), если задача привязана к реализации в конкретном стеке.
 5. При необходимости добавить один профиль типа изменения (`overlay profile`) или использовать один профиль сценария для аналитической задачи без стековой привязки.
@@ -63,16 +64,17 @@ Get-ChildItem instructions/profiles
 6. Для структуры документов `instructions/*` owner-документом является `instructions/governance/document-contract.md`.
 7. Для полезных комментариев и cleanup комментариев owner-документом является `instructions/governance/commenting-policy.md`.
 8. Для общего процесса рефакторинга owner-документом является `instructions/governance/refactoring-policy.md`.
-9. Локальный `AGENTS.override.md` не заменяет central stack, может только ужесточать центральные правила и не может ослаблять центральный `MUST`.
+9. Для model/prompt behavior, outcome-first формулировок, verbosity/reasoning guidance и stop rules owner-документом является `instructions/core/model-behavior-baseline.md`.
+10. Локальный `AGENTS.override.md` не заменяет central stack, может только ужесточать центральные правила и не может ослаблять центральный `MUST`.
 
 ## Базовый набор по типу задачи
 
 | Тип задачи | Обязательные документы |
 |---|---|
-| `catalog-governance` | `quest-governance`, `collaboration-baseline` |
-| `consumer-onboarding` | `collaboration-baseline` |
-| `delivery-task` | `quest-governance`, `collaboration-baseline`; + `testing-baseline` при изменении поведения |
-| `guided-artifact-workflow` | `collaboration-baseline` |
+| `catalog-governance` | `model-behavior-baseline`, `quest-governance`, `collaboration-baseline` |
+| `consumer-onboarding` | `model-behavior-baseline`, `collaboration-baseline` |
+| `delivery-task` | `model-behavior-baseline`, `quest-governance`, `collaboration-baseline`; + `testing-baseline` при изменении поведения |
+| `guided-artifact-workflow` | `model-behavior-baseline`, `collaboration-baseline` |
 
 ## Выбор context по типу выполнения
 
@@ -122,6 +124,8 @@ Get-ChildItem instructions/profiles
 
 ## Быстрые примеры маршрутов
 
+Во всех примерах ниже `model-behavior-baseline` подключается как обязательный core baseline и не повторяется в строках для краткости.
+
 | Ситуация | Минимальный стек |
 |---|---|
 | .NET backend фича | `quest-governance + collaboration-baseline + testing-baseline + testing-dotnet + dotnet-backend-api` |
@@ -138,6 +142,7 @@ Get-ChildItem instructions/profiles
 ## Связанные документы
 
 - [AGENTS.md](../../AGENTS.md)
+- [instructions/core/model-behavior-baseline.md](../core/model-behavior-baseline.md)
 - [instructions/governance/commenting-policy.md](./commenting-policy.md)
 - [instructions/governance/document-contract.md](./document-contract.md)
 - [instructions/governance/refactoring-policy.md](./refactoring-policy.md)
