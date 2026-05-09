@@ -2,6 +2,14 @@
 
 All notable changes to this instruction catalog are documented in this file.
 
+## [2.2.1] - 2026-05-09
+
+### Changed
+
+- Уточнен рабочий communication contract агента:
+  - [model-behavior-baseline.md](instructions/core/model-behavior-baseline.md) теперь требует короткий lead-style preamble перед началом значимой работы, запуском инструментов, мутациями файлов или внешними side effects;
+  - [collaboration-baseline.md](instructions/core/collaboration-baseline.md) теперь явно связывает такие preamble с объяснением намерения, причины действия и ожидаемого результата.
+
 ## [2.2.0] - 2026-04-27
 
 ### Added
