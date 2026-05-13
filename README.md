@@ -43,15 +43,25 @@
 
 # Общая архитектура
 
-Проекты **не дублируют инструкции**, а ссылаются на центральный каталог.
-То же правило распространяется на базовый шаблон спеки: canonical `_template.md` живёт в центральном каталоге по отдельному пути `templates/specs/_template.md`, а локальный `specs/` остаётся только каталогом рабочих спецификаций.
+Основная схема для Codex: один глобальный pointer в `~\.codex\AGENTS.md`
+ссылается на центральный каталог `~\.codex\agents\AGENTS.md`.
+Рабочие репозитории не дублируют инструкции: локально они добавляют только
+`AGENTS.override.md`, если нужны дополнительные строгие правила.
+
+То же правило распространяется на базовый шаблон спеки: canonical `_template.md`
+живёт в центральном каталоге по отдельному пути `templates/specs/_template.md`,
+а локальный `specs/` остаётся только каталогом рабочих спецификаций.
 
 ```mermaid
 flowchart TD
 
+CodexHome[~/.codex/AGENTS.md<br/>global pointer]
+Central[~/.codex/agents/AGENTS.md<br/>central catalog]
+
 RepoA[Проект A]
 RepoB[Проект B]
 RepoC[Проект C]
+Override[AGENTS.override.md<br/>optional local strict rules]
 
 Router[routing-matrix.md]
 
@@ -61,9 +71,14 @@ Contexts[контекстные правила]
 Profiles[технологические профили]
 Prompts[prompt templates]
 
-RepoA --> Router
-RepoB --> Router
-RepoC --> Router
+CodexHome --> Central
+
+RepoA --> CodexHome
+RepoB --> CodexHome
+RepoC --> CodexHome
+RepoA -. optional .-> Override
+
+Central --> Router
 
 Router --> Core
 Core --> Model
@@ -175,17 +190,69 @@ specs/             # рабочие спецификации изменений 
 
 # Быстрый старт
 
-## 1. Склонировать каталог инструкций
+## Основной способ: global pointer в Codex home
 
+Для Codex подключите каталог один раз в `C:\Users\<user>\.codex\`.
+Проверенная схема:
+
+* центральный каталог доступен как `C:\Users\<user>\.codex\agents`
+* `C:\Users\<user>\.codex\AGENTS.md` содержит короткий pointer на центральный `AGENTS.md`
+* в рабочих репозиториях локальный `AGENTS.md` больше не нужен
+* локальный `AGENTS.override.md` применяется только поверх central stack и может только ужесточать `MUST`
+* для `QUEST` рабочие spec-файлы создаются в локальном `.\specs\`, а canonical template берётся из центрального `templates\specs\_template.md`
+
+### 1. Подключить каталог как `~\.codex\agents`
+
+Если репозиторий уже клонирован в удобном месте, создайте junction:
+
+```powershell
+$codexHome = Join-Path $env:USERPROFILE ".codex"
+$agentsRepo = "C:\path\to\Agents.md"
+
+New-Item -ItemType Junction `
+  -Path (Join-Path $codexHome "agents") `
+  -Target $agentsRepo
 ```
-git clone https://github.com/Kibnet/Agents.md.git .agents
+
+Если удобнее хранить каталог прямо в Codex home:
+
+```powershell
+git clone https://github.com/Kibnet/Agents.md.git "$env:USERPROFILE\.codex\agents"
 ```
 
 ---
 
-## 2. Подключить его к проекту
+### 2. Создать глобальный pointer
 
-Создайте в своём репозитории файл `AGENTS.md`:
+Создайте `C:\Users\<user>\.codex\AGENTS.md`:
+
+```
+# AGENTS (global pointer)
+
+Необходимо использовать центральный каталог инструкций:
+
+- `C:\Users\<user>\.codex\agents\AGENTS.md`
+
+Порядок применения:
+1. Центральный `AGENTS.md` -> central stack
+2. Локальный `AGENTS.override.md` -> дополнительные локальные инструкции поверх central stack; только ужесточение MUST
+
+Для QUEST-задач:
+
+- рабочие spec-файлы создаются в локальном `.\specs\` репозитория
+- canonical template берется из `C:\Users\<user>\.codex\agents\templates\specs\_template.md`
+```
+
+### 3. Добавлять только локальные ужесточения
+
+В проектах создавайте `AGENTS.override.md` только если нужны дополнительные
+локальные ограничения, команды или профиль по умолчанию. Central stack остаётся
+источником правил, а override не заменяет центральный `AGENTS.md`.
+
+## Альтернатива: pointer в конкретном репозитории
+
+Для инструментов, которые не читают `~\.codex\AGENTS.md`, можно оставить
+локальный pointer в репозитории-потребителе:
 
 ```
 # AGENTS
@@ -200,13 +267,8 @@ git clone https://github.com/Kibnet/Agents.md.git .agents
 - canonical template всегда берётся из `<AGENTS_ROOT>\templates\specs\_template.md`
 ```
 
-Где `<AGENTS_ROOT>` указывает на каталог с централизованными инструкциями, например:
-
-```
-$env:AGENTS_ROOT = "$PWD\.agents"
-```
-
-Теперь агент будет читать правила из общего каталога, а для `QUEST` брать canonical spec template из этого же central root по пути `templates/specs/_template.md`.
+Где `<AGENTS_ROOT>` указывает на каталог с централизованными инструкциями,
+например `$env:USERPROFILE\.codex\agents`.
 
 ---
 
