@@ -20,6 +20,7 @@
 - Перед началом значимой работы, запуском инструментов, мутациями файлов или внешними side effects давать короткий user-visible preamble: что будет сделано, зачем, какой результат или затронутые артефакты ожидаются. Держать стиль как краткий отчёт тимлиду, без длинного плана и без запроса подтверждения, если отдельный gate его не требует.
 - Для retrieval, tool и validation loops задавать stop rules: продолжать только если не хватает обязательного факта, проверки, evidence, side-effect confirmation или явно запрошенного exhaustive coverage.
 - После изменений запускать наиболее релевантную доступную проверку; если проверку нельзя выполнить, явно указать причину и next-best check.
+- Для задач, которые меняют UI layout, визуальное состояние, навигационный flow, feedback/error/success state или другое UI-facing поведение, на этапе планирования/SPEC фиксировать visual planning artifact до реализации: wireframe, annotated screenshot, storyboard, lightweight render/mockup или другой доступный render, показывающий целевую структуру экрана и ключевые состояния/переходы. Артефакт должен быть доступен reviewer в spec, PR, repo-relative path или приложении; local-only evidence нужно явно помечать. Если артефакт недоступен или непропорционален, явно указать `Не применимо` и дать текстовую fallback-схему layout/states. Copy-only изменения без влияния на layout, flow, state или visual acceptance не требуют visual artifact.
 - Не добавлять current date в центральные инструкции без business-specific причины: timezone, policy-effective date, локальная дата пользователя или другой не-UTC контекст.
 - При проектировании Responses workflows учитывать `phase` preservation, если приложение вручную replayed assistant output items вместо `previous_response_id`.
 
@@ -29,6 +30,7 @@
 - Управлять длиной через `text.verbosity`, word budgets, section limits и output contract; не смешивать краткость финального ответа с глубиной reasoning.
 - Для factual и retrieval задач заранее определять, какие claims требуют evidence, что считается minimum sufficient evidence и когда отсутствие evidence означает неопределённость, а не отрицательный факт.
 - Для tool-heavy workflows держать tool-specific guidance в описаниях инструментов, а в системных инструкциях оставлять только общие policy, side-effect и retry rules.
+- Для visual planning artifact выбирать минимальную достаточную fidelity: ASCII/low-fi wireframe для простых правок, rendered prototype или screenshot/mockup для сложных layout или interaction changes.
 - Для frontend, visual и generated artifact задач рендерить или инспектировать результат доступными инструментами перед завершением.
 - Сохранять стабильные части prompt/context раньше динамических данных, чтобы не ухудшать prompt caching в API-интеграциях.
 

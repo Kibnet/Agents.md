@@ -2,6 +2,16 @@
 
 All notable changes to this instruction catalog are documented in this file.
 
+## [2.4.0] - 2026-05-14
+
+### Changed
+
+- Усилен planning contract для UI-facing визуальных изменений:
+  - [model-behavior-baseline.md](instructions/core/model-behavior-baseline.md) теперь требует на этапе планирования/SPEC фиксировать visual planning artifact для изменений layout, visual state, navigation flow или UI-facing behavior;
+  - [templates/specs/_template.md](templates/specs/_template.md) теперь содержит подсказки для wireframe/render/storyboard/annotated screenshot и visual acceptance;
+  - [review-loops.md](instructions/governance/review-loops.md) теперь проверяет наличие visual artifact или explicit `Не применимо` на post-SPEC review;
+  - [ui-automation-testing.md](instructions/profiles/ui-automation-testing.md) связывает visual planning artifact с e2e/smoke acceptance сценариями.
+
 ## [2.3.0] - 2026-05-14
 
 ### Added

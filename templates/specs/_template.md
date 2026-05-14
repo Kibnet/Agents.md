@@ -46,6 +46,7 @@ Outcome contract:
 - потоки данных
 - контракты / API
 - output contract / evidence rules
+- visual planning artifact для UI-facing изменений: wireframe/render/storyboard/annotated screenshot или `Не применимо` с причиной
 - границы сохранения поведения / допустимые изменения контракта (если применимо)
 - обработка ошибок
 - производительность
@@ -71,6 +72,7 @@ Outcome contract:
 - Acceptance Criteria
 - Какие тесты добавить/изменить
 - Characterization tests / contract checks для текущего поведения (если применимо)
+- Visual acceptance для UI-facing изменений: что должно совпасть с wireframe/render и как это проверить
 - Базовые замеры до/после для performance tradeoff (если применимо)
 - Команды для проверки
 - Stop rules для test/retrieval/tool/validation loops

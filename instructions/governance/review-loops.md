@@ -14,6 +14,7 @@
 
 - После первичного черновика спецификации выполнять `post-SPEC review` до запроса пользовательского подтверждения.
 - В `post-SPEC review` проверять как минимум: полноту границ, противоречия, пропущенные acceptance criteria, скрытые риски, альтернативы, недоопределённые решения, outcome-first contract, output/evidence contract, stop rules и отсутствие лишних абсолютных правил для judgement calls.
+- Для UI-facing задач в `post-SPEC review` проверять, что spec содержит доступный reviewer visual planning artifact (wireframe, render, storyboard, annotated screenshot или эквивалент) либо явное `Не применимо` с причиной и fallback layout/state description.
 - Если `post-SPEC review` выявил проблему с однозначным исправлением, агент обязан сам обновить спецификацию и повторить затронутые quality gate проверки.
 - После реализации и обязательных проверок выполнять `post-EXEC review` до финального отчёта.
 - В `post-EXEC review` проверять как минимум: отклонения от спеки, регрессии, пропущенные тесты, критичные edge cases, небезопасные допущения, устаревшие или ложные комментарии, скрытые функциональные изменения под видом refactor, неподтверждённые performance tradeoff, неподдержанные factual claims, отсутствие нужной validation evidence и незавершённые follow-up, которые на самом деле нужно исправить сейчас.
