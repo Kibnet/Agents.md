@@ -2,6 +2,15 @@
 
 All notable changes to this instruction catalog are documented in this file.
 
+## [2.6.0] - 2026-05-14
+
+### Changed
+
+- Зафиксированы конкретные процедуры и формат вывода обязательных `QUEST` review:
+  - [review-loops.md](instructions/governance/review-loops.md) теперь задаёт severity/status contract, обязательный `Scope reviewed`, actionable findings table, validation evidence, unrelated changes и residual risks для `post-SPEC review` и `post-EXEC review`;
+  - [templates/specs/_template.md](templates/specs/_template.md) теперь содержит готовые блоки `SPEC Linter Result`, `SPEC Rubric Result`, `Post-SPEC Review` и `Post-EXEC Review`;
+  - [quest-prompt-spec.md](instructions/core/quest-prompt-spec.md) и [quest-prompt-exec.md](instructions/core/quest-prompt-exec.md) теперь явно направляют агента к формату review из owner-документа.
+
 ## [2.5.0] - 2026-05-14
 
 ### Changed

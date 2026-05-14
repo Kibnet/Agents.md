@@ -110,12 +110,62 @@ Outcome contract:
 - Почему выбранное решение лучше в контексте этой задачи:
 
 ## 19. Результат quality gate и review
-- чеклист из SPEC-LINTER.md;
-- итог по SPEC-RUBRIC.md;
-- краткий Post-SPEC Review:
-  - Статус: PASS / NEEDS-FIX / ASK-HUMAN
-  - Что исправлено:
-  - Что осталось на решение пользователя:
+### SPEC Linter Result
+
+| Блок | Пункты | Статус | Комментарий |
+|---|---|---|---|
+| A. Полнота спеки | 1-5 | PASS/PARTIAL/FAIL | ... |
+| B. Качество дизайна | 6-10 | PASS/PARTIAL/FAIL | ... |
+| C. Безопасность изменений | 11-13 | PASS/PARTIAL/FAIL | ... |
+| D. Проверяемость | 14-16 | PASS/PARTIAL/FAIL | ... |
+| E. Готовность к автономной реализации | 17-19 | PASS/PARTIAL/FAIL | ... |
+| F. Соответствие профилю | 20 | PASS/PARTIAL/FAIL | ... |
+
+Итог: ГОТОВО / НУЖНА ДОРАБОТКА
+
+### SPEC Rubric Result
+
+| Критерий | Балл (0/2/5) | Обоснование |
+|---|---:|---|
+| 1. Ясность цели и границ | | |
+| 2. Понимание текущего состояния | | |
+| 3. Конкретность целевого дизайна | | |
+| 4. Безопасность (миграция, откат) | | |
+| 5. Тестируемость | | |
+| 6. Готовность к автономной реализации | | |
+
+Итоговый балл: __ / 30
+Зона: рискованно / под контролем / готово к автономному выполнению
+
+### Post-SPEC Review
+- Статус: PASS / NEEDS-FIX / ASK-HUMAN
+- Scope reviewed: spec path, instruction stack, selected profile, open questions, planned changed files
+- Decision: можно запрашивать подтверждение / нужно исправить / нужен выбор пользователя
+
+| Severity | Area | Finding | Required action | Status |
+| --- | --- | --- | --- | --- |
+| BLOCKER/HIGH/MEDIUM/LOW | scope / design / acceptance / risk / evidence / profile / prompt-quality | ... или `Нет находок` | ... | fixed / accepted-risk / ask-human / follow-up |
+
+- Fixed before continuing:
+- Checks rerun:
+- Needs human:
+- Residual risks / follow-ups:
+
+### Post-EXEC Review
+- Статус: PASS / NEEDS-FIX / ASK-HUMAN / Не выполнен до EXEC
+- Scope reviewed: approved spec, `git status --short`, `git diff --stat`, relevant diff, tests/validation evidence, docs/changelog impact
+- Decision: можно завершать / нужно исправить / нужен выбор пользователя / Не применимо до EXEC
+
+| Severity | Area | Finding | Required action | Status |
+| --- | --- | --- | --- | --- |
+| BLOCKER/HIGH/MEDIUM/LOW | spec compliance / regression / tests / docs / comments / unrelated changes / evidence / follow-up | ... или `Нет находок` | ... | fixed / accepted-risk / ask-human / follow-up |
+
+- Fixed before final report:
+- Checks rerun:
+- Validation evidence:
+- Unrelated changes:
+- Needs human:
+- Residual risks / follow-ups:
 
 ## Approval
 Ожидается фраза: "Спеку подтверждаю"

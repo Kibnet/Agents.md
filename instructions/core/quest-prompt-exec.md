@@ -20,6 +20,7 @@
 - Выполнять все команды и проверки, указанные в спецификации.
 - Использовать `instructions/governance/review-loops.md` для обязательного `post-EXEC review`.
 - После реализации и обязательных проверок проводить `post-EXEC review` по правилам `instructions/core/quest-mode.md` и `instructions/governance/review-loops.md`.
+- Фиксировать `post-EXEC review` в формате `instructions/governance/review-loops.md`, включая `Scope reviewed`, findings table, validation evidence, unrelated changes и residual risks.
 - Если `post-EXEC review` приводит к нескольким жизнеспособным вариантам без uniquely best option, задавать пользователю точный вопрос вместо произвольного выбора.
 - Формировать финальный отчёт со структурой: `Summary`, `Changed files`, `Tests`, `Review`, `Commands`, `How to verify`, `Follow-ups`.
 
@@ -27,7 +28,7 @@
 
 - Прозрачно перечислять отклонения от исходного плана, если они возникли в ходе исполнения.
 - Отмечать зависшие проверки/неподтверждённые риски отдельным блоком `Follow-ups`.
-- Кратко указывать, что именно было исправлено по итогам `post-EXEC review`.
+- Кратко указывать, что именно было исправлено по итогам `post-EXEC review`, и отделять это от accepted risks / follow-ups.
 
 ## MAY
 
@@ -49,7 +50,7 @@
 - Выполнены тесты и команды проверки из spec либо явно объяснено, почему проверка недоступна.
 - `post-EXEC review` выполнен до финального отчёта.
 - Критичные и высокоуверенные проблемы с однозначным исправлением устранены, а затронутые проверки повторены.
-- Итоговый отчёт содержит `Summary`, `Changed files`, `Tests`, `Review`, `Commands`, `How to verify`, `Follow-ups`.
+- Итоговый отчёт содержит `Summary`, `Changed files`, `Tests`, `Review`, `Commands`, `How to verify`, `Follow-ups`; блок `Review` использует формат `instructions/governance/review-loops.md`.
 
 # Constraints
 - Используй `instructions/core/model-behavior-baseline.md` для progress updates, stop rules и output contract.
@@ -62,7 +63,7 @@
 - Краткий итог изменений.
 - Список изменённых файлов.
 - Проверки и их результат.
-- Итоги `post-EXEC review`, включая исправленные находки и остаточные риски.
+- Итоги `post-EXEC review`, включая reviewed scope, findings, исправленные находки, validation evidence, unrelated changes и остаточные риски.
 
 # Stop rules
 - Остановись и задай точный вопрос, если реализация требует выбора между несколькими жизнеспособными вариантами без uniquely best option.
