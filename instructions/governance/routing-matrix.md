@@ -65,7 +65,8 @@ Get-ChildItem instructions/profiles
 7. Для полезных комментариев и cleanup комментариев owner-документом является `instructions/governance/commenting-policy.md`.
 8. Для общего процесса рефакторинга owner-документом является `instructions/governance/refactoring-policy.md`.
 9. Для model/prompt behavior, outcome-first формулировок, verbosity/reasoning guidance и stop rules owner-документом является `instructions/core/model-behavior-baseline.md`.
-10. Локальный `AGENTS.override.md` не заменяет central stack, может только ужесточать центральные правила и не может ослаблять центральный `MUST`.
+10. Для GitHub branch naming, pull request и GitHub Release artifacts owner-документом является `instructions/governance/github-delivery-policy.md`.
+11. Локальный `AGENTS.override.md` не заменяет central stack, может только ужесточать центральные правила и не может ослаблять центральный `MUST`.
 
 ## Базовый набор по типу задачи
 
@@ -120,6 +121,7 @@ Get-ChildItem instructions/profiles
 | QUEST: фаза SPEC | `quest-mode`, `spec-linter`, `spec-rubric`, `review-loops` |
 | QUEST: фаза EXEC | `quest-mode`, `review-loops` |
 | Коммиты и changelog | `commit-message-policy`, `versioning-policy` |
+| Ветки, pull request и GitHub Releases | `github-delivery-policy`; для PR title/squash также `commit-message-policy`; для релизов также `versioning-policy` |
 | Подключение каталога в потребительский репозиторий | `onboarding/quick-start`, `onboarding/AGENTS.consumer.template`, `onboarding/AGENTS.override.template` |
 
 ## Быстрые примеры маршрутов
@@ -145,6 +147,7 @@ Get-ChildItem instructions/profiles
 - [instructions/core/model-behavior-baseline.md](../core/model-behavior-baseline.md)
 - [instructions/governance/commenting-policy.md](./commenting-policy.md)
 - [instructions/governance/document-contract.md](./document-contract.md)
+- [instructions/governance/github-delivery-policy.md](./github-delivery-policy.md)
 - [instructions/governance/refactoring-policy.md](./refactoring-policy.md)
 - [instructions/governance/versioning-policy.md](./versioning-policy.md)
 - [instructions/core/quest-mode.md](../core/quest-mode.md)

@@ -51,6 +51,7 @@ $requiredPaths = @(
     "instructions/governance/spec-rubric.md",
     "instructions/governance/review-loops.md",
     "instructions/governance/commit-message-policy.md",
+    "instructions/governance/github-delivery-policy.md",
     "instructions/onboarding/quick-start.md",
     "instructions/onboarding/AGENTS.consumer.template.md",
     "instructions/onboarding/AGENTS.override.template.md",

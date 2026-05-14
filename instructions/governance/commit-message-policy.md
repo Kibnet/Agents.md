@@ -50,5 +50,6 @@ refactor(nac-rabbit): simplify connection retry logic
 ## Связанные документы
 
 - [AGENTS.md](../../AGENTS.md)
+- [instructions/governance/github-delivery-policy.md](./github-delivery-policy.md)
 - [instructions/governance/versioning-policy.md](./versioning-policy.md)
 - [CHANGELOG.md](../../CHANGELOG.md)

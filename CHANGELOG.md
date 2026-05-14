@@ -2,6 +2,22 @@
 
 All notable changes to this instruction catalog are documented in this file.
 
+## [2.3.0] - 2026-05-14
+
+### Added
+
+- Добавлен governance-документ [github-delivery-policy.md](instructions/governance/github-delivery-policy.md) для GitHub delivery workflow:
+  - правила именования веток;
+  - минимальный контракт PR title/body, draft readiness, validation evidence и issue links;
+  - правила GitHub Release tags, release notes и связи с changelog.
+
+### Changed
+
+- Синхронизированы routing и связанные governance-документы:
+  - [routing-matrix.md](instructions/governance/routing-matrix.md) теперь маршрутизирует ветки, pull request и GitHub Releases на новый policy;
+  - [commit-message-policy.md](instructions/governance/commit-message-policy.md) и [versioning-policy.md](instructions/governance/versioning-policy.md) теперь ссылаются на новый delivery policy;
+  - [validate-instructions.ps1](scripts/validate-instructions.ps1) считает новый governance-документ обязательной частью каталога.
+
 ## [2.2.1] - 2026-05-09
 
 ### Changed

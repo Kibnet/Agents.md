@@ -49,3 +49,4 @@ git diff --stat
 - [CHANGELOG.md](../../CHANGELOG.md)
 - [instructions/core/quest-governance.md](../core/quest-governance.md)
 - [instructions/governance/commit-message-policy.md](./commit-message-policy.md)
+- [instructions/governance/github-delivery-policy.md](./github-delivery-policy.md)
