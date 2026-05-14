@@ -47,6 +47,7 @@ Outcome contract:
 - контракты / API
 - output contract / evidence rules
 - visual planning artifact для UI-facing изменений: wireframe/render/storyboard/annotated screenshot или `Не применимо` с причиной
+- UI test video evidence для UI automation задач: `до`/`после` artifacts из автоматизированных UI test runs или `Не применимо` / fallback с причиной
 - границы сохранения поведения / допустимые изменения контракта (если применимо)
 - обработка ошибок
 - производительность
@@ -73,6 +74,7 @@ Outcome contract:
 - Какие тесты добавить/изменить
 - Characterization tests / contract checks для текущего поведения (если применимо)
 - Visual acceptance для UI-facing изменений: что должно совпасть с wireframe/render и как это проверить
+- UI video evidence для UI-facing фич/багфиксов: команды, `до`/`после` artifact paths/links, применимость baseline и fallback evidence
 - Базовые замеры до/после для performance tradeoff (если применимо)
 - Команды для проверки
 - Stop rules для test/retrieval/tool/validation loops

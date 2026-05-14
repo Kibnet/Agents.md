@@ -25,6 +25,7 @@
 - Использовать GitHub closing keywords только когда PR полностью закрывает связанную issue.
 - Открывать PR как draft, если implementation, tests, self-review или обязательный template еще не готовы.
 - Перед переводом PR в ready for review выполнить self-review, указать validation evidence и убрать unrelated changes.
+- Для PR с UI automation изменениями указывать в validation evidence ссылки или пути на `до`/`после` video artifacts из автоматизированных UI test runs либо явный fallback с причиной и next-best evidence.
 - Для breaking changes явно помечать PR и release notes через `BREAKING CHANGE:` или отдельный блок `Breaking`.
 - Публиковать GitHub Release только от SemVer tag формата `vMAJOR.MINOR.PATCH`, если профиль репозитория не задает более строгую схему.
 - Перед публикацией GitHub Release сверять release notes с changelog, merged PR и фактическим diff.
@@ -41,7 +42,7 @@
   - `release/v2-3-0`
 - Делать PR маленькими: одна корневая проблема или один связный outcome на PR.
 - Использовать PR body sections: `Summary`, `Changes`, `Validation`, `Risks / Rollback`, `Links`.
-- Для UI-facing изменений добавлять screenshots/video или явно объяснять, почему визуальное evidence не применимо.
+- Для UI-facing изменений добавлять screenshots/video или явно объяснять, почему визуальное evidence не применимо; если применялся `ui-automation-testing`, video evidence должно быть связано с UI test run.
 - Для production-sensitive изменений добавлять rollout notes, rollback plan и impact.
 - Настраивать GitHub labels так, чтобы они помогали release notes categories: `feature`, `fix`, `docs`, `breaking`, `security`, `dependencies`.
 - Группировать GitHub Release body по блокам: `Highlights`, `Added`, `Changed`, `Fixed`, `Removed`, `Security`, `Breaking`, `Migration`, `Known Issues`.

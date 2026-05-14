@@ -2,6 +2,16 @@
 
 All notable changes to this instruction catalog are documented in this file.
 
+## [2.5.0] - 2026-05-14
+
+### Changed
+
+- Усилен evidence contract для UI-facing фич и багфиксов:
+  - [ui-automation-testing.md](instructions/profiles/ui-automation-testing.md) теперь требует `до`/`после` video evidence из автоматизированных UI test runs, когда есть релевантный UI suite и безопасная запись видео поддерживается;
+  - для багфиксов `до` evidence должно показывать failing/repro run; characterization video допустимо только если deterministic failing assertion невозможен и само видео демонстрирует дефект;
+  - [templates/specs/_template.md](templates/specs/_template.md) теперь подсказывает планировать команды и artifact paths/links для UI video evidence;
+  - [review-loops.md](instructions/governance/review-loops.md) и [github-delivery-policy.md](instructions/governance/github-delivery-policy.md) теперь проверяют и публикуют UI test video evidence или явный fallback с причиной и next-best evidence.
+
 ## [2.4.0] - 2026-05-14
 
 ### Changed
