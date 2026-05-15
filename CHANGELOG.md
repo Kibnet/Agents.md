@@ -2,6 +2,15 @@
 
 All notable changes to this instruction catalog are documented in this file.
 
+## [2.7.0] - 2026-05-15
+
+### Changed
+
+- Усилен обязательный `QUEST` review-loop против поверхностного `PASS`:
+  - [review-loops.md](instructions/governance/review-loops.md) теперь требует full review-loop с `Scope/Evidence pass`, `Contract pass`, `Adversarial risk pass`, `Fix and re-review`, `Stop decision`, no-evidence/no-pass rules, depth checklist и manual-review challenge;
+  - [templates/specs/_template.md](templates/specs/_template.md) теперь содержит audit fields `Review passes`, `Evidence inspected`, `Depth checklist`, `Re-review after fixes` / `Fix and re-review` и `No-findings justification`;
+  - [quest-governance.md](instructions/core/quest-governance.md), [quest-mode.md](instructions/core/quest-mode.md), [quest-prompt-spec.md](instructions/core/quest-prompt-spec.md) и [quest-prompt-exec.md](instructions/core/quest-prompt-exec.md) теперь требуют full review-loop вместо single-pass review summary.
+
 ## [2.6.0] - 2026-05-14
 
 ### Changed

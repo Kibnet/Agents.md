@@ -22,18 +22,18 @@
 - Считать `instructions/core/quest-mode.md` каноническим owner-документом для фазового поведения `QUEST`, включая допустимые мутации файлов на `SPEC` и `EXEC`.
 - Прогнать самопроверку по `instructions/governance/spec-linter.md`.
 - Оценить спецификацию по `instructions/governance/spec-rubric.md`.
-- Выполнить `post-SPEC review` по `instructions/governance/review-loops.md` и встроить в spec все улучшения, которые не требуют выбора пользователя.
+- Выполнить full `post-SPEC review-loop` по `instructions/governance/review-loops.md` и встроить в spec все улучшения, которые не требуют выбора пользователя.
 - Если итог по рубрике < 21, явно пометить автономное выполнение как рискованное и предложить снижение рисков.
 - До утверждения спецификации пользователем не выполнять реализацию.
 - После утверждения реализовывать строго в границах `Non-Goals` и ограничений.
-- После реализации и обязательных проверок применять `post-EXEC review` и правила завершения задачи по `instructions/core/quest-mode.md` и `instructions/governance/review-loops.md`.
+- После реализации и обязательных проверок применять full `post-EXEC review-loop` и правила завершения задачи по `instructions/core/quest-mode.md` и `instructions/governance/review-loops.md`.
 
 ## SHOULD
 
 - Формулировать одну корневую проблему на одну спецификацию.
 - Фиксировать измеримые критерии приемки и команды проверки.
 - Для значимых изменений декомпозировать реализацию на этапы с явным порядком.
-- Кратко фиксировать результат `post-SPEC review` в секции quality gate спецификации, а результат `post-EXEC review` в итоговом отчёте.
+- Кратко фиксировать результат full `post-SPEC review-loop` в секции quality gate спецификации, а результат full `post-EXEC review-loop` в итоговом отчёте.
 
 ## MAY
 

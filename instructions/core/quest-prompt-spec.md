@@ -26,7 +26,9 @@
 - Задать вопросы только если они критичны для качества спеки.
 - Создать или обновить рабочую спецификацию в локальном `specs/`.
 - Прогнать `SPEC-LINTER` и `SPEC-RUBRIC`, зафиксировать результат в `specs`.
-- Выполнить `post-SPEC review` в формате `instructions/governance/review-loops.md`, внести все findings с однозначным исправлением и повторить quality gate, если review существенно изменил spec.
+- Выполнить full `post-SPEC review-loop` в формате `instructions/governance/review-loops.md`, включая `Scope/Evidence pass`, `Contract pass`, `Adversarial risk pass`, `Re-review after fixes` / `Fix and re-review` и `Stop decision`; single-pass review summary недопустим.
+- Перед `PASS` в `post-SPEC review-loop` проверить manual-review challenge: что бы пользовательский отдельный ручной review нашёл после моего `PASS`.
+- Внести все findings с однозначным исправлением и повторить relevant review passes и quality gate, если review существенно изменил spec.
 - Если review оставил несколько жизнеспособных вариантов без uniquely best option, задать пользователю один точный вопрос на выбор решения.
 - До фразы пользователя `Спеку подтверждаю` не начинать `EXEC` и не менять файлы вне текущей рабочей спецификации.
 
@@ -34,7 +36,7 @@
 
 - Закрыть все `Открытые вопросы` до фазы исполнения.
 - Привязать профиль к конкретной задаче и явно зафиксировать в `specs` в секции `Соответствие профилю`.
-- Кратко показать, что именно улучшено на этапе `post-SPEC review`.
+- Кратко показать, что именно улучшено на этапе full `post-SPEC review-loop`.
 
 ## MAY
 
@@ -52,7 +54,7 @@
 - Выбран и кратко обоснован профиль из `instructions/profiles`.
 - Spec создана из canonical `templates/specs/_template.md` каталога текущих инструкций.
 - Spec содержит цель, границы, acceptance criteria, проверочные команды, риски, stop rules и список файлов.
-- SPEC-LINTER, SPEC-RUBRIC и post-SPEC review выполнены, а результаты зафиксированы в секции 19 в формате `instructions/governance/review-loops.md`.
+- SPEC-LINTER, SPEC-RUBRIC и full post-SPEC review-loop выполнены, а результаты зафиксированы в секции 19 в формате `instructions/governance/review-loops.md`.
 - Если блокирующих вопросов нет, пользователь получает точную фразу подтверждения: "Спеку подтверждаю".
 
 # Constraints
@@ -74,7 +76,7 @@
 - Запрос подтверждения только если spec готова: "Спеку подтверждаю".
 
 # Stop rules
-- Остановись и спроси пользователя, если post-SPEC review оставил несколько жизнеспособных вариантов без uniquely best option.
+- Остановись и спроси пользователя, если full post-SPEC review-loop оставил несколько жизнеспособных вариантов без uniquely best option.
 - Остановись, если итог SPEC-RUBRIC < 21 и недостающие данные нельзя восстановить из репозитория.
 - Не переходи к `EXEC` до явной фразы пользователя "Спеку подтверждаю".
 

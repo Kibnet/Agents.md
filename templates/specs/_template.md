@@ -141,6 +141,23 @@ Outcome contract:
 - Статус: PASS / NEEDS-FIX / ASK-HUMAN
 - Scope reviewed: spec path, instruction stack, selected profile, open questions, planned changed files
 - Decision: можно запрашивать подтверждение / нужно исправить / нужен выбор пользователя
+- Review passes:
+  - Scope/Evidence pass:
+  - Contract pass:
+  - Adversarial risk pass:
+  - Re-review after fixes / Fix and re-review:
+  - Stop decision:
+- Evidence inspected:
+- Depth checklist:
+  - Scope drift / unrelated changes:
+  - Acceptance criteria:
+  - Validation evidence:
+  - Unsupported claims:
+  - Regression / edge case:
+  - Comments/docs/changelog:
+  - Hidden contract change:
+  - Manual-review challenge: что бы я нашёл, если пользователь после моего `PASS` попросит отдельное ручное ревью?
+- No-findings justification:
 
 | Severity | Area | Finding | Required action | Status |
 | --- | --- | --- | --- | --- |
@@ -155,6 +172,23 @@ Outcome contract:
 - Статус: PASS / NEEDS-FIX / ASK-HUMAN / Не выполнен до EXEC
 - Scope reviewed: approved spec, `git status --short`, `git diff --stat`, relevant diff, tests/validation evidence, docs/changelog impact
 - Decision: можно завершать / нужно исправить / нужен выбор пользователя / Не применимо до EXEC
+- Review passes:
+  - Scope/Evidence pass:
+  - Contract pass:
+  - Adversarial risk pass:
+  - Re-review after fixes / Fix and re-review:
+  - Stop decision:
+- Evidence inspected:
+- Depth checklist:
+  - Scope drift / unrelated changes:
+  - Acceptance criteria:
+  - Validation evidence:
+  - Unsupported claims:
+  - Regression / edge case:
+  - Comments/docs/changelog:
+  - Hidden contract change:
+  - Manual-review challenge: что бы я нашёл, если пользователь после моего `PASS` попросит отдельное ручное ревью?
+- No-findings justification:
 
 | Severity | Area | Finding | Required action | Status |
 | --- | --- | --- | --- | --- |

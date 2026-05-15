@@ -18,17 +18,18 @@
 - Реализовывать строго в пределах утверждённой спецификации.
 - Соблюдать `Non-Goals` и ограничения.
 - Выполнять все команды и проверки, указанные в спецификации.
-- Использовать `instructions/governance/review-loops.md` для обязательного `post-EXEC review`.
-- После реализации и обязательных проверок проводить `post-EXEC review` по правилам `instructions/core/quest-mode.md` и `instructions/governance/review-loops.md`.
-- Фиксировать `post-EXEC review` в формате `instructions/governance/review-loops.md`, включая `Scope reviewed`, findings table, validation evidence, unrelated changes и residual risks.
-- Если `post-EXEC review` приводит к нескольким жизнеспособным вариантам без uniquely best option, задавать пользователю точный вопрос вместо произвольного выбора.
+- Использовать `instructions/governance/review-loops.md` для обязательного full `post-EXEC review-loop`.
+- После реализации и обязательных проверок проводить full `post-EXEC review-loop` по правилам `instructions/core/quest-mode.md` и `instructions/governance/review-loops.md`; single-pass review summary недопустим.
+- Фиксировать full `post-EXEC review-loop` в формате `instructions/governance/review-loops.md`, включая `Scope/Evidence pass`, `Contract pass`, `Adversarial risk pass`, `Re-review after fixes` / `Fix and re-review`, `Stop decision`, validation evidence, unrelated changes и residual risks.
+- Перед `PASS` в `post-EXEC review-loop` проверить manual-review challenge: что бы пользовательский отдельный ручной review нашёл после моего `PASS`.
+- Если full `post-EXEC review-loop` приводит к нескольким жизнеспособным вариантам без uniquely best option, задавать пользователю точный вопрос вместо произвольного выбора.
 - Формировать финальный отчёт со структурой: `Summary`, `Changed files`, `Tests`, `Review`, `Commands`, `How to verify`, `Follow-ups`.
 
 ## SHOULD
 
 - Прозрачно перечислять отклонения от исходного плана, если они возникли в ходе исполнения.
 - Отмечать зависшие проверки/неподтверждённые риски отдельным блоком `Follow-ups`.
-- Кратко указывать, что именно было исправлено по итогам `post-EXEC review`, и отделять это от accepted risks / follow-ups.
+- Кратко указывать, что именно было исправлено по итогам full `post-EXEC review-loop`, и отделять это от accepted risks / follow-ups.
 
 ## MAY
 
@@ -48,14 +49,14 @@
 # Success criteria
 - Все изменения соответствуют утверждённой spec.
 - Выполнены тесты и команды проверки из spec либо явно объяснено, почему проверка недоступна.
-- `post-EXEC review` выполнен до финального отчёта.
-- Критичные и высокоуверенные проблемы с однозначным исправлением устранены, а затронутые проверки повторены.
-- Итоговый отчёт содержит `Summary`, `Changed files`, `Tests`, `Review`, `Commands`, `How to verify`, `Follow-ups`; блок `Review` использует формат `instructions/governance/review-loops.md`.
+- Full `post-EXEC review-loop` выполнен до финального отчёта.
+- Все findings с однозначным исправлением устранены или явно переведены в `ASK-HUMAN`, а затронутые проверки повторены.
+- Итоговый отчёт содержит `Summary`, `Changed files`, `Tests`, `Review`, `Commands`, `How to verify`, `Follow-ups`; блок `Review` использует full review-loop формат `instructions/governance/review-loops.md`.
 
 # Constraints
 - Используй `instructions/core/model-behavior-baseline.md` для progress updates, stop rules и output contract.
 - Используй `instructions/core/quest-mode.md` как owner фазовых правил `EXEC`.
-- Используй `instructions/governance/review-loops.md` для обязательного `post-EXEC review`.
+- Используй `instructions/governance/review-loops.md` для обязательного full `post-EXEC review-loop`.
 - Не выходи за `Non-Goals`, ограничения и acceptance criteria спеки.
 - Не меняй публичный API, UX/product agreement или операционные договорённости вне утверждённой spec.
 
@@ -63,12 +64,12 @@
 - Краткий итог изменений.
 - Список изменённых файлов.
 - Проверки и их результат.
-- Итоги `post-EXEC review`, включая reviewed scope, findings, исправленные находки, validation evidence, unrelated changes и остаточные риски.
+- Итоги full `post-EXEC review-loop`, включая reviewed scope, review passes, depth checklist, findings, исправленные находки, validation evidence, unrelated changes и остаточные риски.
 
 # Stop rules
 - Остановись и задай точный вопрос, если реализация требует выбора между несколькими жизнеспособными вариантами без uniquely best option.
 - Остановись, если обнаружен блокер, который нельзя устранить в рамках утверждённой spec.
-- Завершай только после обязательных проверок, `post-EXEC review` и повторной проверки исправлений.
+- Завершай только после обязательных проверок, full `post-EXEC review-loop` и повторной проверки исправлений.
 ```
 
 ## Связанные документы
