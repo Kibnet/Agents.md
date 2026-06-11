@@ -22,9 +22,12 @@
 - До фразы пользователя `Спеку подтверждаю` запрещено менять код, инфраструктуру, `instructions/*`, `prompts/*`, `templates/*`, `scripts/*`, `README.md`, `CHANGELOG.md` и другие файлы проекта вне текущей рабочей спецификации.
 - На фазе SPEC использовать `instructions/governance/spec-linter.md`, `instructions/governance/spec-rubric.md` и `instructions/governance/review-loops.md`.
 - Перед запросом подтверждения спецификации выполнять full `post-SPEC review-loop` по `instructions/governance/review-loops.md`, вносить объективно лучшие правки в spec и повторять затронутые quality gate проверки.
+- Перед запросом подтверждения спецификации выполнять `Pre-Approval Rework Prevention Gate`: заполнить или явно пометить как `Не применимо` с причиной `User-Observable Scenarios`, `Decision Ledger`, `Acceptance-to-Test Matrix`, `Expected User Review Objections` и `Role-Based Review Result`; если `Decision Ledger` содержит user-owned решение, блокирующее EXEC, задать точный вопрос вместо запроса approval.
+- В `Pre-Approval Rework Prevention Gate` для small-задач допустимо компактное заполнение, но нельзя пропускать user-observable scenario, decision ledger, acceptance-to-test mapping или likely objection без проверяемой причины.
 - Фразу пользователя `Спеку подтверждаю` считать единственным переходом из фазы `SPEC` в фазу `EXEC`.
 - На фазах `SPEC` и `EXEC` после каждого значимого блока работ обновлять журнал действий агента в текущей рабочей спецификации, отдельно фиксируя ожидаемую передачу решения человеку и фактическое обращение к человеку / решение человека.
 - На фазе EXEC реализовывать только в границах `Non-Goals` и ограничений спецификации.
+- Перед финальным отчётом выполнять `User-Observable Completion Gate`: сверить реализацию с `User-Observable Scenarios`, проверки с `Acceptance-to-Test Matrix`, а `Expected User Review Objections` закрыть или явно оставить как approved residual risk / follow-up из утверждённой spec.
 - Перед финальным отчётом выполнять full `post-EXEC review-loop` по `instructions/governance/review-loops.md`, исправлять все findings с однозначным исправлением, повторять затронутые проверки и только потом завершать задачу.
 - Если review упирается в несколько жизнеспособных вариантов без единственного оптимального решения, запрашивать решение у пользователя.
 

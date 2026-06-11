@@ -23,9 +23,11 @@
 - Прогнать самопроверку по `instructions/governance/spec-linter.md`.
 - Оценить спецификацию по `instructions/governance/spec-rubric.md`.
 - Выполнить full `post-SPEC review-loop` по `instructions/governance/review-loops.md` и встроить в spec все улучшения, которые не требуют выбора пользователя.
+- Выполнить `Pre-Approval Rework Prevention Gate`: до запроса approval проверить user-observable scenarios, decision ledger, acceptance-to-test mapping, expected user objections и role-based review applicability по canonical template.
 - Если итог по рубрике < 21, явно пометить автономное выполнение как рискованное и предложить снижение рисков.
 - До утверждения спецификации пользователем не выполнять реализацию.
 - После утверждения реализовывать строго в границах `Non-Goals` и ограничений.
+- Перед финальным отчётом сверить реализацию с `User-Observable Scenarios`, `Acceptance-to-Test Matrix` и `Expected User Review Objections`, если эти секции применимы к утверждённой spec.
 - После реализации и обязательных проверок применять full `post-EXEC review-loop` и правила завершения задачи по `instructions/core/quest-mode.md` и `instructions/governance/review-loops.md`.
 
 ## SHOULD

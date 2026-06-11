@@ -52,6 +52,34 @@ Outcome contract:
 - обработка ошибок
 - производительность
 
+### 6.3 User-Observable Scenarios
+Для изменений, которые влияют на UI, output, workflow, delivery или поведение будущего агента, зафиксировать видимые пользователю сценарии. Для small-задач допустима 1 строка; если не применимо, указать `Не применимо` и причину.
+
+| Scenario | User action / trigger | Expected visible result / output | Evidence required | Covered by AC |
+| --- | --- | --- | --- | --- |
+| ... | ... | ... | ... | ... |
+
+### 6.4 State / Interaction Matrix
+Для UI/workflow/stateful изменений описать ключевые переходы, empty/error/disabled/concurrent cases. Для stateless docs-only изменений указать `Не применимо`.
+
+| Current state | Trigger | Expected transition/result | Empty/error/disabled/concurrent case | Notes |
+| --- | --- | --- | --- | --- |
+| ... | ... | ... | ... | ... |
+
+### 6.5 Decision Ledger
+Фиксировать решения, которые агент принимает сам, и решения, которые должен принять пользователь. Если есть `Needs user before EXEC = Да`, не запрашивать approval как готовую spec; вместо этого задать точный вопрос.
+
+| Decision | Owner | Default / chosen option | Confidence | Risk if assumed | Needs user before EXEC |
+| --- | --- | --- | ---: | --- | --- |
+| ... | agent/user | ... | 0.0-1.0 | ... | Да/Нет |
+
+### 6.6 Runtime / Config / Data Contract Matrix
+Для backend, bot, CI, deploy, config, storage, API и integration задач зафиксировать source of truth и проверку. Если не применимо, указать причину.
+
+| Contract area | Current source of truth | Expected change | Compatibility / migration | Verification |
+| --- | --- | --- | --- | --- |
+| ... | ... | ... | ... | ... |
+
 ## 7. Бизнес-правила / Алгоритмы (если есть)
 Формальные правила, таблицы истинности, инварианты.
 
@@ -70,6 +98,8 @@ Outcome contract:
 - план отката
 
 ## 11. Тестирование и критерии приёмки
+Definition of Done / критерии готовности описывают, как проверить уже выполненную работу. Не использовать их как список подготовительных действий, если результат подготовки не является отдельным auditable artifact.
+
 - Acceptance Criteria
 - Какие тесты добавить/изменить
 - Characterization tests / contract checks для текущего поведения (если применимо)
@@ -79,9 +109,32 @@ Outcome contract:
 - Команды для проверки
 - Stop rules для test/retrieval/tool/validation loops
 
+### Acceptance-to-Test Matrix
+Каждый значимый acceptance criterion должен иметь test/check/evidence или явную причину, почему проверка невозможна.
+
+| Acceptance criterion | Automated test | Manual / visual / log check | Evidence artifact | If not tested, why |
+| --- | --- | --- | --- | --- |
+| ... | ... | ... | ... | ... |
+
 ## 12. Риски и edge cases
 - возможные проблемы
 - способы смягчения
+
+### Expected User Review Objections
+Перед запросом approval предсказать вероятные замечания пользователя и либо закрыть их в spec, либо явно оставить как риск/вопрос. Для small-задач минимум 1 строка; для medium/large минимум 3 строки.
+
+| Likely objection | Why likely | Mitigation in spec/code plan | Status |
+| --- | --- | --- | --- |
+| ... | ... | ... | mitigated / accepted-risk / ask-human |
+
+### Rework Prevention Checklist
+- Does the spec name what the user will see or operate?
+- Does every user-visible scenario have evidence?
+- Did the agent list decisions it assumed?
+- Did the agent predict likely objections and mitigate them?
+- Did role-based review run for the relevant task type?
+- Are acceptance criteria verifiers, not preparation steps?
+- Does EXEC have a path to prove the scenarios before final?
 
 ## 13. План выполнения
 Пошаговый план реализации, если точный порядок является инвариантом. Иначе фиксировать этапы по outcome, dependencies и условиям остановки.
@@ -137,6 +190,17 @@ Outcome contract:
 Итоговый балл: __ / 30
 Зона: рискованно / под контролем / готово к автономному выполнению
 
+### Role-Based Review Result
+Заполнить релевантные роли. Нерелевантные роли можно пометить `Не применимо` с причиной. Для UI-facing задач роль `UX / designer` применима всегда; для config/deploy/CI/secrets/delivery задач применима роль `Delivery / operations / security`.
+
+| Role | Applicability | Review question | Verdict | Required spec changes |
+| --- | --- | --- | --- | --- |
+| Business analyst / domain workflow | applicable / not applicable | Does the workflow, business rule, config/state behavior match the user's actual goal? | PASS/NEEDS-FIX/ASK-HUMAN | ... |
+| UX / designer | applicable / not applicable | Would the visible result, interaction, layout, copy and state handling pass user visual review? | PASS/NEEDS-FIX/ASK-HUMAN | ... |
+| Tester / validation | applicable | Does every AC map to test/check/evidence and are negative/edge cases covered? | PASS/NEEDS-FIX/ASK-HUMAN | ... |
+| Developer / architect | applicable | Are contracts, boundaries, migrations, performance and maintainability coherent? | PASS/NEEDS-FIX/ASK-HUMAN | ... |
+| Delivery / operations / security | applicable / not applicable | Are git/CI/config/deploy/secrets/runtime risks handled and rollback clear? | PASS/NEEDS-FIX/ASK-HUMAN | ... |
+
 ### Post-SPEC Review
 - Статус: PASS / NEEDS-FIX / ASK-HUMAN
 - Scope reviewed: spec path, instruction stack, selected profile, open questions, planned changed files
@@ -145,12 +209,14 @@ Outcome contract:
   - Scope/Evidence pass:
   - Contract pass:
   - Adversarial risk pass:
+  - Role-Based pass:
   - Re-review after fixes / Fix and re-review:
   - Stop decision:
 - Evidence inspected:
 - Depth checklist:
   - Scope drift / unrelated changes:
   - Acceptance criteria:
+  - User-observable scenarios / Decision ledger / Expected objections:
   - Validation evidence:
   - Unsupported claims:
   - Regression / edge case:
@@ -176,12 +242,14 @@ Outcome contract:
   - Scope/Evidence pass:
   - Contract pass:
   - Adversarial risk pass:
+  - Role-Based pass:
   - Re-review after fixes / Fix and re-review:
   - Stop decision:
 - Evidence inspected:
 - Depth checklist:
   - Scope drift / unrelated changes:
   - Acceptance criteria:
+  - User-observable scenarios / Acceptance-to-test matrix / Expected objections:
   - Validation evidence:
   - Unsupported claims:
   - Regression / edge case:

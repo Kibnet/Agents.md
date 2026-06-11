@@ -2,6 +2,16 @@
 
 All notable changes to this instruction catalog are documented in this file.
 
+## [2.11.0] - 2026-07-10
+
+### Changed
+
+- Усилен `QUEST` workflow против поздних доработок после approval/EXEC:
+  - [templates/specs/_template.md](templates/specs/_template.md) теперь содержит preventive sections `User-Observable Scenarios`, `State / Interaction Matrix`, `Decision Ledger`, `Runtime / Config / Data Contract Matrix`, `Acceptance-to-Test Matrix`, `Expected User Review Objections` и `Role-Based Review Result`;
+  - [quest-mode.md](instructions/core/quest-mode.md) и [quest-governance.md](instructions/core/quest-governance.md) теперь требуют `Pre-Approval Rework Prevention Gate` перед запросом `Спеку подтверждаю` и `User-Observable Completion Gate` перед финальным EXEC-отчётом;
+  - [review-loops.md](instructions/governance/review-loops.md) теперь добавляет `Role-Based pass` и применимость ролей business analyst, UX/designer, tester, developer/architect и delivery/operations/security;
+  - [quest-prompt-spec.md](instructions/core/quest-prompt-spec.md) и [quest-prompt-exec.md](instructions/core/quest-prompt-exec.md) синхронизированы с preventive gates и user-observable evidence checks.
+
 ## [2.10.0] - 2026-06-13
 
 ### Added
