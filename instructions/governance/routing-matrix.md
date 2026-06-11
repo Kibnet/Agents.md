@@ -86,6 +86,7 @@ Get-ChildItem instructions/profiles
 | .NET runtime/test debug, exception capture, live inspection | `debug-dotnet-mcp-coreclr` |
 | Оптимизация производительности | `performance-optimization` |
 | Визуальная обратная связь (скриншот/видео окна) | `visual-feedback` |
+| Session-derived lessons/preferences/runbooks, known repo history, repeated agent errors | `session-insights-context` |
 
 ## Выбор stack profile по стеку
 
@@ -120,6 +121,7 @@ Get-ChildItem instructions/profiles
 | Целенаправленное массовое комментирование / cleanup комментариев | `commenting-policy` |
 | QUEST: фаза SPEC | `quest-mode`, `spec-linter`, `spec-rubric`, `review-loops` |
 | QUEST: фаза EXEC | `quest-mode`, `review-loops` |
+| Прошлые Codex-сессии, частые ошибки агента, known repo runbooks, пользовательские workflow preferences | `session-insights-context` |
 | Коммиты и changelog | `commit-message-policy`, `versioning-policy` |
 | Ветки, pull request и GitHub Releases | `github-delivery-policy`; для PR title/squash также `commit-message-policy`; для релизов также `versioning-policy` |
 | Подключение каталога в потребительский репозиторий | `onboarding/quick-start`, `onboarding/AGENTS.consumer.template`, `onboarding/AGENTS.override.template` |
@@ -152,6 +154,7 @@ Get-ChildItem instructions/profiles
 - [instructions/governance/versioning-policy.md](./versioning-policy.md)
 - [instructions/core/quest-mode.md](../core/quest-mode.md)
 - [instructions/core/quest-governance.md](../core/quest-governance.md)
+- [instructions/contexts/session-insights-context.md](../contexts/session-insights-context.md)
 - [instructions/governance/review-loops.md](./review-loops.md)
 - [instructions/profiles/business-process-automation.md](../profiles/business-process-automation.md)
 - [instructions/profiles/refactor-local.md](../profiles/refactor-local.md)

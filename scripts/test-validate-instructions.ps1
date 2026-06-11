@@ -47,6 +47,7 @@ try {
         "CHANGELOG.md",
         "README.md",
         "prompts",
+        "session-insights",
         "templates",
         "specs",
         "instructions",

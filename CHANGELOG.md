@@ -2,6 +2,22 @@
 
 All notable changes to this instruction catalog are documented in this file.
 
+## [2.8.0] - 2026-06-11
+
+### Added
+
+- Добавлен context-документ [session-insights-context.md](instructions/contexts/session-insights-context.md) для безопасной on-demand загрузки session-derived lessons, runbooks и workflow preferences:
+  - фиксирует trigger-based lookup через `session-insights/README.md`;
+  - ограничивает загрузку 1-3 релевантными источниками по умолчанию;
+  - требует проверять drift-prone факты в текущем workspace;
+  - запрещает stage/commit `private-local` артефактов без явного решения пользователя.
+- Добавлен sanitized operational каталог [session-insights](session-insights/README.md) с частыми ошибками агента, command/validation cookbooks, UI rubric, repo runbooks и backlog улучшений.
+
+### Changed
+
+- [routing-matrix.md](instructions/governance/routing-matrix.md) теперь маршрутизирует прошлые Codex-сессии, known repo runbooks, повторяющиеся ошибки агента и workflow preferences на `session-insights-context`.
+- [validate-instructions.ps1](scripts/validate-instructions.ps1) и [test-validate-instructions.ps1](scripts/test-validate-instructions.ps1) считают новый context и sanitized session-insights subset частью валидного каталога.
+
 ## [2.7.0] - 2026-05-15
 
 ### Changed

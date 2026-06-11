@@ -34,6 +34,7 @@ $requiredPaths = @(
     "instructions/core/testing-baseline.md",
     "instructions/contexts/debug-dotnet-mcp-coreclr.md",
     "instructions/contexts/performance-optimization.md",
+    "instructions/contexts/session-insights-context.md",
     "instructions/contexts/testing-dotnet.md",
     "instructions/contexts/testing-frontend.md",
     "instructions/profiles/dotnet-backend-api.md",
@@ -68,6 +69,15 @@ $requiredPaths = @(
     "prompts/business-process-automation/03-automation-opportunities-analysis.md",
     "prompts/business-process-automation/04-to-be-process-design.md",
     "prompts/business-process-automation/05-ai-agent-skill-graph.md",
+    "session-insights/README.md",
+    "session-insights/AGENT_SESSION_LESSONS.md",
+    "session-insights/REPO_RUNBOOKS_FROM_SESSIONS.md",
+    "session-insights/VALIDATION_COOKBOOK_FROM_SESSIONS.md",
+    "session-insights/UI_QUALITY_RUBRIC_FROM_SESSIONS.md",
+    "session-insights/COMMAND_COOKBOOK_FROM_SESSIONS.md",
+    "session-insights/USER_WORKFLOW_PREFERENCES.md",
+    "session-insights/AGENTS_IMPROVEMENT_BACKLOG.md",
+    "session-insights/DO_NOT_REPEAT.md",
     "scripts/validate-instructions.ps1",
     "scripts/test-validate-instructions.ps1"
 )
