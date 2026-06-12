@@ -20,6 +20,7 @@
 2. Для applicability и quality gate `QUEST` использовать [instructions/core/quest-governance.md](instructions/core/quest-governance.md).
 3. Для фазового поведения `QUEST`, включая допустимые мутации файлов на `SPEC` и `EXEC`, использовать [instructions/core/quest-mode.md](instructions/core/quest-mode.md).
 4. Локальный `AGENTS.override.md` в репозитории-потребителе применять только после central stack как дополнительные локальные инструкции поверх него; он не заменяет центральный `AGENTS.md` и может только ужесточать центральные MUST.
+5. Для STORM product workflow и команд `/storm:*` использовать [instructions/profiles/storm-product-development.md](instructions/profiles/storm-product-development.md).
 
 ## Routing
 
@@ -33,6 +34,7 @@
 2. Открыть `instructions/governance/routing-matrix.md` и выбрать сценарий.
 3. Собрать instruction stack, включая `model-behavior-baseline` как обязательный core baseline для `gpt-5.5`, и разрешать конфликты только по алгоритму матрицы.
 4. Если в consumer-репозитории есть `AGENTS.override.md`, применить его после central stack как дополнительные локальные инструкции поверх него.
+5. Если пользователь вызывает `/storm:*`, подключить профиль `storm-product-development`; команды с изменениями tests/code/behavior должны идти через обычный `delivery-task` и `QUEST`.
 
 ## Подключение в другой репозиторий
 
@@ -41,6 +43,7 @@
 - [instructions/onboarding/quick-start.md](instructions/onboarding/quick-start.md)
 - [instructions/onboarding/AGENTS.consumer.template.md](instructions/onboarding/AGENTS.consumer.template.md)
 - [instructions/onboarding/AGENTS.override.template.md](instructions/onboarding/AGENTS.override.template.md)
+- [instructions/profiles/storm-product-development.md](instructions/profiles/storm-product-development.md)
 
 ## Quality Gate каталога
 

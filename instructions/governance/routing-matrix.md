@@ -107,6 +107,7 @@ Get-ChildItem instructions/profiles
 | Rendering / preview pipeline | `rendering-pipeline` |
 | Проектирование подсистемы | `product-system-design` |
 | Анализ и автоматизация бизнес-процесса | `business-process-automation` |
+| STORM product discovery / living product specification / `/storm:*` | `storm-product-development` |
 | Вынос доменной логики | `domain-logic-extraction` |
 | Локальный структурный рефакторинг | `refactor-local` |
 | Архитектурный рефакторинг | `refactor-architecture` |
@@ -140,6 +141,8 @@ Get-ChildItem instructions/profiles
 | Производительность render-пайплайна | `quest-governance + collaboration-baseline + testing-baseline + performance-optimization + stack profile + rendering-pipeline` |
 | Проектирование автоматизации бизнес-процесса | `quest-governance + collaboration-baseline + business-process-automation` |
 | Проведение интервью / AS-IS / TO-BE / skill graph по шагам | `collaboration-baseline + business-process-automation` |
+| `/storm:full-cycle` в safe analysis mode без изменений tests/code/annotations | `collaboration-baseline + storm-product-development` |
+| `/storm:cover`, `/storm:cleanup`, `/storm:implement ST-XXXX` или любой `/storm:*` с изменениями tests/code/behavior | `quest-governance + collaboration-baseline + testing-baseline + stack/testing profile + storm-product-development` |
 | Локальный рефакторинг модуля | `quest-governance + collaboration-baseline + stack profile + refactor-local + refactoring-policy` |
 | Массовое улучшение комментариев в hotspot-участках | `quest-governance + collaboration-baseline + stack profile + commenting-policy` |
 
@@ -157,4 +160,5 @@ Get-ChildItem instructions/profiles
 - [instructions/contexts/session-insights-context.md](../contexts/session-insights-context.md)
 - [instructions/governance/review-loops.md](./review-loops.md)
 - [instructions/profiles/business-process-automation.md](../profiles/business-process-automation.md)
+- [instructions/profiles/storm-product-development.md](../profiles/storm-product-development.md)
 - [instructions/profiles/refactor-local.md](../profiles/refactor-local.md)

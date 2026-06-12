@@ -1,0 +1,46 @@
+{
+  "metadata": {
+    "schema_version": "1.0.0",
+    "process": "storm-cloud-product-development",
+    "repository": "",
+    "created_at": "",
+    "updated_at": "",
+    "generated_by": "agent",
+    "notes": []
+  },
+  "vision": {
+    "id": "VS-0001",
+    "statement": "",
+    "status": "needs_review",
+    "provenance": "not_defined",
+    "confidence": 0.0,
+    "evidence": [],
+    "open_questions": []
+  },
+  "product_goal": {
+    "id": "PG-0001",
+    "statement": "",
+    "status": "needs_review",
+    "provenance": "not_defined",
+    "confidence": 0.0,
+    "supported_by_needs": [],
+    "success_measures": [],
+    "non_goals": [],
+    "evidence": [],
+    "open_questions": []
+  },
+  "needs": [],
+  "constraints": [],
+  "stories": [],
+  "tests": [],
+  "code_units": [],
+  "conflicts": [],
+  "dependencies": [],
+  "ranking": [],
+  "process_audit": {
+    "last_run_at": "",
+    "metrics": {},
+    "scorecard": {},
+    "improvements": []
+  }
+}

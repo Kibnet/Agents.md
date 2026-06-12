@@ -105,12 +105,16 @@ instructions/
  └─ onboarding/    # шаблоны подключения
 
 prompts/           # канонические prompt templates для guided workflows
- └─ business-process-automation/
+ ├─ business-process-automation/
+ └─ storm/
 
-scripts/           # валидация инструкций
+schemas/           # JSON Schema для machine-readable workflow artifacts
+scripts/           # валидация инструкций и вспомогательные workflow scripts
+ └─ storm/
 templates/
- └─ specs/
-    └─ _template.md
+ ├─ specs/
+ │  └─ _template.md
+ └─ storm/
 specs/             # рабочие спецификации изменений каталога
 ```
 
@@ -127,6 +131,7 @@ specs/             # рабочие спецификации изменений 
 * `instructions/core/quest-mode.md` — owner фазового поведения `QUEST`
 * `instructions/governance/review-loops.md` — обязательные auto-review loops после `SPEC` и `EXEC`
 * `instructions/profiles/business-process-automation.md` — сценарный профиль для пошаговой автоматизации бизнес-процессов
+* `instructions/profiles/storm-product-development.md` — сценарный профиль для STORM product workflow и команд `/storm:*`
 
 ---
 
@@ -158,12 +163,15 @@ specs/             # рабочие спецификации изменений 
 * внутри `QUEST` после исполнения обязателен цикл `implement → test → post-review → fix/retest → report`
 * если review находит uniquely best option, агент обязан выбрать его сам; пользователя спрашивают только при реальной неоднозначности
 * guided workflow с пользовательскими артефактами может идти без `SPEC gate`, если агент не меняет канонические файлы
+* STORM safe full-cycle может идти как guided workflow только без изменений tests/code/test annotations; любые такие изменения переводят задачу в `delivery-task` с `QUEST`
 * для аналитических задач без выраженного стека можно использовать сценарный профиль без `stack profile`
 
 Примеры:
 
 * инженерная задача по каталогу: `model-behavior-baseline + quest-governance + collaboration-baseline + governance overlays`
 * пошаговый анализ бизнес-процесса: `model-behavior-baseline + collaboration-baseline + business-process-automation`
+* STORM product discovery без code/test mutations: `model-behavior-baseline + collaboration-baseline + storm-product-development`
+* STORM implementation/cleanup/test coverage: `model-behavior-baseline + quest-governance + collaboration-baseline + testing-baseline + stack/testing profile + storm-product-development`
 
 ---
 
@@ -171,9 +179,10 @@ specs/             # рабочие спецификации изменений 
 
 Каталог поддерживает не только правила для инженерных изменений, но и готовые сценарии пошаговой аналитической работы.
 
-Сейчас в репозитории есть канонический guided workflow:
+Сейчас в репозитории есть канонические guided workflows:
 
 * `business-process-automation`
+* `storm-product-development`
 
 Этот сценарий ведёт агента по цепочке:
 
@@ -185,6 +194,53 @@ specs/             # рабочие спецификации изменений 
 
 Шаблоны шагов лежат в `prompts/business-process-automation/`.
 Если пользователь просит выдавать артефакты по шагам, агент должен сохранять каждый шаг отдельным файлом и ждать подтверждения перед продолжением.
+
+## STORM Product Development
+
+`storm-product-development` ведёт агента по циклу living product specification:
+
+1. восстановить реализованные stories, constraints, tests и code units из текущего продукта;
+2. построить traceability `story -> acceptance criteria -> tests -> code`;
+3. вывести needs, Product Goal и Product Vision;
+4. найти gaps, cloud conflicts и proposed backlog;
+5. построить dependency-aware ranking;
+6. провести process audit;
+7. реализовывать отдельные stories через SDD только через `/storm:implement ST-XXXX`.
+
+Канонический machine-readable artifact в consumer-репозитории:
+
+```text
+docs/product/storm.json
+```
+
+Central assets:
+
+```text
+instructions/profiles/storm-product-development.md
+prompts/storm/
+templates/storm/
+schemas/storm-artifacts.schema.json
+scripts/storm/validate-artifacts.py
+scripts/storm/rank-backlog.py
+```
+
+Примеры вызова:
+
+```text
+Используй central stack по AGENTS.md и routing-matrix.md, подключи профиль storm-product-development и выполни /storm:full-cycle.
+Не меняй tests, code и test annotations.
+```
+
+```text
+Используй central stack по AGENTS.md и routing-matrix.md, подключи профиль storm-product-development и выполни /storm:implement ST-0007.
+```
+
+Проверка artifacts из consumer-репозитория:
+
+```powershell
+python <AGENTS_ROOT>\scripts\storm\validate-artifacts.py .\docs\product\storm.json
+python <AGENTS_ROOT>\scripts\storm\rank-backlog.py .\docs\product\storm.json --out .\docs\product\reports\ranking.md
+```
 
 ---
 

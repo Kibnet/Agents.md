@@ -2,6 +2,25 @@
 
 All notable changes to this instruction catalog are documented in this file.
 
+## [2.9.0] - 2026-06-12
+
+### Added
+
+- Добавлен сценарный профиль [storm-product-development.md](instructions/profiles/storm-product-development.md) для STORM product workflow и команд `/storm:*`:
+  - фиксирует artifact model `docs/product/storm.json`, ID/status/provenance/confidence rules и traceability `story -> acceptance criteria -> tests -> code`;
+  - разделяет safe artifact-only full-cycle и команды с изменениями tests/code/behavior, которые должны идти через `delivery-task` и `QUEST`;
+  - описывает bootstrap, trace, coverage, derive, expand, conflicts, cleanup, ranking, implementation и audit contracts.
+- Добавлены canonical STORM assets:
+  - prompt templates в [prompts/storm](prompts/storm);
+  - starter templates в [templates/storm](templates/storm);
+  - JSON schema [storm-artifacts.schema.json](schemas/storm-artifacts.schema.json);
+  - scripts [validate-artifacts.py](scripts/storm/validate-artifacts.py) и [rank-backlog.py](scripts/storm/rank-backlog.py).
+
+### Changed
+
+- [routing-matrix.md](instructions/governance/routing-matrix.md) теперь маршрутизирует `/storm:*`, living product specification, cloud-conflict analysis и dependency-aware ranking на `storm-product-development`.
+- [AGENTS.md](AGENTS.md), [README.md](README.md), [validate-instructions.ps1](scripts/validate-instructions.ps1) и [test-validate-instructions.ps1](scripts/test-validate-instructions.ps1) обновлены для STORM как поддерживаемого guided workflow центрального каталога.
+
 ## [2.8.0] - 2026-06-11
 
 ### Added
