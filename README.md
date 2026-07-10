@@ -131,7 +131,7 @@ specs/             # рабочие спецификации изменений 
 * `instructions/core/quest-mode.md` — owner фазового поведения `QUEST`
 * `instructions/governance/review-loops.md` — обязательные auto-review loops после `SPEC` и `EXEC`
 * `instructions/profiles/business-process-automation.md` — сценарный профиль для пошаговой автоматизации бизнес-процессов
-* `instructions/profiles/storm-product-development.md` — сценарный профиль для STORM product workflow и команд `/storm:*`
+* `instructions/profiles/storm-product-development.md` — сценарный профиль для STORM product workflow, BDD/Gherkin behavior layer и команд `/storm:*`
 
 ---
 
@@ -164,6 +164,7 @@ specs/             # рабочие спецификации изменений 
 * если review находит uniquely best option, агент обязан выбрать его сам; пользователя спрашивают только при реальной неоднозначности
 * guided workflow с пользовательскими артефактами может идти без `SPEC gate`, если агент не меняет канонические файлы
 * STORM safe full-cycle может идти как guided workflow только без изменений tests/code/test annotations; любые такие изменения переводят задачу в `delivery-task` с `QUEST`
+* STORM BDD/Gherkin команды `/storm:gherkin`, `/storm:bdd-sync`, `/storm:bdd-lint` и `/storm:bdd-conflicts` могут идти как artifact-only guided workflow; `/storm:bdd-implement ST-XXXX` всегда идёт как `delivery-task` через `QUEST`
 * для аналитических задач без выраженного стека можно использовать сценарный профиль без `stack profile`
 
 Примеры:
@@ -201,17 +202,26 @@ specs/             # рабочие спецификации изменений 
 
 1. восстановить реализованные stories, constraints, tests и code units из текущего продукта;
 2. построить traceability `story -> acceptance criteria -> tests -> code`;
-3. вывести needs, Product Goal и Product Vision;
-4. найти gaps, cloud conflicts и proposed backlog;
-5. построить dependency-aware ranking;
-6. провести process audit;
-7. реализовывать отдельные stories через SDD только через `/storm:implement ST-XXXX`.
+3. сформировать Gherkin Rules/Scenarios как executable behavior examples;
+4. вывести needs, Product Goal и Product Vision;
+5. найти gaps, cloud conflicts и proposed backlog;
+6. построить dependency-aware ranking;
+7. провести process audit;
+8. реализовывать отдельные stories через SDD/BDD только через `/storm:implement ST-XXXX` или `/storm:bdd-implement ST-XXXX`.
 
 Канонический machine-readable artifact в consumer-репозитории:
 
 ```text
 docs/product/storm.json
 ```
+
+`.feature` files по умолчанию лежат в:
+
+```text
+features/
+```
+
+Если consumer-репозиторий использует другой root, он фиксируется в `metadata.feature_root` внутри `storm.json`.
 
 Central assets:
 
@@ -235,12 +245,22 @@ scripts/storm/rank-backlog.py
 Используй central stack по AGENTS.md и routing-matrix.md, подключи профиль storm-product-development и выполни /storm:implement ST-0007.
 ```
 
+```text
+Используй central stack по AGENTS.md и routing-matrix.md, подключи профиль storm-product-development и выполни /storm:gherkin ST-0007.
+```
+
+```text
+Используй central stack по AGENTS.md и routing-matrix.md, подключи профиль storm-product-development и выполни /storm:bdd-lint.
+```
+
 Проверка artifacts из consumer-репозитория:
 
 ```powershell
 python <AGENTS_ROOT>\scripts\storm\validate-artifacts.py .\docs\product\storm.json
 python <AGENTS_ROOT>\scripts\storm\rank-backlog.py .\docs\product\storm.json --out .\docs\product\reports\ranking.md
 ```
+
+BDD/Gherkin слой в `storm.json` хранит metadata and traceability, а сами executable examples должны жить в `.feature` files. Acceptance criteria остаются обзорным readiness contract, Gherkin Rules/Scenarios делают их проверяемыми примерами, automated tests and step definitions исполняют эти примеры.
 
 ---
 

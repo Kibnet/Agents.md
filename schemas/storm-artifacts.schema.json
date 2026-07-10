@@ -25,6 +25,10 @@
     "constraints": { "type": "array", "items": { "$ref": "#/$defs/constraint" } },
     "stories": { "type": "array", "items": { "$ref": "#/$defs/story" } },
     "tests": { "type": "array", "items": { "$ref": "#/$defs/test" } },
+    "gherkin_features": { "type": "array", "items": { "$ref": "#/$defs/gherkin_feature" } },
+    "gherkin_rules": { "type": "array", "items": { "$ref": "#/$defs/gherkin_rule" } },
+    "gherkin_scenarios": { "type": "array", "items": { "$ref": "#/$defs/gherkin_scenario" } },
+    "step_definitions": { "type": "array", "items": { "$ref": "#/$defs/step_definition" } },
     "code_units": { "type": "array", "items": { "$ref": "#/$defs/code_unit" } },
     "conflicts": { "type": "array", "items": { "$ref": "#/$defs/conflict" } },
     "dependencies": { "type": "array", "items": { "$ref": "#/$defs/dependency" } },
@@ -50,6 +54,8 @@
         "text": { "type": "string" },
         "coverage_level": { "enum": ["none", "smoke", "partial", "critical", "full"] },
         "linked_tests": { "type": "array", "items": { "type": "string" } },
+        "linked_rules": { "type": "array", "items": { "type": "string" } },
+        "linked_scenarios": { "type": "array", "items": { "type": "string" } },
         "evidence": { "type": "array", "items": { "$ref": "#/$defs/evidence" } }
       },
       "additionalProperties": true
@@ -69,9 +75,12 @@
         "supports_needs": { "type": "array", "items": { "type": "string" } },
         "threatens_needs": { "type": "array", "items": { "type": "string" } },
         "linked_tests": { "type": "array", "items": { "type": "string" } },
+        "linked_scenarios": { "type": "array", "items": { "type": "string" } },
         "linked_code": { "type": "array", "items": { "type": "string" } },
         "dependencies": { "type": "array", "items": { "type": "string" } },
         "priority": { "type": "object" },
+        "behavior_coverage_level": { "type": "integer", "minimum": 0, "maximum": 5 },
+        "gherkin_exception": { "type": "string" },
         "evidence": { "type": "array", "items": { "$ref": "#/$defs/evidence" } },
         "assumptions": { "type": "array", "items": { "type": "string" } },
         "open_questions": { "type": "array", "items": { "type": "string" } }
@@ -108,6 +117,7 @@
         "description": { "type": "string" },
         "protects_needs": { "type": "array", "items": { "type": "string" } },
         "verified_by_tests": { "type": "array", "items": { "type": "string" } },
+        "verified_by_scenarios": { "type": "array", "items": { "type": "string" } },
         "enforced_by_code": { "type": "array", "items": { "type": "string" } },
         "threatened_by_stories": { "type": "array", "items": { "type": "string" } },
         "evidence": { "type": "array", "items": { "$ref": "#/$defs/evidence" } }
@@ -126,7 +136,97 @@
         "linked_stories": { "type": "array", "items": { "type": "string" } },
         "linked_acceptance_criteria": { "type": "array", "items": { "type": "string" } },
         "linked_constraints": { "type": "array", "items": { "type": "string" } },
+        "linked_scenarios": { "type": "array", "items": { "type": "string" } },
         "status": { "type": "string" },
+        "evidence": { "type": "array", "items": { "$ref": "#/$defs/evidence" } }
+      },
+      "additionalProperties": true
+    },
+    "gherkin_feature": {
+      "type": "object",
+      "required": ["id", "title", "file"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^GF-[0-9]{3,}$" },
+        "title": { "type": "string" },
+        "file": { "type": "string" },
+        "supports_needs": { "type": "array", "items": { "type": "string" } },
+        "contains_rules": { "type": "array", "items": { "type": "string" } },
+        "status": { "type": "string" },
+        "evidence": { "type": "array", "items": { "$ref": "#/$defs/evidence" } }
+      },
+      "additionalProperties": true
+    },
+    "gherkin_rule": {
+      "type": "object",
+      "required": ["id", "title", "feature_id", "linked_stories", "scenarios"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^GR-[0-9]{3,}$" },
+        "title": { "type": "string" },
+        "feature_id": { "type": "string" },
+        "linked_stories": { "type": "array", "items": { "type": "string" } },
+        "linked_acceptance_criteria": { "type": "array", "items": { "type": "string" } },
+        "linked_constraints": { "type": "array", "items": { "type": "string" } },
+        "scenarios": { "type": "array", "items": { "type": "string" } },
+        "evidence": { "type": "array", "items": { "$ref": "#/$defs/evidence" } }
+      },
+      "additionalProperties": true
+    },
+    "gherkin_scenario": {
+      "type": "object",
+      "required": ["id", "title", "file", "coverage_role", "status"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^SC-[A-Za-z0-9]+(?:-[A-Za-z0-9]+)*-[0-9]{3,}$" },
+        "title": { "type": "string" },
+        "file": { "type": "string" },
+        "line": { "type": ["integer", "string"] },
+        "tags": { "type": "array", "items": { "type": "string" } },
+        "linked_story": { "type": "string" },
+        "verifies_needs": { "type": "array", "items": { "type": "string" } },
+        "protects_constraints": { "type": "array", "items": { "type": "string" } },
+        "threatens_needs": { "type": "array", "items": { "type": "string" } },
+        "automation_status": { "type": "string" },
+        "linked_tests": { "type": "array", "items": { "type": "string" } },
+        "step_definitions": { "type": "array", "items": { "type": "string" } },
+        "coverage_role": {
+          "enum": [
+            "happy_path",
+            "negative_path",
+            "edge_case",
+            "business_rule",
+            "constraint_check",
+            "regression",
+            "security",
+            "performance",
+            "compatibility",
+            "accessibility"
+          ]
+        },
+        "status": {
+          "enum": [
+            "draft",
+            "reviewed",
+            "automated",
+            "manual",
+            "failing",
+            "passing",
+            "deprecated",
+            "superseded"
+          ]
+        },
+        "evidence": { "type": "array", "items": { "$ref": "#/$defs/evidence" } }
+      },
+      "additionalProperties": true
+    },
+    "step_definition": {
+      "type": "object",
+      "required": ["id", "path"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^SD-[0-9]{4,}$" },
+        "path": { "type": "string" },
+        "symbol": { "type": "string" },
+        "framework": { "type": "string" },
+        "step_text": { "type": "string" },
+        "supports_scenarios": { "type": "array", "items": { "type": "string" } },
         "evidence": { "type": "array", "items": { "$ref": "#/$defs/evidence" } }
       },
       "additionalProperties": true
@@ -154,6 +254,9 @@
         "story_or_constraint": { "type": "string" },
         "need_a": { "type": "string" },
         "need_b": { "type": "string" },
+        "rule_id": { "type": "string" },
+        "scenario_id": { "type": "string" },
+        "scenario_data_risk": { "type": "string" },
         "want_a": { "type": "string" },
         "want_b": { "type": "string" },
         "assumptions": { "type": "array", "items": { "type": "string" } },

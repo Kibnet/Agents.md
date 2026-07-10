@@ -2,6 +2,25 @@
 
 All notable changes to this instruction catalog are documented in this file.
 
+## [2.10.0] - 2026-06-13
+
+### Added
+
+- Добавлен BDD/Gherkin слой в [storm-product-development.md](instructions/profiles/storm-product-development.md):
+  - новая artifact chain `Vision -> Product Goal -> Need / Constraint -> Story -> Gherkin Rule -> Gherkin Scenario -> Automated Test / Step Definition -> Code`;
+  - правила `.feature` files, tags, scenario statuses, coverage roles, behavior coverage и scenario quality;
+  - команды `/storm:gherkin`, `/storm:bdd-sync`, `/storm:bdd-lint`, `/storm:bdd-conflicts`, `/storm:bdd-implement ST-XXXX`.
+- Добавлены canonical BDD assets:
+  - [feature-template.feature](templates/storm/feature-template.feature);
+  - prompt templates [11-generate-gherkin.md](prompts/storm/11-generate-gherkin.md), [12-bdd-sync.md](prompts/storm/12-bdd-sync.md), [13-bdd-lint.md](prompts/storm/13-bdd-lint.md), [14-bdd-conflicts.md](prompts/storm/14-bdd-conflicts.md), [15-bdd-implement-story.md](prompts/storm/15-bdd-implement-story.md).
+
+### Changed
+
+- [storm-artifacts.schema.json](schemas/storm-artifacts.schema.json) расширена опциональными секциями `gherkin_features`, `gherkin_rules`, `gherkin_scenarios` и `step_definitions`.
+- [validate-artifacts.py](scripts/storm/validate-artifacts.py) теперь проверяет Gherkin traceability, required tags, automation links, orphan scenarios, deprecated drift and behavior coverage metrics.
+- [rank-backlog.py](scripts/storm/rank-backlog.py) учитывает `scenario_automation_cost` и `step_reuse_penalty` в agentic effort.
+- [AGENTS.md](AGENTS.md), [README.md](README.md), [routing-matrix.md](instructions/governance/routing-matrix.md) и [validate-instructions.ps1](scripts/validate-instructions.ps1) синхронизированы с BDD/Gherkin командами STORM.
+
 ## [2.9.0] - 2026-06-12
 
 ### Added

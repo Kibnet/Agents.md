@@ -1,8 +1,9 @@
 {
   "metadata": {
-    "schema_version": "1.0.0",
+    "schema_version": "1.1.0",
     "process": "storm-cloud-product-development",
     "repository": "",
+    "feature_root": "features",
     "created_at": "",
     "updated_at": "",
     "generated_by": "agent",
@@ -33,6 +34,10 @@
   "constraints": [],
   "stories": [],
   "tests": [],
+  "gherkin_features": [],
+  "gherkin_rules": [],
+  "gherkin_scenarios": [],
+  "step_definitions": [],
   "code_units": [],
   "conflicts": [],
   "dependencies": [],

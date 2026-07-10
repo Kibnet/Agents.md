@@ -42,6 +42,8 @@ def story_effort(story: Dict[str, Any]) -> float:
         effort.get("architecture_blast_radius", 1.0),
         effort.get("verification_complexity", 1.0),
         effort.get("dependency_overhead", 0.0),
+        effort.get("scenario_automation_cost", 0.0),
+        effort.get("step_reuse_penalty", 0.0),
         effort.get("migration_or_rollout_risk", 0.0),
     ]
     total = 0.0
@@ -229,7 +231,7 @@ def write_markdown(path: Path, ranked: List[Dict[str, Any]], cycles: List[List[s
         lines.append("")
         lines.append("## Method")
         lines.append("")
-        lines.append("For each candidate, the script computes the closure: the item plus all unimplemented prerequisites. It then calculates cumulative value and cost and greedily selects the best priority*. After each selection, already paid prerequisites are removed from future closures.")
+        lines.append("For each candidate, the script computes the closure: the item plus all unimplemented prerequisites. It then calculates cumulative value and cost and greedily selects the best priority*. Agentic effort may include architecture blast radius, verification complexity, dependency overhead, scenario automation cost, step reuse penalty, and rollout risk. After each selection, already paid prerequisites are removed from future closures.")
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
