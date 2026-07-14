@@ -156,6 +156,36 @@ try {
     finally {
         Set-Content -Path $deprecatedPathFile -Value $original -Encoding UTF8
     }
+
+    # Scenario 9: missing Responses API owner
+    $responsesOwnerFile = Join-Path $scenarioRoot "instructions/governance/openai-responses-api.md"
+    $original = Get-Content -Path $responsesOwnerFile -Raw
+    try {
+        Remove-Item -Path $responsesOwnerFile -Force
+        if (-not (Invoke-Validation -ScenarioName "отсутствует Responses API owner" -ScenarioPath $scenarioRoot -ShouldPass $false)) {
+            $failed = $true
+        }
+    }
+    finally {
+        Set-Content -Path $responsesOwnerFile -Value $original -Encoding UTF8
+    }
+
+    # Scenario 10: stale declared GPT-5.5 target
+    $modelBaselineFile = Join-Path $scenarioRoot "instructions/core/model-behavior-baseline.md"
+    $original = Get-Content -Path $modelBaselineFile -Raw
+    try {
+        $modified = $original.Replace(
+            'Считать семейство `GPT-5.6` целевой optimization baseline каталога',
+            'Считать `gpt-5.5` целевой моделью каталога'
+        )
+        Set-Content -Path $modelBaselineFile -Value $modified -Encoding UTF8
+        if (-not (Invoke-Validation -ScenarioName "устаревший declared target GPT-5.5" -ScenarioPath $scenarioRoot -ShouldPass $false)) {
+            $failed = $true
+        }
+    }
+    finally {
+        Set-Content -Path $modelBaselineFile -Value $original -Encoding UTF8
+    }
 }
 finally {
     if (Test-Path $tempRoot) {

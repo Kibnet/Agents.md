@@ -2,6 +2,26 @@
 
 All notable changes to this instruction catalog are documented in this file.
 
+## [3.0.0] - 2026-07-14
+
+### Added
+
+- Добавлен trigger-based owner [openai-responses-api.md](instructions/governance/openai-responses-api.md) для exact GPT-5.6 API routing, persisted reasoning, stateless replay, Programmatic Tool Calling, Responses multi-agent и end-user `safety_identifier`.
+- В [README.md](README.md) добавлена датированная Surface Contract Matrix, которая разделяет standard ChatGPT, Work/Codex и OpenAI API и не переносит availability, aliases, Pro/Ultra semantics между поверхностями.
+- Validator получил semantic contracts для GPT-5.6 target, API owner, surface metadata и обязательного before/after behavioral smoke; test suite покрывает отсутствие API owner и возврат stale declared target `GPT-5.5`.
+
+### Changed
+
+- **BREAKING:** целевая optimization baseline каталога переведена с `GPT-5.5` на семейство `GPT-5.6`; consumer workflows, которые проверяют старые target markers или полагаются на GPT-5.5-specific prompt duplication, должны перейти на surface-aware contract.
+- [model-behavior-baseline.md](instructions/core/model-behavior-baseline.md) теперь разделяет target family и effective runtime, задаёт Sol/Terra/Luna workload guidance, lean prompt rules и evidence-based escalation reasoning/tier/Pro/Ultra.
+- [collaboration-baseline.md](instructions/core/collaboration-baseline.md) стал единственным owner communication preamble и явно разделяет read-only requests, разрешённые in-scope implementation actions и операции, требующие нового полномочия.
+- [routing-matrix.md](instructions/governance/routing-matrix.md), [AGENTS.md](AGENTS.md), [templates/specs/_template.md](templates/specs/_template.md) и [review-loops.md](instructions/governance/review-loops.md) синхронизированы с GPT-5.6 surface/effective-runtime evidence и обязательным same-profile behavior regression smoke.
+
+### Migration / Rollback
+
+- Для model-sensitive validation нужно фиксировать реальную surface, exact model/tier, reasoning level/mode и fallback; API alias `gpt-5.6` не считается универсальной гарантией для product/CLI surfaces.
+- Rollback выполняется единым откатом change set `3.0.0`; частичный возврат только model marker без API owner, routing, template и validator недопустим.
+
 ## [2.11.0] - 2026-07-10
 
 ### Changed

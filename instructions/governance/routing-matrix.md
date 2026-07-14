@@ -15,7 +15,7 @@
 - Использовать этот документ как канонический source of truth для:
   - порядка сборки central instruction stack;
   - модели разрешения конфликтов между документами.
-- Для каждой задачи подключать `instructions/core/model-behavior-baseline.md` как обязательный core baseline поведения целевой модели `gpt-5.5`.
+- Для каждой задачи подключать `instructions/core/model-behavior-baseline.md` как обязательный core baseline оптимизации под семейство `GPT-5.6`, не подменяя им проверку фактической surface/runtime availability.
 - Для каждой задачи фиксировать минимум один core-документ и при необходимости один context + один profile.
 - Использовать не более двух profile-документов одновременно:
   - один профиль стека приложения;
@@ -64,9 +64,11 @@ Get-ChildItem instructions/profiles
 6. Для структуры документов `instructions/*` owner-документом является `instructions/governance/document-contract.md`.
 7. Для полезных комментариев и cleanup комментариев owner-документом является `instructions/governance/commenting-policy.md`.
 8. Для общего процесса рефакторинга owner-документом является `instructions/governance/refactoring-policy.md`.
-9. Для model/prompt behavior, outcome-first формулировок, verbosity/reasoning guidance и stop rules owner-документом является `instructions/core/model-behavior-baseline.md`.
-10. Для GitHub branch naming, pull request и GitHub Release artifacts owner-документом является `instructions/governance/github-delivery-policy.md`.
-11. Локальный `AGENTS.override.md` не заменяет central stack, может только ужесточать центральные правила и не может ослаблять центральный `MUST`.
+9. Для model/prompt behavior, outcome-first формулировок, surface-neutral verbosity/reasoning guidance и stop rules owner-документом является `instructions/core/model-behavior-baseline.md`.
+10. Для OpenAI Responses API payload, exact model routing, persisted reasoning, Programmatic Tool Calling и Responses multi-agent owner-документом является `instructions/governance/openai-responses-api.md`.
+11. Для communication preamble и общей границы разрешённых действий owner-документом является `instructions/core/collaboration-baseline.md`.
+12. Для GitHub branch naming, pull request и GitHub Release artifacts owner-документом является `instructions/governance/github-delivery-policy.md`.
+13. Локальный `AGENTS.override.md` не заменяет central stack, может только ужесточать центральные правила и не может ослаблять центральный `MUST`.
 
 ## Базовый набор по типу задачи
 
@@ -122,6 +124,7 @@ Get-ChildItem instructions/profiles
 | Целенаправленное массовое комментирование / cleanup комментариев | `commenting-policy` |
 | QUEST: фаза SPEC | `quest-mode`, `spec-linter`, `spec-rubric`, `review-loops` |
 | QUEST: фаза EXEC | `quest-mode`, `review-loops` |
+| OpenAI Responses API, API model/tier routing, persisted reasoning, `reasoning.context`, Programmatic Tool Calling или Responses multi-agent | `openai-responses-api`; для проектирования подсистемы также `product-system-design` |
 | Прошлые Codex-сессии, частые ошибки агента, known repo runbooks, пользовательские workflow preferences | `session-insights-context` |
 | Коммиты и changelog | `commit-message-policy`, `versioning-policy` |
 | Ветки, pull request и GitHub Releases | `github-delivery-policy`; для PR title/squash также `commit-message-policy`; для релизов также `versioning-policy` |
@@ -145,6 +148,7 @@ Get-ChildItem instructions/profiles
 | `/storm:cover`, `/storm:cleanup`, `/storm:implement ST-XXXX`, `/storm:bdd-implement ST-XXXX` или любой `/storm:*` с изменениями tests/code/behavior | `quest-governance + collaboration-baseline + testing-baseline + stack/testing profile + storm-product-development` |
 | Локальный рефакторинг модуля | `quest-governance + collaboration-baseline + stack profile + refactor-local + refactoring-policy` |
 | Массовое улучшение комментариев в hotspot-участках | `quest-governance + collaboration-baseline + stack profile + commenting-policy` |
+| Проектирование GPT-5.6 Responses API workflow | `quest-governance + collaboration-baseline + product-system-design + openai-responses-api` |
 
 ## Связанные документы
 
@@ -153,6 +157,7 @@ Get-ChildItem instructions/profiles
 - [instructions/governance/commenting-policy.md](./commenting-policy.md)
 - [instructions/governance/document-contract.md](./document-contract.md)
 - [instructions/governance/github-delivery-policy.md](./github-delivery-policy.md)
+- [instructions/governance/openai-responses-api.md](./openai-responses-api.md)
 - [instructions/governance/refactoring-policy.md](./refactoring-policy.md)
 - [instructions/governance/versioning-policy.md](./versioning-policy.md)
 - [instructions/core/quest-mode.md](../core/quest-mode.md)

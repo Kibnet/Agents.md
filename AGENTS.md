@@ -16,11 +16,12 @@
 
 Дополнительно:
 
-1. Для целевого поведения модели `gpt-5.5`, outcome-first формулировок, verbosity/reasoning guidance и stop rules использовать [instructions/core/model-behavior-baseline.md](instructions/core/model-behavior-baseline.md).
+1. Для optimization baseline семейства `GPT-5.6`, outcome-first формулировок, surface-aware model guidance и stop rules использовать [instructions/core/model-behavior-baseline.md](instructions/core/model-behavior-baseline.md). Это целевой behavior contract, а не гарантия доступности модели в текущей поверхности/runtime.
 2. Для applicability и quality gate `QUEST` использовать [instructions/core/quest-governance.md](instructions/core/quest-governance.md).
 3. Для фазового поведения `QUEST`, включая допустимые мутации файлов на `SPEC` и `EXEC`, использовать [instructions/core/quest-mode.md](instructions/core/quest-mode.md).
 4. Локальный `AGENTS.override.md` в репозитории-потребителе применять только после central stack как дополнительные локальные инструкции поверх него; он не заменяет центральный `AGENTS.md` и может только ужесточать центральные MUST.
 5. Для STORM product workflow, BDD/Gherkin behavior layer и команд `/storm:*` использовать [instructions/profiles/storm-product-development.md](instructions/profiles/storm-product-development.md).
+6. Для OpenAI Responses API, exact model/tier routing, persisted reasoning, Programmatic Tool Calling и Responses multi-agent использовать [instructions/governance/openai-responses-api.md](instructions/governance/openai-responses-api.md) только по соответствующему триггеру.
 
 ## Routing
 
@@ -32,7 +33,7 @@
 
 1. Прочитать `AGENTS.md` как entry point.
 2. Открыть `instructions/governance/routing-matrix.md` и выбрать сценарий.
-3. Собрать instruction stack, включая `model-behavior-baseline` как обязательный core baseline для `gpt-5.5`, и разрешать конфликты только по алгоритму матрицы.
+3. Собрать instruction stack, включая `model-behavior-baseline` как обязательный core baseline для семейства `GPT-5.6`, зафиксировать фактическую surface/runtime конфигурацию, если она влияет на результат, и разрешать конфликты только по алгоритму матрицы.
 4. Если в consumer-репозитории есть `AGENTS.override.md`, применить его после central stack как дополнительные локальные инструкции поверх него.
 5. Если пользователь вызывает `/storm:*`, подключить профиль `storm-product-development`; команды с изменениями tests/code/behavior должны идти через обычный `delivery-task` и `QUEST`, включая `/storm:bdd-implement`.
 

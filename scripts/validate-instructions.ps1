@@ -45,6 +45,7 @@ $requiredPaths = @(
     "instructions/profiles/python-hardware-gpio.md",
     "instructions/governance/routing-matrix.md",
     "instructions/governance/document-contract.md",
+    "instructions/governance/openai-responses-api.md",
     "instructions/governance/versioning-policy.md",
     "instructions/governance/commenting-policy.md",
     "instructions/governance/refactoring-policy.md",
@@ -224,6 +225,111 @@ foreach ($mdFile in $activeTemplateScanFiles) {
     $normalizedContent = $rawContent -replace '\\', '/'
     if ([regex]::IsMatch($normalizedContent, $deprecatedTemplatePathPattern)) {
         Add-Error "Обнаружена активная ссылка на устаревший template path 'specs/_template.md' в $($mdFile.FullName)"
+    }
+}
+
+$semanticContracts = @(
+    @{
+        Path = "instructions/core/model-behavior-baseline.md"
+        Pattern = 'семейство `GPT-5\.6` целевой optimization baseline'
+        Description = "GPT-5.6 target baseline"
+    },
+    @{
+        Path = "instructions/core/model-behavior-baseline.md"
+        Pattern = 'фактический runtime'
+        Description = "surface/runtime evidence rule"
+    },
+    @{
+        Path = "instructions/core/collaboration-baseline.md"
+        Pattern = 'Для просьб ответить, объяснить, спланировать, диагностировать, сделать review или сообщить status'
+        Description = "read-only authorization boundary"
+    },
+    @{
+        Path = "instructions/governance/openai-responses-api.md"
+        Pattern = 'reasoning\.context'
+        Description = "persisted reasoning contract"
+    },
+    @{
+        Path = "instructions/governance/openai-responses-api.md"
+        Pattern = '`none`, `low`, `medium`, `high`, `xhigh`, `max`'
+        Description = "GPT-5.6 reasoning effort levels"
+    },
+    @{
+        Path = "instructions/governance/openai-responses-api.md"
+        Pattern = 'allowed_callers: \["programmatic"\]'
+        Description = "Programmatic Tool Calling contract"
+    },
+    @{
+        Path = "instructions/governance/openai-responses-api.md"
+        Pattern = 'safety_identifier'
+        Description = "end-user safety identifier contract"
+    },
+    @{
+        Path = "instructions/governance/routing-matrix.md"
+        Pattern = 'OpenAI Responses API, API model/tier routing'
+        Description = "Responses API routing trigger"
+    },
+    @{
+        Path = "README.md"
+        Pattern = '# Surface Contract Matrix для GPT-5\.6'
+        Description = "surface contract matrix"
+    },
+    @{
+        Path = "templates/specs/_template.md"
+        Pattern = 'Effective runtime:'
+        Description = "effective runtime metadata"
+    },
+    @{
+        Path = "templates/specs/_template.md"
+        Pattern = 'before/after behavioral smoke'
+        Description = "behavior regression evidence"
+    },
+    @{
+        Path = "instructions/governance/review-loops.md"
+        Pattern = 'Static validator, semantic scan и cross-model benchmark дополняют, но не заменяют этот smoke'
+        Description = "behavioral smoke no-substitution rule"
+    }
+)
+
+foreach ($contract in $semanticContracts) {
+    $contractPath = Join-Path $resolvedRoot $contract.Path
+    if (-not (Test-Path $contractPath)) {
+        continue
+    }
+
+    $contractContent = Get-Content -Path $contractPath -Raw
+    if ($contractContent -notmatch $contract.Pattern) {
+        Add-Error "Нарушен semantic contract '$($contract.Description)' в $($contract.Path)"
+    }
+}
+
+$staleTargetPatterns = @(
+    '(?i)Целевая модель:\s*`?gpt-5\.5`?',
+    '(?i)целевого поведения модели\s*`gpt-5\.5`',
+    '(?i)обязательный core baseline для\s*`gpt-5\.5`',
+    '(?i)GPT-5\.5 style',
+    '(?i)Считать\s+`?gpt-5\.5`?\s+целевой моделью каталога'
+)
+$staleTargetFiles = @(
+    "AGENTS.md",
+    "README.md",
+    "instructions/core/model-behavior-baseline.md",
+    "instructions/governance/routing-matrix.md",
+    "templates/specs/_template.md"
+)
+
+foreach ($relativePath in $staleTargetFiles) {
+    $targetPath = Join-Path $resolvedRoot $relativePath
+    if (-not (Test-Path $targetPath)) {
+        continue
+    }
+
+    $targetContent = Get-Content -Path $targetPath -Raw
+    foreach ($pattern in $staleTargetPatterns) {
+        if ($targetContent -match $pattern) {
+            Add-Error "Обнаружен устаревший declared target GPT-5.5 в $relativePath"
+            break
+        }
     }
 }
 

@@ -44,6 +44,7 @@
 - После первичного черновика спецификации выполнять full `post-SPEC review-loop` до запроса пользовательского подтверждения.
 - В full `post-SPEC review-loop` фиксировать `Scope reviewed`: путь spec, instruction stack, selected profile, open questions и planned changed files.
 - В full `post-SPEC review-loop` проверять как минимум: полноту границ, противоречия, пропущенные acceptance criteria, скрытые риски, альтернативы, недоопределённые решения, outcome-first contract, output/evidence contract, stop rules и отсутствие лишних абсолютных правил для judgement calls.
+- Для model/prompt/instruction migration в full `post-SPEC review-loop` отдельно проверять: смешение standard ChatGPT, Work/Codex и API contracts; неподтверждённую availability; дублирование owner-правил; broad brevity rules; необоснованные `max` / Pro / Ultra; потерю обязательной полноты final answer; отсутствие representative before/after behavioral smoke.
 - В full `post-SPEC review-loop` проверять `Pre-Approval Rework Prevention Gate`: user-observable scenarios, decision ledger, acceptance-to-test mapping, expected user objections и применимость role-based review.
 - Для UI-facing задач в full `post-SPEC review-loop` проверять, что spec содержит доступный reviewer visual planning artifact (wireframe, render, storyboard, annotated screenshot или эквивалент) либо явное `Не применимо` с причиной и fallback layout/state description.
 - Если full `post-SPEC review-loop` выявил finding с однозначным исправлением, агент обязан сам обновить спецификацию и повторить затронутые quality gate проверки.
@@ -51,6 +52,8 @@
 - После реализации и обязательных проверок выполнять full `post-EXEC review-loop` до финального отчёта.
 - В full `post-EXEC review-loop` фиксировать `Scope reviewed`: approved spec, `git status --short`, `git diff --stat`, relevant diff, tests/validation evidence и docs/changelog impact.
 - В full `post-EXEC review-loop` проверять как минимум: отклонения от спеки, регрессии, пропущенные тесты, критичные edge cases, небезопасные допущения, устаревшие или ложные комментарии, скрытые функциональные изменения под видом refactor, неподтверждённые performance tradeoff, неподдержанные factual claims, отсутствие нужной validation evidence и незавершённые follow-up, которые на самом деле нужно исправить сейчас.
+- Для model/prompt/instruction migration требовать before/after behavioral smoke на одинаковой effective model, surface, reasoning и sandbox конфигурации с одними representative scenarios. Static validator, semantic scan и cross-model benchmark дополняют, но не заменяют этот smoke.
+- Если изменяемый каталог или конфигурация подключены к активной agent session через junction, symlink или global pointer, выполнять authoring и candidate validation из изолированного checkout; перед активацией сверять drift active checkout, применять один подготовленный change set, иметь проверяемый rollback и повторять critical checks уже на активном пути.
 - В full `post-EXEC review-loop` проверять `User-Observable Completion Gate`: implementation/diff соответствует user-observable scenarios, validation соответствует acceptance-to-test matrix, а expected user objections закрыты или явно оставлены approved residual risk.
 - В full `post-EXEC review-loop` проверять отсутствие unrelated changes в `git status --short` и relevant diff; если unrelated changes есть, явно отделить их от текущей задачи.
 - Для задач, где применялся `ui-automation-testing`, в full `post-EXEC review-loop` проверять наличие `до`/`после` video evidence из автоматизированных UI test runs либо явный fallback с объективной причиной, командой проверки и next-best evidence.
@@ -166,6 +169,7 @@
 - [instructions/governance/commenting-policy.md](./commenting-policy.md)
 - [instructions/governance/document-contract.md](./document-contract.md)
 - [instructions/governance/github-delivery-policy.md](./github-delivery-policy.md)
+- [instructions/governance/openai-responses-api.md](./openai-responses-api.md)
 - [instructions/governance/refactoring-policy.md](./refactoring-policy.md)
 - [instructions/core/model-behavior-baseline.md](../core/model-behavior-baseline.md)
 - [instructions/core/quest-mode.md](../core/quest-mode.md)

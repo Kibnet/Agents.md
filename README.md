@@ -66,7 +66,8 @@ Override[AGENTS.override.md<br/>optional local strict rules]
 Router[routing-matrix.md]
 
 Core[core правила]
-Model[GPT-5.5 behavior]
+Model[GPT-5.6 behavior]
+Responses[Responses API contract]
 Contexts[контекстные правила]
 Profiles[технологические профили]
 Prompts[prompt templates]
@@ -82,10 +83,25 @@ Central --> Router
 
 Router --> Core
 Core --> Model
+Router --> Responses
 Router --> Contexts
 Router --> Profiles
 Router --> Prompts
 ```
+
+---
+
+# Surface Contract Matrix для GPT-5.6
+
+Каталог оптимизирован под семейство `GPT-5.6`, но не предполагает одинаковую модель, naming или reasoning controls во всех продуктах. Перед model-sensitive validation фиксируйте фактическую поверхность и выбранный профиль. Snapshot актуализирован 2026-07-14; availability и тарифные ограничения нужно перепроверять перед rollout.
+
+| Поверхность | Текущий контракт | Как использовать каталог |
+|---|---|---|
+| Standard ChatGPT | `GPT-5.5 Instant` остаётся default; `GPT-5.6 Sol` используется для Medium/High/Extra High, а Sol Pro — для Pro на доступных планах. Terra/Luna здесь не выбираются. | Применять behavior baseline, но не требовать GPT-5.6 для обычного Instant-чата и не переносить API model IDs в product UI. |
+| Work в ChatGPT / Codex | В зависимости от плана доступны Sol/Terra/Luna и reasoning controls; Codex Ultra означает multi-agent execution, а не API `reasoning.mode: "pro"`. | Фиксировать фактически выбранные model/tier/effort. Для воспроизводимых CLI smoke предпочитать явный tier, например `gpt-5.6-sol`; alias проверять в текущей account/runtime среде. |
+| OpenAI API | Доступны `gpt-5.6-sol`, `gpt-5.6-terra`, `gpt-5.6-luna`; API alias `gpt-5.6` направляет на Sol. Reasoning effort и Pro mode задаются API-параметрами. | По API-триггеру подключать `instructions/governance/openai-responses-api.md`; не дублировать его wire-level правила в общем baseline. |
+
+Официальные источники snapshot: [GPT-5.6 in ChatGPT](https://help.openai.com/en/articles/20001354-gpt-56-in-chatgpt/), [ChatGPT Work и Codex models](https://learn.chatgpt.com/docs/models), [OpenAI API model guidance](https://developers.openai.com/api/docs/guides/latest-model).
 
 ---
 
@@ -126,7 +142,8 @@ specs/             # рабочие спецификации изменений 
 
 * `AGENTS.md` — основная точка входа
 * `instructions/governance/routing-matrix.md` — алгоритм маршрутизации инструкций
-* `instructions/core/model-behavior-baseline.md` — owner поведения целевой модели `gpt-5.5`: outcome-first, stop rules, verbosity/reasoning guidance
+* `instructions/core/model-behavior-baseline.md` — owner optimization baseline семейства `GPT-5.6`: outcome-first, surface-aware model guidance и stop rules
+* `instructions/governance/openai-responses-api.md` — trigger-based owner wire-level контрактов OpenAI Responses API
 * `instructions/core/quest-governance.md` — gate `SPEC → EXEC` для инженерных изменений
 * `instructions/core/quest-mode.md` — owner фазового поведения `QUEST`
 * `instructions/governance/review-loops.md` — обязательные auto-review loops после `SPEC` и `EXEC`
@@ -148,7 +165,7 @@ specs/             # рабочие спецификации изменений 
    * `consumer-onboarding`
    * `delivery-task`
    * `guided-artifact-workflow`
-4. Собрать central stack по `routing-matrix.md`, включая `model-behavior-baseline` как обязательный core baseline для `gpt-5.5`
+4. Собрать central stack по `routing-matrix.md`, включая `model-behavior-baseline` как обязательный core baseline для семейства `GPT-5.6`
 5. Если в consumer-репозитории есть `AGENTS.override.md`, применить только его ужесточающие правила
 6. Если задача идёт через `QUEST`, использовать:
    * [instructions/core/quest-governance.md](instructions/core/quest-governance.md) для applicability и quality gate
@@ -157,7 +174,8 @@ specs/             # рабочие спецификации изменений 
 Важно:
 
 * `SPEC gate` применяется к инженерным изменениям каталога, кода, инфраструктуры и канонических файлов проекта
-* `model-behavior-baseline` применяется ко всем сценариям и задаёт GPT-5.5 style: outcome-first цель, критерии успеха, ограничения, output contract и stop rules
+* `model-behavior-baseline` применяется ко всем сценариям и задаёт GPT-5.6 optimization contract: outcome-first цель, surface evidence, критерии успеха, ограничения, output contract и stop rules
+* `openai-responses-api` подключается только для API-specific задач; ordinary Markdown review или работа в product UI не должны тянуть wire-level API правила
 * на фазе `SPEC` рабочая spec в локальном `./specs/` может обновляться до подтверждения пользователя; остальные файлы менять нельзя
 * внутри `QUEST` после черновика спеки обязателен цикл `draft → lint/rubric → post-review → refine`
 * внутри `QUEST` после исполнения обязателен цикл `implement → test → post-review → fix/retest → report`
