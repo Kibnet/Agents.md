@@ -2,3 +2,10 @@
 USER_PROFILE_FROM_CODEX_SESSIONS.md
 session-insights/PROJECT_INTEREST_MAP.md
 session-insights/FLAKY_SLOW_TESTS_REGISTRY.md
+
+# Privacy-safe local operational evidence
+.artifacts/session-insights/
+.artifacts/evals/agent-operations-*/
+.artifacts/agent-operations-*/
+.agent-operations-gold-set.json
+.agent-operations-evidence-map.json

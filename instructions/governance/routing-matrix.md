@@ -16,6 +16,7 @@
   - порядка сборки central instruction stack;
   - модели разрешения конфликтов между документами.
 - Для каждой задачи подключать `instructions/core/model-behavior-baseline.md` как обязательный core baseline оптимизации под семейство `GPT-5.6`, не подменяя им проверку фактической surface/runtime availability.
+- Для каждой `tool-heavy` задачи подключать `instructions/core/tool-execution-baseline.md` до первого значимого tool call; этот owner добавляется поверх task-type core и не конкурирует с выбранным context.
 - Для каждой задачи фиксировать минимум один core-документ и при необходимости один context + один profile.
 - Использовать не более двух profile-документов одновременно:
   - один профиль стека приложения;
@@ -48,11 +49,12 @@ Get-ChildItem instructions/profiles
 1. Классифицировать задачу:
    - `catalog-governance`, `consumer-onboarding`, `delivery-task`, `guided-artifact-workflow`.
 2. Подключить `model-behavior-baseline` и базовый набор (`core`) по типу задачи.
-3. Выбрать один `context` по типу выполнения.
-4. Выбрать один профиль технологического стека (`stack profile`), если задача привязана к реализации в конкретном стеке.
-5. При необходимости добавить один профиль типа изменения (`overlay profile`) или использовать один профиль сценария для аналитической задачи без стековой привязки.
-6. Добавить governance overlays по триггерам задачи.
-7. Если задача выполняется в consumer-репозитории и есть локальный `AGENTS.override.md`, применить его после central stack как дополнительные локальные инструкции поверх него и использовать только для ужесточения central `MUST`.
+3. Если задача `tool-heavy`, добавить `tool-execution-baseline`.
+4. Выбрать один `context` по типу выполнения.
+5. Выбрать один профиль технологического стека (`stack profile`), если задача привязана к реализации в конкретном стеке.
+6. При необходимости добавить один профиль типа изменения (`overlay profile`) или использовать один профиль сценария для аналитической задачи без стековой привязки.
+7. Добавить governance overlays по триггерам задачи.
+8. Если задача выполняется в consumer-репозитории и есть локальный `AGENTS.override.md`, применить его после central stack как дополнительные локальные инструкции поверх него и использовать только для ужесточения central `MUST`.
 
 ## Conflict Resolution Model
 
@@ -67,8 +69,9 @@ Get-ChildItem instructions/profiles
 9. Для model/prompt behavior, outcome-first формулировок, surface-neutral verbosity/reasoning guidance и stop rules owner-документом является `instructions/core/model-behavior-baseline.md`.
 10. Для OpenAI Responses API payload, exact model routing, persisted reasoning, Programmatic Tool Calling и Responses multi-agent owner-документом является `instructions/governance/openai-responses-api.md`.
 11. Для communication preamble и общей границы разрешённых действий owner-документом является `instructions/core/collaboration-baseline.md`.
-12. Для GitHub branch naming, pull request и GitHub Release artifacts owner-документом является `instructions/governance/github-delivery-policy.md`.
-13. Локальный `AGENTS.override.md` не заменяет central stack, может только ужесточать центральные правила и не может ослаблять центральный `MUST`.
+12. Для path discovery, PowerShell, `rg`, patch retry, Git/worktree preflight и общей классификации tool failures owner-документом является `instructions/core/tool-execution-baseline.md`.
+13. Для GitHub branch naming, pull request и GitHub Release artifacts owner-документом является `instructions/governance/github-delivery-policy.md`.
+14. Локальный `AGENTS.override.md` не заменяет central stack, может только ужесточать центральные правила и не может ослаблять центральный `MUST`.
 
 ## Базовый набор по типу задачи
 
@@ -119,6 +122,7 @@ Get-ChildItem instructions/profiles
 
 | Триггер | Governance |
 |---|---|
+| Shell/tool invocation, file mutation, patch, build/test, Git, browser/UI automation или external runtime/config operation | `tool-execution-baseline` |
 | Изменение правил/структуры `instructions/*` | `document-contract`, `versioning-policy` |
 | Любой рефакторинг кода | `refactoring-policy` |
 | Целенаправленное массовое комментирование / cleanup комментариев | `commenting-policy` |
@@ -154,6 +158,7 @@ Get-ChildItem instructions/profiles
 
 - [AGENTS.md](../../AGENTS.md)
 - [instructions/core/model-behavior-baseline.md](../core/model-behavior-baseline.md)
+- [instructions/core/tool-execution-baseline.md](../core/tool-execution-baseline.md)
 - [instructions/governance/commenting-policy.md](./commenting-policy.md)
 - [instructions/governance/document-contract.md](./document-contract.md)
 - [instructions/governance/github-delivery-policy.md](./github-delivery-policy.md)

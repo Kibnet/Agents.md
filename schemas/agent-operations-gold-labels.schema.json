@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Agent operations private gold labels",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "samplingAlgorithm", "seedId", "sampleId", "entries"],
+  "properties": {
+    "schemaVersion": {
+      "type": "integer",
+      "const": 1
+    },
+    "samplingAlgorithm": {
+      "type": "string",
+      "pattern": "\\S"
+    },
+    "seedId": {
+      "type": "string",
+      "pattern": "\\S"
+    },
+    "sampleId": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "entries": {
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": {
+        "pattern": "^[0-9a-f]{64}$"
+      },
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["category", "expected"],
+        "properties": {
+          "category": {
+            "enum": ["path-glob", "failed-patch", "git-sandbox", "timeout", "user-correction"]
+          },
+          "expected": {
+            "type": "boolean"
+          }
+        }
+      }
+    }
+  }
+}

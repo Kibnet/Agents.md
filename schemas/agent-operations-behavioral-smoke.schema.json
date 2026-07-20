@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Agent operations behavioral smoke decisions",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["runtime", "scenarios"],
+  "$defs": {
+    "nonEmptyString": {
+      "type": "string",
+      "pattern": "\\S"
+    },
+    "scenario": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "firstAction", "sequence", "stopCondition", "userVisibleDecision"],
+      "properties": {
+        "id": {
+          "enum": ["windows-wildcard", "stale-patch", "tunit-validation", "shared-writers", "git-worktree"]
+        },
+        "firstAction": { "$ref": "#/$defs/nonEmptyString" },
+        "sequence": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/nonEmptyString" }
+        },
+        "stopCondition": { "$ref": "#/$defs/nonEmptyString" },
+        "userVisibleDecision": { "$ref": "#/$defs/nonEmptyString" }
+      }
+    }
+  },
+  "properties": {
+    "runtime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["surface", "model", "reasoning", "sandbox"],
+      "properties": {
+        "surface": { "$ref": "#/$defs/nonEmptyString" },
+        "model": { "$ref": "#/$defs/nonEmptyString" },
+        "reasoning": { "$ref": "#/$defs/nonEmptyString" },
+        "sandbox": { "$ref": "#/$defs/nonEmptyString" }
+      }
+    },
+    "scenarios": {
+      "type": "array",
+      "minItems": 5,
+      "maxItems": 5,
+      "prefixItems": [
+        { "allOf": [{ "$ref": "#/$defs/scenario" }, { "properties": { "id": { "const": "windows-wildcard" } } }] },
+        { "allOf": [{ "$ref": "#/$defs/scenario" }, { "properties": { "id": { "const": "stale-patch" } } }] },
+        { "allOf": [{ "$ref": "#/$defs/scenario" }, { "properties": { "id": { "const": "tunit-validation" } } }] },
+        { "allOf": [{ "$ref": "#/$defs/scenario" }, { "properties": { "id": { "const": "shared-writers" } } }] },
+        { "allOf": [{ "$ref": "#/$defs/scenario" }, { "properties": { "id": { "const": "git-worktree" } } }] }
+      ],
+      "items": false
+    }
+  }
+}

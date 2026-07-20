@@ -17,4 +17,14 @@ jobs:
 
       - name: Test instruction validator
         shell: pwsh
-        run: pwsh ./scripts/test-validate-instructions.ps1
+        run: pwsh ./scripts/test-validate-instructions.ps1 -SkipAgentOperations
+
+  operational-windows:
+    name: Run Windows operational contracts
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Test agent operations
+        shell: pwsh
+        run: pwsh ./scripts/test-agent-operations.ps1 -Area All

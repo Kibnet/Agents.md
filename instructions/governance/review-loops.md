@@ -33,6 +33,10 @@
   - `Developer / architect` для public API, data/model contracts, architecture, migration, performance или maintainability risks;
   - `Delivery / operations / security` для git, CI, deploy, config, secrets, environment, release, PR или runtime access changes.
 - Для small-задач role-based review может быть компактным, но применимость ролей и stop decision должны быть явно указаны.
+- Для large/high-risk QUEST (`config`, `security`, `deploy`, migration, multi-module или public behavior) post-SPEC и post-EXEC должны включать independent reviewer, когда subagent facility доступна.
+- Independent review считать технически read-only только при evidence фактического child sandbox `read-only`; custom-agent default без проверки effective runtime недостаточен, потому что parent live overrides могут иметь приоритет.
+- Использовать personal/project custom agent из `templates/codex/agents/independent-reviewer.toml`, когда он доступен. Reviewer возвращает findings и не меняет файлы.
+- Если independent reviewer или read-only sandbox недоступны, выполнять отдельный adversarial fallback, явно фиксировать причину и residual risk; self/writable pass не называть независимым.
 - `PASS` в full `post-SPEC review-loop` запрещён, если `Decision Ledger`, `User-Observable Scenarios`, `Acceptance-to-Test Matrix`, `Expected User Review Objections` или `Role-Based Review Result` пустые без `Не применимо` и проверяемой причины.
 - `PASS` в full `post-EXEC review-loop` запрещён, если изменённое поведение, docs/template behavior или delivery behavior не сверены с `User-Observable Scenarios`, `Acceptance-to-Test Matrix` и незакрытыми `Expected User Review Objections`.
 - `PASS` запрещён, если `Scope reviewed`, `Review passes`, `Evidence inspected`, `Depth checklist` или `Stop decision` пустые, общие или не подтверждают реальную инспекцию.
@@ -172,6 +176,7 @@
 - [instructions/governance/openai-responses-api.md](./openai-responses-api.md)
 - [instructions/governance/refactoring-policy.md](./refactoring-policy.md)
 - [instructions/core/model-behavior-baseline.md](../core/model-behavior-baseline.md)
+- [instructions/core/tool-execution-baseline.md](../core/tool-execution-baseline.md)
 - [instructions/core/quest-mode.md](../core/quest-mode.md)
 - [instructions/core/quest-governance.md](../core/quest-governance.md)
 - [instructions/core/quest-prompt-spec.md](../core/quest-prompt-spec.md)

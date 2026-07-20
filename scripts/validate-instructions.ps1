@@ -24,6 +24,7 @@ Add-Info "Проверка каталога: $resolvedRoot"
 $requiredPaths = @(
     "AGENTS.md",
     "CHANGELOG.md",
+    ".github/workflows/validate-instructions.yml",
     "templates/specs/_template.md",
     "instructions/core/model-behavior-baseline.md",
     "instructions/core/quest-governance.md",
@@ -32,6 +33,7 @@ $requiredPaths = @(
     "instructions/core/quest-prompt-exec.md",
     "instructions/core/collaboration-baseline.md",
     "instructions/core/testing-baseline.md",
+    "instructions/core/tool-execution-baseline.md",
     "instructions/contexts/debug-dotnet-mcp-coreclr.md",
     "instructions/contexts/performance-optimization.md",
     "instructions/contexts/session-insights-context.md",
@@ -55,6 +57,7 @@ $requiredPaths = @(
     "instructions/governance/commit-message-policy.md",
     "instructions/governance/github-delivery-policy.md",
     "instructions/onboarding/quick-start.md",
+    "instructions/onboarding/local-environment.md",
     "instructions/onboarding/AGENTS.consumer.template.md",
     "instructions/onboarding/AGENTS.override.template.md",
     "instructions/profiles/domain-logic-extraction.md",
@@ -94,8 +97,27 @@ $requiredPaths = @(
     "templates/storm/ranking.md",
     "templates/storm/traceability.md",
     "schemas/storm-artifacts.schema.json",
+    "schemas/agent-operations-gold-labels.schema.json",
+    "schemas/agent-operations-behavioral-smoke.schema.json",
+    "schemas/agent-operations-smoke-review.schema.json",
     "scripts/storm/validate-artifacts.py",
     "scripts/storm/rank-backlog.py",
+    "templates/codex/agent-operations-hooks.json",
+    "templates/codex/agents/independent-reviewer.toml",
+    "templates/codex/local-environment/README.md",
+    "templates/codex/local-environment/preflight.ps1",
+    "scripts/hooks/agent-operations-hook.ps1",
+    "scripts/install-agent-operations.ps1",
+    "scripts/probe-agent-operations-activation.ps1",
+    "scripts/analyze-codex-session-errors.ps1",
+    "scripts/test-agent-operations.ps1",
+    "scripts/fixtures/agent-operations/analyzer/trace-main.jsonl",
+    "scripts/fixtures/agent-operations/analyzer/trace-child.jsonl",
+    "scripts/fixtures/agent-operations/analyzer/gold-set.json",
+    "scripts/fixtures/agent-operations/analyzer-salt.txt",
+    "scripts/fixtures/agent-operations/installer/config-foreign.toml",
+    "scripts/fixtures/agent-operations/installer/hooks-foreign.json",
+    "scripts/fixtures/agent-operations/tunit/TUnitFixture.csproj",
     "session-insights/README.md",
     "session-insights/AGENT_SESSION_LESSONS.md",
     "session-insights/REPO_RUNBOOKS_FROM_SESSIONS.md",
@@ -288,6 +310,126 @@ $semanticContracts = @(
         Path = "instructions/governance/review-loops.md"
         Pattern = 'Static validator, semantic scan и cross-model benchmark дополняют, но не заменяют этот smoke'
         Description = "behavioral smoke no-substitution rule"
+    },
+    @{
+        Path = "AGENTS.md"
+        Pattern = 'tool-execution-baseline\.md'
+        Description = "tool execution owner entry point"
+    },
+    @{
+        Path = "instructions/governance/routing-matrix.md"
+        Pattern = 'Для каждой `tool-heavy` задачи подключать `instructions/core/tool-execution-baseline\.md`'
+        Description = "mandatory tool-heavy routing"
+    },
+    @{
+        Path = "instructions/core/tool-execution-baseline.md"
+        Pattern = '`1` без stderr — expected no-match'
+        Description = "rg expected no-match normalization"
+    },
+    @{
+        Path = "instructions/core/tool-execution-baseline.md"
+        Pattern = 'Не предлагать broad `writable_roots`'
+        Description = "Git metadata protection boundary"
+    },
+    @{
+        Path = "instructions/core/tool-execution-baseline.md"
+        Pattern = 'Идентичный retry по stale context запрещён'
+        Description = "stale patch no-identical-retry rule"
+    },
+    @{
+        Path = "instructions/core/collaboration-baseline.md"
+        Pattern = 'Один файл в один момент имеет одного writer'
+        Description = "one-writer ownership"
+    },
+    @{
+        Path = "instructions/core/testing-baseline.md"
+        Pattern = 'successful full test run'
+        Description = "successful full-run completion gate"
+    },
+    @{
+        Path = "instructions/governance/review-loops.md"
+        Pattern = 'Independent review считать технически read-only только при evidence фактического child sandbox `read-only`'
+        Description = "effective read-only reviewer evidence"
+    },
+    @{
+        Path = "instructions/contexts/session-insights-context.md"
+        Pattern = 'targeted retrieval layer'
+        Description = "session insights retrieval-only role"
+    },
+    @{
+        Path = "instructions/onboarding/local-environment.md"
+        Pattern = 'не изобретать undocumented `\.codex` schema'
+        Description = "documented local-environment schema boundary"
+    },
+    @{
+        Path = "instructions/onboarding/local-environment.md"
+        Pattern = 'Codex Desktop.*не изобретать undocumented `\.codex` schema.*не заявлять CLI support'
+        Description = "Desktop-only local-environment surface"
+    },
+    @{
+        Path = "instructions/onboarding/local-environment.md"
+        Pattern = '-RequiredCommand @\("git", "pwsh", "dotnet"\)'
+        Description = "copy-ready preflight array syntax"
+    },
+    @{
+        Path = "templates/codex/local-environment/README.md"
+        Pattern = '-OptionalCommand @\("node", "rg"\)'
+        Description = "copy-ready optional command array syntax"
+    },
+    @{
+        Path = ".github/workflows/validate-instructions.yml"
+        Pattern = 'runs-on: windows-latest'
+        Description = "Windows operational CI runner"
+    },
+    @{
+        Path = ".github/workflows/validate-instructions.yml"
+        Pattern = 'test-agent-operations\.ps1 -Area All'
+        Description = "full Windows operational CI gate"
+    },
+    @{
+        Path = ".github/workflows/validate-instructions.yml"
+        Pattern = 'test-validate-instructions\.ps1 -SkipAgentOperations'
+        Description = "Linux catalog and Windows operational CI split"
+    },
+    @{
+        Path = "scripts/install-agent-operations.ps1"
+        Pattern = 'ApprovedProposalHash'
+        Description = "proposal-hash activation gate"
+    },
+    @{
+        Path = "scripts/install-agent-operations.ps1"
+        Pattern = 'awaiting-trust'
+        Description = "non-managed hook trust state"
+    },
+    @{
+        Path = "scripts/install-agent-operations.ps1"
+        Pattern = 'MarkActive'
+        Description = "evidence-bound active-state transition"
+    },
+    @{
+        Path = "scripts/hooks/agent-operations-hook.ps1"
+        Pattern = 'InstallManifestPath'
+        Description = "manifest-bound private telemetry salt"
+    },
+    @{
+        Path = "scripts/probe-agent-operations-activation.ps1"
+        Pattern = 'reviewerWriteDenied'
+        Description = "activation reviewer write-denial evidence"
+    },
+    @{
+        Path = "scripts/analyze-codex-session-errors.ps1"
+        Pattern = 'manual-review-only'
+        Description = "classifier accuracy fallback"
+    },
+    @{
+        Path = "scripts/analyze-codex-session-errors.ps1"
+        Pattern = 'independent-stratified-v1'
+        Description = "independent private-gold sampling"
+    },
+    @{
+        Path = "scripts/test-agent-operations.ps1"
+        Pattern = 'ValidateSet\("All", "Hooks", "Installer", "Analyzer", "Privacy"\)'
+        Description = "agent operations test areas"
     }
 )
 
@@ -300,6 +442,39 @@ foreach ($contract in $semanticContracts) {
     $contractContent = Get-Content -Path $contractPath -Raw
     if ($contractContent -notmatch $contract.Pattern) {
         Add-Error "Нарушен semantic contract '$($contract.Description)' в $($contract.Path)"
+    }
+}
+
+$hookTemplateFile = Join-Path $resolvedRoot "templates/codex/agent-operations-hooks.json"
+if (Test-Path -LiteralPath $hookTemplateFile -PathType Leaf) {
+    try {
+        $hookTemplate = (Get-Content -LiteralPath $hookTemplateFile -Raw) | ConvertFrom-Json -Depth 30
+        $eventNames = @($hookTemplate.hooks.PSObject.Properties.Name | Sort-Object)
+        if (($eventNames -join ",") -ne "PostToolUse,PreToolUse") {
+            Add-Error "Hook template должен содержать только PreToolUse и PostToolUse"
+        }
+        foreach ($eventName in $eventNames) {
+            foreach ($group in @($hookTemplate.hooks.$eventName)) {
+                foreach ($handler in @($group.hooks)) {
+                    if ($handler.type -ne "command" -or [int]$handler.timeout -gt 5) {
+                        Add-Error "Hook template event '$eventName' нарушает command/timeout contract"
+                    }
+                }
+            }
+        }
+    }
+    catch {
+        Add-Error "Hook template не является валидным JSON contract: $($_.Exception.Message)"
+    }
+}
+
+$reviewerTemplateFile = Join-Path $resolvedRoot "templates/codex/agents/independent-reviewer.toml"
+if (Test-Path -LiteralPath $reviewerTemplateFile -PathType Leaf) {
+    $reviewerTemplate = Get-Content -LiteralPath $reviewerTemplateFile -Raw
+    foreach ($marker in @('name = "independent-reviewer"', 'description = ', 'developer_instructions = ', 'sandbox_mode = "read-only"')) {
+        if ($reviewerTemplate -notmatch [regex]::Escape($marker)) {
+            Add-Error "Reviewer template не содержит required marker '$marker'"
+        }
     }
 }
 
@@ -534,8 +709,19 @@ function Test-LinkTarget {
     }
 }
 
+$excludedMarkdownFiles = @(
+    "USER_PROFILE_FROM_CODEX_SESSIONS.md",
+    "session-insights/PROJECT_INTEREST_MAP.md",
+    "session-insights/FLAKY_SLOW_TESTS_REGISTRY.md"
+)
 $markdownFiles = Get-ChildItem -Path $resolvedRoot -Recurse -File -Filter *.md
 foreach ($mdFile in $markdownFiles) {
+    $relativeMarkdownPath = [System.IO.Path]::GetRelativePath($resolvedRoot, $mdFile.FullName).Replace("\", "/")
+    if ($relativeMarkdownPath.StartsWith(".artifacts/", [System.StringComparison]::OrdinalIgnoreCase) -or
+        $relativeMarkdownPath -in $excludedMarkdownFiles) {
+        continue
+    }
+
     $raw = Get-Content -Path $mdFile.FullName -Raw
     $content = Remove-CodeFenceContent -Markdown $raw
 

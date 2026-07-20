@@ -1,0 +1,4 @@
+{"timestamp":"2026-01-01T00:01:00Z","type":"session_meta","payload":{"id":"00000000-0000-0000-0000-000000000002","parent_thread_id":"00000000-0000-0000-0000-000000000001"}}
+{"timestamp":"2026-01-01T00:01:03Z","type":"event_msg","payload":{"type":"task_complete"}}
+{"timestamp":"2026-01-02T00:00:00Z","type":"response_item","payload":{"type":"function_call","call_id":"call-outside-window","name":"shell_command","arguments":"{\"command\":\"git status\"}"}}
+{"timestamp":"2026-01-02T00:00:01Z","type":"response_item","payload":{"type":"function_call_output","call_id":"call-outside-window","output":"Script completed\nExit code: 0\nOutput:\n"}}

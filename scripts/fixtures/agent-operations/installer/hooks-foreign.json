@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "hooks": {
+    "Notification": [
+      {
+        "matcher": "^fixture$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "fixture-notification"
+          }
+        ]
+      }
+    ]
+  }
+}

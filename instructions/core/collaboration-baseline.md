@@ -24,6 +24,11 @@
 - Не менять публичный API без подтверждённого contract/spec или явной просьбы пользователя.
 - Для изменений поведения сопровождать работу автоматическими тестами; при исправлении воспроизводимой ошибки сначала добавлять или находить failing regression check, если это пропорционально риску.
 - Не оставлять после изменений ложные или устаревшие комментарии и docstring.
+- До параллельной работы фиксировать ownership map. Один файл в один момент имеет одного writer; shared integration files по умолчанию остаются у main agent.
+- Использовать subagents прежде всего для read-heavy exploration/review либо выдавать им непересекающиеся write sets.
+- Reviewer не меняет файлы: он возвращает findings main agent. Writable reviewer нельзя называть independent read-only review.
+- Builds/tests, которые пишут в один output directory или используют общее mutable state, выполнять последовательно.
+- При повторном write conflict остановить overlapping writers и интегрировать изменения последовательно под одним owner.
 
 ## SHOULD
 
@@ -32,6 +37,7 @@
 - Сначала делать код максимально самодокументируемым; комментарии использовать только для скрытого контекста: межфайловых связей, инвариантов, side effects, workaround и границ безопасного изменения.
 - Выполнять локальный refactor только если он снижает когнитивную сложность или связанность; не ухудшать понятность ради гипотетической микрооптимизации.
 - Явно отделять подтверждённые факты, текущие observations и предположения в отчёте.
+- Ограничивать default fan-out четырьмя прямыми read-only lanes; увеличивать его только при доказанно disjoint scope и доступных ресурсах.
 
 ## MAY
 
@@ -50,6 +56,7 @@ rg -n "MUST|SHOULD|MAY|Спеку подтверждаю|approval|side effect" i
 
 - [AGENTS.md](../../AGENTS.md)
 - [instructions/core/model-behavior-baseline.md](./model-behavior-baseline.md)
+- [instructions/core/tool-execution-baseline.md](./tool-execution-baseline.md)
 - [instructions/core/quest-mode.md](./quest-mode.md)
 - [instructions/core/testing-baseline.md](./testing-baseline.md)
 - [instructions/governance/commenting-policy.md](../governance/commenting-policy.md)

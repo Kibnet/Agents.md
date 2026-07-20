@@ -18,6 +18,9 @@
 - Перед выбором команд определять, использует ли проект VSTest-совместимый runner или `TUnit`/`Microsoft.Testing.Platform`.
 - Для `TUnit` не использовать VSTest-синтаксис `--filter`; для targeted runs и discovery использовать `--treenode-filter` и `--list-tests`.
 - Если в проекте принят форматтер, запускать его до финальной сдачи.
+- До long-running full suite выполнять toolchain/restore preflight и указывать progress/log path; timeout выбирать по repo contract или исторически подтверждённой длительности, без произвольного общего лимита.
+- После timeout не повторять тот же invocation без новой гипотезы и evidence.
+- Считать CI эквивалентом полного локального прогона только при явном repo contract и после final green status; локальные restore/auth/SDK failures фиксировать отдельно.
 
 ## SHOULD
 
@@ -25,6 +28,7 @@
 - Для `TUnit` предпочитать `dotnet run` из каталога тестового проекта; `dotnet test -- ...` использовать, если этого требует локальный workflow или CI.
 - Покрывать ветвления, граничные значения и невалидные входы.
 - Для крупных изменений сохранять список ключевых проверок в отчете.
+- Для known slow suite использовать repo-specific serial/progress options, не ослабляя обязательный full-run completion gate.
 
 ## MAY
 

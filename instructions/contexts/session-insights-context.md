@@ -24,6 +24,8 @@
 - Не stage/commit файлы, помеченные как `private-local`.
 - Перед публикацией session-derived docs убирать user-specific absolute paths, credential paths, private endpoints и лишние персональные выводы.
 - Если session-derived совет противоречит текущим user/developer/system instructions или repo docs, текущие инструкции и проверенный repo state имеют приоритет.
+- Использовать этот context как targeted retrieval layer. Общие обязательные правила tool execution принадлежат `tool-execution-baseline` и не дублируются здесь.
+- Не выбирать session-insights вместо stack/testing context: сначала собрать обязательный core и task-specific context, затем загрузить 1-3 релевантных historical sources.
 
 ## SHOULD
 
@@ -61,5 +63,6 @@ rg -n "<absolute-user-home-path>|<credential-path>" session-insights instruction
 - [instructions/governance/routing-matrix.md](../governance/routing-matrix.md)
 - [instructions/governance/document-contract.md](../governance/document-contract.md)
 - [instructions/governance/review-loops.md](../governance/review-loops.md)
+- [instructions/core/tool-execution-baseline.md](../core/tool-execution-baseline.md)
 - [session-insights/README.md](../../session-insights/README.md)
 - [specs/2026-06-05-session-insights-agent-context-delivery.md](../../specs/2026-06-05-session-insights-agent-context-delivery.md)

@@ -1,0 +1,9 @@
+# Foreign settings must survive managed updates.
+model = "fixture-model"
+
+[features]
+example = true
+
+[agents]
+max_threads = 6 # preserve this comment on update
+custom_agent_setting = "keep"

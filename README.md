@@ -67,10 +67,12 @@ Router[routing-matrix.md]
 
 Core[core правила]
 Model[GPT-5.6 behavior]
+ToolExecution[tool execution baseline]
 Responses[Responses API contract]
 Contexts[контекстные правила]
 Profiles[технологические профили]
 Prompts[prompt templates]
+Operations[warn-only hooks and analyzer]
 
 CodexHome --> Central
 
@@ -83,10 +85,12 @@ Central --> Router
 
 Router --> Core
 Core --> Model
+Core --> ToolExecution
 Router --> Responses
 Router --> Contexts
 Router --> Profiles
 Router --> Prompts
+Central --> Operations
 ```
 
 ---
@@ -125,9 +129,12 @@ prompts/           # канонические prompt templates для guided wor
  └─ storm/
 
 schemas/           # JSON Schema для machine-readable workflow artifacts
-scripts/           # валидация инструкций и вспомогательные workflow scripts
+scripts/           # validator, operational runtime и workflow scripts
+ ├─ hooks/
+ ├─ fixtures/agent-operations/
  └─ storm/
 templates/
+ ├─ codex/
  ├─ specs/
  │  └─ _template.md
  └─ storm/
@@ -143,6 +150,7 @@ specs/             # рабочие спецификации изменений 
 * `AGENTS.md` — основная точка входа
 * `instructions/governance/routing-matrix.md` — алгоритм маршрутизации инструкций
 * `instructions/core/model-behavior-baseline.md` — owner optimization baseline семейства `GPT-5.6`: outcome-first, surface-aware model guidance и stop rules
+* `instructions/core/tool-execution-baseline.md` — обязательный owner preflight, paths/globs, PowerShell, patch, Git и failure classification для tool-heavy задач
 * `instructions/governance/openai-responses-api.md` — trigger-based owner wire-level контрактов OpenAI Responses API
 * `instructions/core/quest-governance.md` — gate `SPEC → EXEC` для инженерных изменений
 * `instructions/core/quest-mode.md` — owner фазового поведения `QUEST`
@@ -165,7 +173,7 @@ specs/             # рабочие спецификации изменений 
    * `consumer-onboarding`
    * `delivery-task`
    * `guided-artifact-workflow`
-4. Собрать central stack по `routing-matrix.md`, включая `model-behavior-baseline` как обязательный core baseline для семейства `GPT-5.6`
+4. Собрать central stack по `routing-matrix.md`, включая `model-behavior-baseline` и, для tool-heavy задачи, `tool-execution-baseline`
 5. Если в consumer-репозитории есть `AGENTS.override.md`, применить только его ужесточающие правила
 6. Если задача идёт через `QUEST`, использовать:
    * [instructions/core/quest-governance.md](instructions/core/quest-governance.md) для applicability и quality gate
@@ -175,6 +183,7 @@ specs/             # рабочие спецификации изменений 
 
 * `SPEC gate` применяется к инженерным изменениям каталога, кода, инфраструктуры и канонических файлов проекта
 * `model-behavior-baseline` применяется ко всем сценариям и задаёт GPT-5.6 optimization contract: outcome-first цель, surface evidence, критерии успеха, ограничения, output contract и stop rules
+* `tool-execution-baseline` применяется до первого значимого tool call и не занимает место task-specific context
 * `openai-responses-api` подключается только для API-specific задач; ordinary Markdown review или работа в product UI не должны тянуть wire-level API правила
 * на фазе `SPEC` рабочая spec в локальном `./specs/` может обновляться до подтверждения пользователя; остальные файлы менять нельзя
 * внутри `QUEST` после черновика спеки обязателен цикл `draft → lint/rubric → post-review → refine`
@@ -187,10 +196,34 @@ specs/             # рабочие спецификации изменений 
 
 Примеры:
 
-* инженерная задача по каталогу: `model-behavior-baseline + quest-governance + collaboration-baseline + governance overlays`
+* инженерная задача по каталогу: `model-behavior-baseline + tool-execution-baseline + quest-governance + collaboration-baseline + governance overlays`
 * пошаговый анализ бизнес-процесса: `model-behavior-baseline + collaboration-baseline + business-process-automation`
 * STORM product discovery без code/test mutations: `model-behavior-baseline + collaboration-baseline + storm-product-development`
 * STORM implementation/cleanup/test coverage: `model-behavior-baseline + quest-governance + collaboration-baseline + testing-baseline + stack/testing profile + storm-product-development`
+
+---
+
+# Operational prevention runtime
+
+Каталог содержит versioned candidate механической защиты от повторяемых tool-ошибок:
+
+* `scripts/hooks/agent-operations-hook.ps1` — fail-open dispatcher только для `PreToolUse` и `PostToolUse`, с physical-path lock, atomic rotation и проверяемым recovery marker для незавершённого rollback;
+* `scripts/install-agent-operations.ps1` — idempotent preview/install/uninstall/prune и evidence-bound `-MarkActive` с physical-alias transaction lock, intermediate reparse guards, fingerprints, backup и rollback; runtime записывается из захваченного и хешированного byte snapshot;
+* `scripts/probe-agent-operations-activation.ps1` — controlled safe/noisy/fail-open probe, проверка agent limits, manual hook trust, подтверждение controlled host task, install-bound runtime challenge и привязанное к fingerprint reviewer write-denial evidence; probe исполняет hash-verified captured runtime bytes из одноразового private staging path и повторно проверяет live runtime;
+* `scripts/analyze-codex-session-errors.ps1` — потоковый privacy-safe отчёт с дедупликацией trace/call IDs, агрегацией child traces в root task, раздельными task/trace/event и envelope/matched/unmatched/boundary denominators и independently sampled private-local gold gate;
+* `templates/codex/agents/independent-reviewer.toml` — read-only reviewer template;
+* `templates/codex/local-environment/` — read-only Windows preflight для consumer rollout.
+
+Проверка versioned candidate не меняет пользовательский Codex home:
+
+```powershell
+pwsh -File scripts/test-agent-operations.ps1
+pwsh -File scripts/install-agent-operations.ps1 -CodexHome <fixture-path> -WhatIf
+```
+
+Telemetry включается только при наличии созданной installer-ом случайной salt в local manifest и пишет allowlist `schemaVersion/timestamp/runtimeVersion/eventName/category/severity/action/exitClass/repoHash` плюс optional `sessionHash`; raw command/output/path не сохраняются. Межпроцессный file lock сериализует lexical aliases одного physical logs directory. При невозможности откатить ротацию hook сохраняет checksum-bound recovery copies и marker; проверенный комплект после 7 дней проходит bounded quarantine cleanup, а malformed/drifted/partial-cleanup state остаётся для ручной проверки без ложного восстановления marker.
+
+Фраза `Спеку подтверждаю` разрешает только repository implementation. Реальная установка в `%USERPROFILE%\.codex` допустима лишь после отдельного Git delivery, проверки active central checkout, предъявления exact `-WhatIf` proposal с `proposalHash` и фразы `Глобальную активацию подтверждаю` для этого hash. Preview раскрывает exact before/after content для `config.toml`, `hooks.json` и reviewer, immutable runtime hash и только явно перечисленные generated fields. После записи non-managed hooks остаются в состоянии `awaiting-trust`, пока пользователь не проверит exact definition через `/hooks` или актуальный документированный эквивалент, не подтвердит запуск controlled host task, probe не увидит install-bound runtime challenge и reviewer write denial, а отдельный approved `-MarkActive` не переведёт полный manifest postimage в `active`. Activation evidence действительно не более 15 минут и повторно проверяется непосредственно перед commit.
 
 ---
 
@@ -386,6 +419,7 @@ AGENTS.override.md
 ```
 pwsh -File scripts/validate-instructions.ps1
 pwsh -File scripts/test-validate-instructions.ps1
+pwsh -File scripts/test-agent-operations.ps1
 ```
 
 ---
@@ -402,6 +436,8 @@ pwsh -File scripts/test-validate-instructions.ps1
 
 * `push`
 * `pull request`
+
+Catalog/link/semantic checks выполняются на `ubuntu-latest` без Windows-specific runtime suite. Полные hook/installer/analyzer/privacy contracts выполняются отдельным `windows-latest` job, где доступны NTFS junction/reparse semantics.
 
 ---
 

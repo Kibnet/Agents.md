@@ -17,6 +17,7 @@
 - Проверить, что локальный `AGENTS.md` не дублирует центральные правила.
 - Для `QUEST`-задач сохранять рабочие spec-файлы в локальном `./specs/` репозитория-потребителя.
 - Для `QUEST`-задач всегда использовать central template `$env:AGENTS_ROOT\templates\specs\_template.md`.
+- Для repo-specific SDK/runtime/browser/native dependencies создать проверяемый local-environment preflight по central contract, не скрыто устанавливая toolchain.
 
 ## SHOULD
 
@@ -39,6 +40,7 @@ $env:AGENTS_ROOT = "/path/to/agents-catalog"
 # 2) При необходимости создать AGENTS.override.md
 # 3) Для QUEST использовать центральный $env:AGENTS_ROOT\templates\specs\_template.md
 # 4) Проверить, что ссылки на центральный каталог валидны
+# 5) При необходимости подключить templates\codex\local-environment\preflight.ps1 через поддерживаемый Codex Desktop local-environment flow
 ```
 
 ## 2) Пример быстрого подключения из внешнего репозитория
@@ -58,3 +60,5 @@ $env:AGENTS_ROOT = "$PWD\.agents-catalog"
 - [instructions/onboarding/AGENTS.consumer.template.md](./AGENTS.consumer.template.md)
 - [instructions/onboarding/AGENTS.override.template.md](./AGENTS.override.template.md)
 - [instructions/governance/document-contract.md](../governance/document-contract.md)
+- [instructions/onboarding/local-environment.md](./local-environment.md)
+- [templates/codex/local-environment/README.md](../../templates/codex/local-environment/README.md)

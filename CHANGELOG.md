@@ -2,6 +2,38 @@
 
 All notable changes to this instruction catalog are documented in this file.
 
+## [3.1.0] - 2026-07-17
+
+### Added
+
+- Добавлен обязательный [tool-execution-baseline.md](instructions/core/tool-execution-baseline.md) для раннего path/toolchain/Git preflight, Windows-safe PowerShell, нормализации `rg` exit `1`, конечного patch retry и классификации environment blockers.
+- Добавлены warn-only `PreToolUse`/`PostToolUse` runtime, non-managed hook template, immutable-version installer с exact `proposalHash`, backup/rollback/uninstall/prune, evidence-bound `-MarkActive`, controlled activation probe и personal [independent-reviewer.toml](templates/codex/agents/independent-reviewer.toml).
+- Добавлены потоковый privacy-safe session analyzer, deterministic broad sampling, independent private-gold thresholds, synthetic fixtures и единый `test-agent-operations.ps1` для hooks, installer, analyzer, retention и privacy contracts.
+- Добавлены [local-environment.md](instructions/onboarding/local-environment.md) и Windows preflight template для отдельных consumer-repository rollout без скрытой установки toolchain.
+
+### Changed
+
+- Routing подключает operational owner для каждой tool-heavy задачи, не вытесняя task-specific context; session insights остаётся targeted historical retrieval layer.
+- Collaboration, testing и review owners теперь требуют one-writer ownership, serial shared-output validation, staged `targeted -> build -> full`, no-blind-retry и effective read-only evidence для independent reviewer.
+- Standard validator проверяет новые owner/runtime/CI markers, ровно два поддержанных hook events и не сканирует ignored `.artifacts`/private-local Markdown; Linux job выполняет catalog regressions, а отдельный `windows-latest` job запускает полный набор hook, installer, analyzer и privacy contracts.
+- Installer сериализует physical aliases одного Codex home, отвергает intermediate reparse paths до managed reads и перед commit, записывает захваченный byte snapshot runtime и раскрывает exact `config.toml`/`hooks.json`/reviewer postimages с bounded generated fields.
+- Activation evidence теперь отдельно фиксирует manual hook trust и controlled host task, связывает runtime observation с install-specific challenge, исполняет hash-verified captured runtime bytes из одноразового staging path, повторно проверяет live runtime, истекает не позднее 15 минут и проверяется непосредственно перед записью полного active manifest postimage.
+- Analyzer дедуплицирует active/archive trace copies и repeated call IDs, сворачивает nested child traces в root task и разделяет legacy envelopes, matched pairs, unmatched calls/outputs и cross-window exclusions; post-`Until` records не меняют исторический window.
+- Behavioral/gold/review schemas теперь проверяются contract tests: smoke использует полный уникальный набор scenario IDs, PASS review требует write denial и улучшение всех сценариев, gold labels хранятся в hash-keyed map без duplicate evidence IDs.
+- Local-environment onboarding ограничен документированной Codex Desktop поверхностью; copy-ready PowerShell examples используют настоящие array arguments и покрыты multi-command regression test.
+
+### Security / Privacy
+
+- Hooks работают только в `warn-only`/`fail-open`, не возвращают block/retry decisions и под межпроцессным lock записывают bounded allowlisted telemetry с локальной случайной salt, без raw command, output, prompt, path, environment или secret fields.
+- Telemetry file lock общий для lexical aliases одного physical logs directory; неуспешный rotation rollback оставляет checksum-bound recovery marker/copies, которые удаляются только после 7 дней, повторной проверки ownership/name/hash/reparse и quarantine commit. Частичный cleanup не восстанавливает marker, который ссылался бы на уже удалённые bytes.
+- Global sandbox/approval policy и consumer repositories не меняются; versioned implementation не активирует user hooks, reviewer или runtime.
+
+### Migration / Rollback
+
+- Фраза `Спеку подтверждаю` разрешает только repository implementation. Global activation требует delivered active catalog, exact `-WhatIf` proposal, отдельного hash-bound approval и ручного trust non-managed hook definition.
+- Installer удаляет только fingerprint-matched managed state, сохраняет foreign TOML/hooks и user drift, ограничивает logs до 10 MB / 3 files / 45 days, backups до 10 и runtime versions до 3 через отдельный previewed prune.
+- Состояние `awaiting-trust -> active` требует свежего evidence с manual trust, controlled host task, install-bound runtime challenge и effective reviewer write denial; истёкший между preview и commit evidence оставляет manifest без изменений.
+
 ## [3.0.0] - 2026-07-14
 
 ### Added

@@ -1,0 +1,11 @@
+{
+  "hook_event_name": "PostToolUse",
+  "tool_name": "Bash",
+  "tool_input": {
+    "command": "rg absent ."
+  },
+  "tool_response": {
+    "exit_code": 1,
+    "stderr": ""
+  }
+}

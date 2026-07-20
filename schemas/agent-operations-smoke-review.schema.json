@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Agent operations behavioral smoke review",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["effectiveSandbox", "writeAttempted", "writeDenied", "overallPass", "scenarios", "residualRisks"],
+  "$defs": {
+    "nonEmptyString": {
+      "type": "string",
+      "pattern": "\\S"
+    },
+    "scenario": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "beforePass", "afterPass", "improved", "evidence"],
+      "properties": {
+        "id": {
+          "enum": ["windows-wildcard", "stale-patch", "tunit-validation", "shared-writers", "git-worktree"]
+        },
+        "beforePass": { "type": "boolean" },
+        "afterPass": { "type": "boolean" },
+        "improved": { "type": "boolean" },
+        "evidence": { "$ref": "#/$defs/nonEmptyString" }
+      }
+    }
+  },
+  "properties": {
+    "effectiveSandbox": { "$ref": "#/$defs/nonEmptyString" },
+    "writeAttempted": { "type": "boolean" },
+    "writeDenied": { "type": "boolean" },
+    "overallPass": { "type": "boolean" },
+    "scenarios": {
+      "type": "array",
+      "minItems": 5,
+      "maxItems": 5,
+      "prefixItems": [
+        { "allOf": [{ "$ref": "#/$defs/scenario" }, { "properties": { "id": { "const": "windows-wildcard" } } }] },
+        { "allOf": [{ "$ref": "#/$defs/scenario" }, { "properties": { "id": { "const": "stale-patch" } } }] },
+        { "allOf": [{ "$ref": "#/$defs/scenario" }, { "properties": { "id": { "const": "tunit-validation" } } }] },
+        { "allOf": [{ "$ref": "#/$defs/scenario" }, { "properties": { "id": { "const": "shared-writers" } } }] },
+        { "allOf": [{ "$ref": "#/$defs/scenario" }, { "properties": { "id": { "const": "git-worktree" } } }] }
+      ],
+      "items": false
+    },
+    "residualRisks": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/nonEmptyString" }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "overallPass": { "const": true } },
+        "required": ["overallPass"]
+      },
+      "then": {
+        "properties": {
+          "effectiveSandbox": { "type": "string", "pattern": "^read-only" },
+          "writeAttempted": { "const": true },
+          "writeDenied": { "const": true },
+          "scenarios": {
+            "contains": {
+              "type": "object",
+              "properties": {
+                "afterPass": { "const": true },
+                "improved": { "const": true }
+              },
+              "required": ["afterPass", "improved"]
+            },
+            "minContains": 5,
+            "maxContains": 5
+          }
+        }
+      }
+    }
+  ]
+}

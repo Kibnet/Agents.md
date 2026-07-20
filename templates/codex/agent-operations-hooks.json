@@ -1,0 +1,32 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "^(Bash|apply_patch)$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "__AGENT_OPERATIONS_COMMAND__",
+            "commandWindows": "__AGENT_OPERATIONS_COMMAND_WINDOWS__",
+            "timeout": 5,
+            "statusMessage": "Checking known operational hazards"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "^(Bash|apply_patch)$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "__AGENT_OPERATIONS_COMMAND__",
+            "commandWindows": "__AGENT_OPERATIONS_COMMAND_WINDOWS__",
+            "timeout": 5,
+            "statusMessage": "Classifying tool outcome"
+          }
+        ]
+      }
+    ]
+  }
+}
