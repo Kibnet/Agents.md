@@ -23,6 +23,7 @@
 
 - Добавлять краткое описание, какой профиль использовать по умолчанию в этом репозитории.
 - Проверять актуальность ссылок при обновлении центрального каталога.
+- Если creative/human-experience задачи должны загружать полный `creator-vibe`, устанавливать его отдельно через системный `skill-installer` с pinned upstream commit; отсутствие полного skill не ломает lightweight central owner.
 
 ## MAY
 
@@ -41,6 +42,13 @@ $env:AGENTS_ROOT = "/path/to/agents-catalog"
 # 3) Для QUEST использовать центральный $env:AGENTS_ROOT\templates\specs\_template.md
 # 4) Проверить, что ссылки на центральный каталог валидны
 # 5) При необходимости подключить templates\codex\local-environment\preflight.ps1 через поддерживаемый Codex Desktop local-environment flow
+
+# 6) Опционально установить полный external creator-vibe
+python "$env:USERPROFILE\.codex\skills\.system\skill-installer\scripts\install-skill-from-github.py" `
+  --repo bish-x/creator-vibe `
+  --path . `
+  --ref 58642d69fafc5768627ed16215723c19198c4b4b `
+  --name creator-vibe
 ```
 
 ## 2) Пример быстрого подключения из внешнего репозитория
@@ -57,6 +65,7 @@ $env:AGENTS_ROOT = "$PWD\.agents-catalog"
 ## Связанные документы
 
 - [AGENTS.md](../../AGENTS.md)
+- [instructions/core/creator-vibe-lens.md](../core/creator-vibe-lens.md)
 - [instructions/onboarding/AGENTS.consumer.template.md](./AGENTS.consumer.template.md)
 - [instructions/onboarding/AGENTS.override.template.md](./AGENTS.override.template.md)
 - [instructions/governance/document-contract.md](../governance/document-contract.md)

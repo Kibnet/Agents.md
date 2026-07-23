@@ -587,7 +587,7 @@ function Test-Installer {
     Assert-Equal -Actual $install.ExitCode -Expected 0 -Message "approved fixture install should pass"
     Assert-Equal -Actual $install.Json.status -Expected "installed-awaiting-trust" -Message "install should not claim active hook trust"
     $config = [System.IO.File]::ReadAllText((Join-Path $codexHome "config.toml"))
-    Assert-True -Condition ($config -match '(?m)^max_threads\s*=\s*4\s*# preserve this comment on update$') -Message "installer should set max_threads and preserve inline comment"
+    Assert-True -Condition ($config -match '(?m)^max_threads\s*=\s*4\s*# preserve this comment on update\r?$') -Message "installer should set max_threads and preserve inline comment"
     Assert-True -Condition ($config -match '(?m)^max_depth\s*=\s*1\s*$') -Message "installer should set max_depth"
     Assert-True -Condition ($config -match 'custom_agent_setting\s*=\s*"keep"') -Message "foreign TOML should survive"
     $hooks = (Get-Content -LiteralPath (Join-Path $codexHome "hooks.json") -Raw) | ConvertFrom-Json -Depth 30
@@ -830,7 +830,7 @@ function Test-Installer {
     $uninstall = Invoke-JsonProcess -ScriptPath $installerScript -Arguments @("-CodexHome", $codexHome, "-Uninstall", "-ApprovedProposalHash", $uninstallPreview.Json.proposalHash, "-OutputFormat", "Json")
     Assert-Equal -Actual $uninstall.Json.status -Expected "uninstalled" -Message "uninstall should pass"
     $restoredConfig = [System.IO.File]::ReadAllText((Join-Path $codexHome "config.toml"))
-    Assert-True -Condition ($restoredConfig -match '(?m)^max_threads\s*=\s*6\s*# preserve this comment on update$') -Message "uninstall should restore previous max_threads"
+    Assert-True -Condition ($restoredConfig -match '(?m)^max_threads\s*=\s*6\s*# preserve this comment on update\r?$') -Message "uninstall should restore previous max_threads"
     Assert-True -Condition ($restoredConfig -notmatch '(?m)^max_depth\s*=') -Message "uninstall should remove previously absent max_depth"
     $restoredHooks = (Get-Content -LiteralPath (Join-Path $codexHome "hooks.json") -Raw) | ConvertFrom-Json -Depth 30
     Assert-Equal -Actual @($restoredHooks.hooks.Notification).Count -Expected 1 -Message "uninstall should preserve foreign hook"

@@ -300,6 +300,53 @@ try {
     finally {
         Set-Content -Path $workflowFile -Value $original -Encoding UTF8
     }
+
+    # Scenario 19: mandatory creator-vibe owner is missing
+    $creatorVibeFile = Join-Path $scenarioRoot "instructions/core/creator-vibe-lens.md"
+    $original = Get-Content -Path $creatorVibeFile -Raw
+    try {
+        Remove-Item -Path $creatorVibeFile -Force
+        if (-not (Invoke-Validation -ScenarioName "отсутствует creator-vibe owner" -ScenarioPath $scenarioRoot -ShouldPass $false)) {
+            $failed = $true
+        }
+    }
+    finally {
+        Set-Content -Path $creatorVibeFile -Value $original -Encoding UTF8
+    }
+
+    # Scenario 20: creator-vibe routing is no longer mandatory
+    $routingFile = Join-Path $scenarioRoot "instructions/governance/routing-matrix.md"
+    $original = Get-Content -Path $routingFile -Raw
+    try {
+        $modified = $original.Replace(
+            'До классификации каждой задачи подключать `instructions/core/creator-vibe-lens.md`',
+            'Для некоторых задач подключать `instructions/core/creator-vibe-lens.md`'
+        )
+        Set-Content -Path $routingFile -Value $modified -Encoding UTF8
+        if (-not (Invoke-Validation -ScenarioName "creator-vibe owner перестал быть обязательным" -ScenarioPath $scenarioRoot -ShouldPass $false)) {
+            $failed = $true
+        }
+    }
+    finally {
+        Set-Content -Path $routingFile -Value $original -Encoding UTF8
+    }
+
+    # Scenario 21: creator-vibe starts overriding explicit and exact contracts
+    $creatorVibeFile = Join-Path $scenarioRoot "instructions/core/creator-vibe-lens.md"
+    $original = Get-Content -Path $creatorVibeFile -Raw
+    try {
+        $modified = $original.Replace(
+            'Эта линза не переопределяет явные инструкции пользователя, factual accuracy, safety, exact-output contract, authorization, scope, QUEST phase gates или более специфичные owner-документы',
+            'Эта линза может переопределять явные инструкции пользователя и exact-output contract'
+        )
+        Set-Content -Path $creatorVibeFile -Value $modified -Encoding UTF8
+        if (-not (Invoke-Validation -ScenarioName "creator-vibe explicit boundary ослаблен" -ScenarioPath $scenarioRoot -ShouldPass $false)) {
+            $failed = $true
+        }
+    }
+    finally {
+        Set-Content -Path $creatorVibeFile -Value $original -Encoding UTF8
+    }
 }
 finally {
     if (Test-Path $tempRoot) {

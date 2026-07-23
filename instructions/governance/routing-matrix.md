@@ -15,6 +15,7 @@
 - Использовать этот документ как канонический source of truth для:
   - порядка сборки central instruction stack;
   - модели разрешения конфликтов между документами.
+- До классификации каждой задачи подключать `instructions/core/creator-vibe-lens.md` как lightweight interpretive owner; полный skill `creator-vibe` загружать только по его creative/human-experience trigger.
 - Для каждой задачи подключать `instructions/core/model-behavior-baseline.md` как обязательный core baseline оптимизации под семейство `GPT-5.6`, не подменяя им проверку фактической surface/runtime availability.
 - Для каждой `tool-heavy` задачи подключать `instructions/core/tool-execution-baseline.md` до первого значимого tool call; этот owner добавляется поверх task-type core и не конкурирует с выбранным context.
 - Для каждой задачи фиксировать минимум один core-документ и при необходимости один context + один profile.
@@ -46,15 +47,17 @@ Get-ChildItem instructions/profiles
 
 ## Stack Assembly Order
 
-1. Классифицировать задачу:
+1. Применить `creator-vibe-lens` как lightweight owner и определить, требует ли задача полного `creator-vibe`; не загружать полный skill для factual, mechanical, exact-output или fully specified work.
+2. Классифицировать задачу:
    - `catalog-governance`, `consumer-onboarding`, `delivery-task`, `guided-artifact-workflow`.
-2. Подключить `model-behavior-baseline` и базовый набор (`core`) по типу задачи.
-3. Если задача `tool-heavy`, добавить `tool-execution-baseline`.
-4. Выбрать один `context` по типу выполнения.
-5. Выбрать один профиль технологического стека (`stack profile`), если задача привязана к реализации в конкретном стеке.
-6. При необходимости добавить один профиль типа изменения (`overlay profile`) или использовать один профиль сценария для аналитической задачи без стековой привязки.
-7. Добавить governance overlays по триггерам задачи.
-8. Если задача выполняется в consumer-репозитории и есть локальный `AGENTS.override.md`, применить его после central stack как дополнительные локальные инструкции поверх него и использовать только для ужесточения central `MUST`.
+3. Подключить `model-behavior-baseline` и базовый набор (`core`) по типу задачи.
+4. Если задача `tool-heavy`, добавить `tool-execution-baseline`.
+5. Выбрать один `context` по типу выполнения.
+6. Выбрать один профиль технологического стека (`stack profile`), если задача привязана к реализации в конкретном стеке.
+7. При необходимости добавить один профиль типа изменения (`overlay profile`) или использовать один профиль сценария для аналитической задачи без стековой привязки.
+8. Добавить governance overlays по триггерам задачи.
+9. Если full-skill trigger сработал и `creator-vibe` установлен, загрузить его до более узких skills/profiles; отсутствие skill не блокирует задачу, если пользователь не потребовал его явно.
+10. Если задача выполняется в consumer-репозитории и есть локальный `AGENTS.override.md`, применить его после central stack как дополнительные локальные инструкции поверх него и использовать только для ужесточения central `MUST`.
 
 ## Conflict Resolution Model
 
@@ -72,8 +75,11 @@ Get-ChildItem instructions/profiles
 12. Для path discovery, PowerShell, `rg`, patch retry, Git/worktree preflight и общей классификации tool failures owner-документом является `instructions/core/tool-execution-baseline.md`.
 13. Для GitHub branch naming, pull request и GitHub Release artifacts owner-документом является `instructions/governance/github-delivery-policy.md`.
 14. Локальный `AGENTS.override.md` не заменяет central stack, может только ужесточать центральные правила и не может ослаблять центральный `MUST`.
+15. Для lightweight интерпретации intent/taste/human outcome и trigger полного external skill owner-документом является `instructions/core/creator-vibe-lens.md`; он не может ослаблять explicit instructions, factual accuracy, safety, exact-output, authorization, scope, QUEST phase gates или более специфичные owner-документы.
 
 ## Базовый набор по типу задачи
+
+`creator-vibe-lens` подключается до классификации для каждой строки и не расходует лимит profile-документов.
 
 | Тип задачи | Обязательные документы |
 |---|---|
@@ -136,7 +142,7 @@ Get-ChildItem instructions/profiles
 
 ## Быстрые примеры маршрутов
 
-Во всех примерах ниже `model-behavior-baseline` подключается как обязательный core baseline и не повторяется в строках для краткости.
+Во всех примерах ниже `creator-vibe-lens` и `model-behavior-baseline` подключаются как обязательные core owners и не повторяются в строках для краткости.
 
 | Ситуация | Минимальный стек |
 |---|---|
@@ -157,6 +163,7 @@ Get-ChildItem instructions/profiles
 ## Связанные документы
 
 - [AGENTS.md](../../AGENTS.md)
+- [instructions/core/creator-vibe-lens.md](../core/creator-vibe-lens.md)
 - [instructions/core/model-behavior-baseline.md](../core/model-behavior-baseline.md)
 - [instructions/core/tool-execution-baseline.md](../core/tool-execution-baseline.md)
 - [instructions/governance/commenting-policy.md](./commenting-policy.md)

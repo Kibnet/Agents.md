@@ -26,6 +26,7 @@ $requiredPaths = @(
     "CHANGELOG.md",
     ".github/workflows/validate-instructions.yml",
     "templates/specs/_template.md",
+    "instructions/core/creator-vibe-lens.md",
     "instructions/core/model-behavior-baseline.md",
     "instructions/core/quest-governance.md",
     "instructions/core/quest-mode.md",
@@ -251,6 +252,31 @@ foreach ($mdFile in $activeTemplateScanFiles) {
 }
 
 $semanticContracts = @(
+    @{
+        Path = "instructions/core/creator-vibe-lens.md"
+        Pattern = 'Эта линза не переопределяет явные инструкции пользователя, factual accuracy, safety, exact-output contract, authorization, scope, QUEST phase gates или более специфичные owner-документы'
+        Description = "creator-vibe explicit boundary"
+    },
+    @{
+        Path = "instructions/core/creator-vibe-lens.md"
+        Pattern = 'Не загружать полный `creator-vibe` для factual lookup, mechanical transformations, exact-output requests и fully specified work'
+        Description = "creator-vibe full-skill exclusions"
+    },
+    @{
+        Path = "AGENTS.md"
+        Pattern = 'instructions/core/creator-vibe-lens\.md'
+        Description = "creator-vibe owner entry point"
+    },
+    @{
+        Path = "instructions/governance/routing-matrix.md"
+        Pattern = 'До классификации каждой задачи подключать `instructions/core/creator-vibe-lens\.md`'
+        Description = "mandatory creator-vibe lightweight routing"
+    },
+    @{
+        Path = "README.md"
+        Pattern = '58642d69fafc5768627ed16215723c19198c4b4b'
+        Description = "creator-vibe pinned provenance"
+    },
     @{
         Path = "instructions/core/model-behavior-baseline.md"
         Pattern = 'семейство `GPT-5\.6` целевой optimization baseline'

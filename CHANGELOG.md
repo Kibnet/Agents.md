@@ -2,6 +2,29 @@
 
 All notable changes to this instruction catalog are documented in this file.
 
+## [3.2.0] - 2026-07-23
+
+### Added
+
+- Добавлен обязательный lightweight owner [creator-vibe-lens.md](instructions/core/creator-vibe-lens.md), который до классификации задачи сохраняет человеческий outcome и авторский замысел, а полный external `creator-vibe` загружает только по creative/human-experience trigger.
+- Validator и regression suite получили contracts для наличия owner, обязательного routing, exact/factual exclusions и приоритета explicit instructions, factual accuracy, safety, authorization, scope и QUEST.
+
+### Changed
+
+- [AGENTS.md](AGENTS.md) и [routing-matrix.md](instructions/governance/routing-matrix.md) подключают lightweight lens для каждой задачи, не считая её дополнительным profile и не ослабляя более специфичные owners.
+- [README.md](README.md) и [quick-start.md](instructions/onboarding/quick-start.md) описывают optional установку полного [`bish-x/creator-vibe`](https://github.com/bish-x/creator-vibe) с pinned commit `58642d69fafc5768627ed16215723c19198c4b4b`.
+- Installer contract assertions принимают сохраняемые Windows `CRLF` line endings, не ослабляя проверку `max_threads` value или inline comment.
+
+### Compatibility / Security
+
+- Factual, mechanical, exact-output и fully specified work исключены из full-skill trigger; lightweight lens не разрешает изобретать requirements или расширять scope.
+- Upstream skill остаётся внешней локальной dependency: его long-form текст не vendored и не модифицируется в этом каталоге; отсутствие полного skill не блокирует обычную задачу и не должно приводить к ложному claim о его загрузке.
+
+### Migration / Rollback
+
+- Для полного creative behavior установить upstream skill системным `skill-installer`; новый skill доступен следующему Codex turn/session.
+- Rollback versioned behavior выполняется единым откатом change set `3.2.0`; локальный external skill можно отдельно вывести из active skills path без изменения global pointer, config, hooks, sandbox или approval policy.
+
 ## [3.1.0] - 2026-07-17
 
 ### Added

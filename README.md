@@ -66,6 +66,7 @@ Override[AGENTS.override.md<br/>optional local strict rules]
 Router[routing-matrix.md]
 
 Core[core правила]
+CreatorVibe[creator-vibe lightweight lens]
 Model[GPT-5.6 behavior]
 ToolExecution[tool execution baseline]
 Responses[Responses API contract]
@@ -73,6 +74,7 @@ Contexts[контекстные правила]
 Profiles[технологические профили]
 Prompts[prompt templates]
 Operations[warn-only hooks and analyzer]
+ExternalSkill[~/.codex/skills/creator-vibe<br/>external full skill]
 
 CodexHome --> Central
 
@@ -84,14 +86,26 @@ RepoA -. optional .-> Override
 Central --> Router
 
 Router --> Core
+Core --> CreatorVibe
 Core --> Model
 Core --> ToolExecution
+CreatorVibe -. creative / human-experience trigger .-> ExternalSkill
 Router --> Responses
 Router --> Contexts
 Router --> Profiles
 Router --> Prompts
 Central --> Operations
 ```
+
+---
+
+# Creator Vibe: lightweight lens и полный skill
+
+Central stack применяет [creator-vibe-lens.md](instructions/core/creator-vibe-lens.md) до классификации каждой задачи. Линза помогает сохранить реальный человеческий outcome и авторский замысел, но не переопределяет explicit instructions, factual accuracy, safety, exact-output, authorization, scope, QUEST или более специфичные owners.
+
+Полный [`bish-x/creator-vibe`](https://github.com/bish-x/creator-vibe) является внешним optional skill: он загружается только для задач, где результат зависит от taste, voice, feeling, UX/human experience или недосказанного намерения. Для factual, mechanical, exact-output и fully specified work полный skill не нужен. Если он не установлен, lightweight owner продолжает работать и не должен создавать ложный claim о загрузке skill.
+
+Репозиторий не vendor-ит и не модифицирует upstream-текст. Воспроизводимая локальная интеграция проверена на commit [`58642d69fafc5768627ed16215723c19198c4b4b`](https://github.com/bish-x/creator-vibe/commit/58642d69fafc5768627ed16215723c19198c4b4b).
 
 ---
 
@@ -149,6 +163,7 @@ specs/             # рабочие спецификации изменений 
 
 * `AGENTS.md` — основная точка входа
 * `instructions/governance/routing-matrix.md` — алгоритм маршрутизации инструкций
+* `instructions/core/creator-vibe-lens.md` — обязательный lightweight owner intent/human outcome и trigger полного external skill
 * `instructions/core/model-behavior-baseline.md` — owner optimization baseline семейства `GPT-5.6`: outcome-first, surface-aware model guidance и stop rules
 * `instructions/core/tool-execution-baseline.md` — обязательный owner preflight, paths/globs, PowerShell, patch, Git и failure classification для tool-heavy задач
 * `instructions/governance/openai-responses-api.md` — trigger-based owner wire-level контрактов OpenAI Responses API
@@ -327,6 +342,7 @@ BDD/Gherkin слой в `storm.json` хранит metadata and traceability, а 
 * в рабочих репозиториях локальный `AGENTS.md` больше не нужен
 * локальный `AGENTS.override.md` применяется только поверх central stack и может только ужесточать `MUST`
 * для `QUEST` рабочие spec-файлы создаются в локальном `.\specs\`, а canonical template берётся из центрального `templates\specs\_template.md`
+* lightweight `creator-vibe-lens` входит в central stack; полный external skill устанавливается отдельно и остаётся optional
 
 ### 1. Подключить каталог как `~\.codex\agents`
 
@@ -370,7 +386,21 @@ git clone https://github.com/Kibnet/Agents.md.git "$env:USERPROFILE\.codex\agent
 - canonical template берется из `C:\Users\<user>\.codex\agents\templates\specs\_template.md`
 ```
 
-### 3. Добавлять только локальные ужесточения
+### 3. Опционально установить полный `creator-vibe`
+
+Lightweight owner уже входит в central catalog. Чтобы creative/human-experience задачи могли загрузить полный upstream skill, используйте системный `skill-installer` и pinned commit:
+
+```powershell
+python "$env:USERPROFILE\.codex\skills\.system\skill-installer\scripts\install-skill-from-github.py" `
+  --repo bish-x/creator-vibe `
+  --path . `
+  --ref 58642d69fafc5768627ed16215723c19198c4b4b `
+  --name creator-vibe
+```
+
+Installer не перезаписывает существующий destination. Новый skill становится доступен следующему Codex turn/session.
+
+### 4. Добавлять только локальные ужесточения
 
 В проектах создавайте `AGENTS.override.md` только если нужны дополнительные
 локальные ограничения, команды или профиль по умолчанию. Central stack остаётся
