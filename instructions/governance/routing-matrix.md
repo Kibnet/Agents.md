@@ -16,7 +16,7 @@
   - порядка сборки central instruction stack;
   - модели разрешения конфликтов между документами.
 - До классификации каждой задачи подключать `instructions/core/creator-vibe-lens.md` как lightweight interpretive owner; полный skill `creator-vibe` загружать только по его creative/human-experience trigger.
-- Для каждой задачи подключать `instructions/core/model-behavior-baseline.md` как обязательный core baseline оптимизации под семейство `GPT-5.6`, не подменяя им проверку фактической surface/runtime availability.
+- Для каждой задачи подключать `instructions/core/model-behavior-baseline.md` как обязательный core baseline оптимизации под `GPT-6 Astra`, не подменяя им проверку фактической surface/runtime availability.
 - Для каждой `tool-heavy` задачи подключать `instructions/core/tool-execution-baseline.md` до первого значимого tool call; этот owner добавляется поверх task-type core и не конкурирует с выбранным context.
 - Для каждой задачи фиксировать минимум один core-документ и при необходимости один context + один profile.
 - Использовать не более двух profile-документов одновременно:
@@ -158,7 +158,7 @@ Get-ChildItem instructions/profiles
 | `/storm:cover`, `/storm:cleanup`, `/storm:implement ST-XXXX`, `/storm:bdd-implement ST-XXXX` или любой `/storm:*` с изменениями tests/code/behavior | `quest-governance + collaboration-baseline + testing-baseline + stack/testing profile + storm-product-development` |
 | Локальный рефакторинг модуля | `quest-governance + collaboration-baseline + stack profile + refactor-local + refactoring-policy` |
 | Массовое улучшение комментариев в hotspot-участках | `quest-governance + collaboration-baseline + stack profile + commenting-policy` |
-| Проектирование GPT-5.6 Responses API workflow | `quest-governance + collaboration-baseline + product-system-design + openai-responses-api` |
+| Проектирование Astra / GPT-5.6 Responses API workflow | `quest-governance + collaboration-baseline + product-system-design + openai-responses-api` |
 
 ## Связанные документы
 

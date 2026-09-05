@@ -176,21 +176,77 @@ try {
         Set-Content -Path $responsesOwnerFile -Value $original -Encoding UTF8
     }
 
-    # Scenario 10: stale declared GPT-5.5 target
+    # Scenario 10: stale declared GPT-5.6 target
     $modelBaselineFile = Join-Path $scenarioRoot "instructions/core/model-behavior-baseline.md"
     $original = Get-Content -Path $modelBaselineFile -Raw
     try {
         $modified = $original.Replace(
-            'Считать семейство `GPT-5.6` целевой optimization baseline каталога',
-            'Считать `gpt-5.5` целевой моделью каталога'
+            'Считать `GPT-6 Astra` целевой optimization baseline каталога',
+            'Считать семейство `GPT-5.6` целевой optimization baseline каталога'
         )
+        if ($modified -ceq $original) { throw "Astra target fixture did not mutate the source" }
         Set-Content -Path $modelBaselineFile -Value $modified -Encoding UTF8
-        if (-not (Invoke-Validation -ScenarioName "устаревший declared target GPT-5.5" -ScenarioPath $scenarioRoot -ShouldPass $false)) {
+        if (-not (Invoke-Validation -ScenarioName "устаревший declared target GPT-5.6" -ScenarioPath $scenarioRoot -ShouldPass $false)) {
             $failed = $true
         }
     }
     finally {
         Set-Content -Path $modelBaselineFile -Value $original -Encoding UTF8
+    }
+
+    # Astra compatibility regressions must remove a real guard, not silently no-op.
+    $astraMutations = @(
+        @{
+            Name = "Astra допускает none"
+            Path = "instructions/governance/openai-responses-api.md"
+            From = 'Для `gpt-6-astra` допустимы `low`, `medium`, `high`, `xhigh`, `max`; `none` и `minimal` не поддерживаются'
+            To = 'Для `gpt-6-astra` допустимы `none`, `low`, `medium`, `high`, `xhigh`, `max`'
+        },
+        @{
+            Name = "Astra tools ошибочно допускают Chat Completions"
+            Path = "instructions/governance/openai-responses-api.md"
+            From = 'Для tool calling в `gpt-6-astra` обязателен Responses API'
+            To = 'Для tool calling в `gpt-6-astra` допустим Chat Completions'
+        },
+        @{
+            Name = "Astra sampling guard удалён"
+            Path = "instructions/governance/openai-responses-api.md"
+            From = 'Для `gpt-6-astra` не передавать `temperature`, `top_p`, `top_logprobs`'
+            To = 'Для `gpt-6-astra` передавать `temperature`, `top_p`, `top_logprobs`'
+        },
+        @{
+            Name = "configuration_update ошибочно допускает pro multi-agent"
+            Path = "instructions/governance/openai-responses-api.md"
+            From = 'Использовать `configuration_update` только в Astra standard single-agent'
+            To = 'Использовать `configuration_update` в Astra pro multi-agent'
+        },
+        @{
+            Name = "configuration_update compaction guard удалён"
+            Path = "instructions/governance/openai-responses-api.md"
+            From = 'Не сочетать `configuration_update` с automatic compaction/truncation или standalone `/responses/compact`'
+            To = 'Сочетать `configuration_update` с automatic compaction/truncation или standalone `/responses/compact`'
+        },
+        @{
+            Name = "после green разрешён бесконечный repeat"
+            Path = "instructions/core/testing-baseline.md"
+            From = 'После успешных обязательных проверок не расширять и не повторять набор без нового изменения, failure или конкретного незакрытого риска'
+            To = 'После успешных обязательных проверок повторять набор без нового основания'
+        }
+    )
+    foreach ($mutation in $astraMutations) {
+        $mutationFile = Join-Path $scenarioRoot $mutation.Path
+        $original = Get-Content -LiteralPath $mutationFile -Raw
+        try {
+            $modified = $original.Replace($mutation.From, $mutation.To)
+            if ($modified -ceq $original) { throw "Fixture did not mutate the source: $($mutation.Name)" }
+            Set-Content -LiteralPath $mutationFile -Value $modified -Encoding UTF8
+            if (-not (Invoke-Validation -ScenarioName $mutation.Name -ScenarioPath $scenarioRoot -ShouldPass $false)) {
+                $failed = $true
+            }
+        }
+        finally {
+            Set-Content -LiteralPath $mutationFile -Value $original -Encoding UTF8
+        }
     }
 
     # Scenario 11: missing mandatory tool-execution owner

@@ -18,6 +18,7 @@
 - До длинного шага сообщать команду, repo-specific expected duration и способ получить progress/log evidence; универсальный time budget не вводить.
 - После timeout не повторять идентичную команду. Сначала получить progress/root-cause evidence, изменить scope/ресурсы или устранить lock/environment blocker.
 - Перед завершением behavior-changing задачи получать successful full test run. Authoritative CI допустим как эквивалент только если это прямо разрешает repo owner contract и итоговый статус green; `pending`, `timeout`, `cancelled` и red не являются evidence.
+- После успешных обязательных проверок не расширять и не повторять набор без нового изменения, failure или конкретного незакрытого риска. Проверка активного пути после rollout остаётся отдельным обязательством, когда её требует owner; этот stop rule не отменяет full suite или before/after behavioral smoke для instruction migration.
 - Expected TDD red считать запланированным только когда failing check создан до fix и причина падения подтверждена; wrong runner, compile error и unrelated failure ожидаемым red не являются.
 - Оставлять regression-тест в кодовой базе.
 
@@ -27,6 +28,7 @@
 - Сохранять тесты независимыми и детерминированными.
 - В отчете указывать, какие команды запускались и что они подтвердили.
 - При невозможности получить full green run завершать задачу как incomplete/blocker с next-best evidence, а не как успешно проверенную.
+- Для обратимых механических правок без изменения поведения не добавлять тесты, зеркалирующие реализацию. Новая проверка должна защищать наблюдаемое поведение или значимый контракт; пропорциональность не отменяет обязательные regression tests при behavior change.
 
 ## MAY
 
@@ -47,3 +49,4 @@
 - [AGENTS.md](../../AGENTS.md)
 - [instructions/contexts/testing-dotnet.md](../contexts/testing-dotnet.md)
 - [instructions/contexts/testing-frontend.md](../contexts/testing-frontend.md)
+- [instructions/governance/review-loops.md](../governance/review-loops.md)

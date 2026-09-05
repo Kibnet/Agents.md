@@ -67,7 +67,7 @@ Router[routing-matrix.md]
 
 Core[core правила]
 CreatorVibe[creator-vibe lightweight lens]
-Model[GPT-5.6 behavior]
+Model[GPT-6 Astra behavior]
 ToolExecution[tool execution baseline]
 Responses[Responses API contract]
 Contexts[контекстные правила]
@@ -109,17 +109,18 @@ Central stack применяет [creator-vibe-lens.md](instructions/core/creato
 
 ---
 
-# Surface Contract Matrix для GPT-5.6
+# Surface Contract Matrix для GPT-6 Astra
 
-Каталог оптимизирован под семейство `GPT-5.6`, но не предполагает одинаковую модель, naming или reasoning controls во всех продуктах. Перед model-sensitive validation фиксируйте фактическую поверхность и выбранный профиль. Snapshot актуализирован 2026-07-14; availability и тарифные ограничения нужно перепроверять перед rollout.
+Каталог оптимизирован под `GPT-6 Astra`; workload-роли GPT-5.6 Sol/Terra/Luna сохранены. Baseline не переключает модели в пользовательской конфигурации. Перед model-sensitive validation фиксируйте фактическую поверхность, model ID, effort и версию клиента: доступность зависит от rollout, sign-in, клиента и account. Срез источников для этой матрицы проверен 2026-09-05; перед rollout перепроверяйте его.
 
 | Поверхность | Текущий контракт | Как использовать каталог |
 |---|---|---|
-| Standard ChatGPT | `GPT-5.5 Instant` остаётся default; `GPT-5.6 Sol` используется для Medium/High/Extra High, а Sol Pro — для Pro на доступных планах. Terra/Luna здесь не выбираются. | Применять behavior baseline, но не требовать GPT-5.6 для обычного Instant-чата и не переносить API model IDs в product UI. |
-| Work в ChatGPT / Codex | В зависимости от плана доступны Sol/Terra/Luna и reasoning controls; Codex Ultra означает multi-agent execution, а не API `reasoning.mode: "pro"`. | Фиксировать фактически выбранные model/tier/effort. Для воспроизводимых CLI smoke предпочитать явный tier, например `gpt-5.6-sol`; alias проверять в текущей account/runtime среде. |
-| OpenAI API | Доступны `gpt-5.6-sol`, `gpt-5.6-terra`, `gpt-5.6-luna`; API alias `gpt-5.6` направляет на Sol. Reasoning effort и Pro mode задаются API-параметрами. | По API-триггеру подключать `instructions/governance/openai-responses-api.md`; не дублировать его wire-level правила в общем baseline. |
+| Standard ChatGPT | Его picker и default проверяются отдельно; документация Work/Codex не устанавливает контракт обычного чата. | Применять общие behavior rules без переноса API model IDs или Work tiers в product UI. |
+| ChatGPT Work / desktop, Codex CLI / IDE | Официальный model guide перечисляет Astra наряду с Sol/Terra/Luna; конкретные options зависят от доступа. Max увеличивает reasoning, Ultra использует subagents и не равен API pro mode. | Сохранять выбранную модель и начинать с доступного default effort. Для воспроизводимого Astra smoke задавать `gpt-6-astra` явно и проверять, что установленная версия клиента поддерживает модель. |
+| Codex cloud | В прочитанной матрице доступности Astra для Codex cloud не заявлена. | Не выводить cloud availability из наличия Astra в local model list; проверять текущий cloud contract отдельно. |
+| OpenAI API | `gpt-6-astra` имеет собственные ограничения efforts/tools/parameters; `gpt-5.6` остаётся family alias Sol, а не Astra. | По API-триггеру подключать [openai-responses-api.md](instructions/governance/openai-responses-api.md); не переносить product Ultra в API payload. |
 
-Официальные источники snapshot: [GPT-5.6 in ChatGPT](https://help.openai.com/en/articles/20001354-gpt-56-in-chatgpt/), [ChatGPT Work и Codex models](https://learn.chatgpt.com/docs/models), [OpenAI API model guidance](https://developers.openai.com/api/docs/guides/latest-model).
+Официальные источники: [ChatGPT Work и Codex models](https://learn.chatgpt.com/docs/models), [Using GPT-6 Astra](https://developers.openai.com/api/docs/guides/latest-model?model=gpt-6-astra), [Astra API model](https://developers.openai.com/api/docs/models/gpt-6-astra). Experimental context management и другие opt-in features автоматически не включаются.
 
 ---
 
@@ -164,7 +165,7 @@ specs/             # рабочие спецификации изменений 
 * `AGENTS.md` — основная точка входа
 * `instructions/governance/routing-matrix.md` — алгоритм маршрутизации инструкций
 * `instructions/core/creator-vibe-lens.md` — обязательный lightweight owner intent/human outcome и trigger полного external skill
-* `instructions/core/model-behavior-baseline.md` — owner optimization baseline семейства `GPT-5.6`: outcome-first, surface-aware model guidance и stop rules
+* `instructions/core/model-behavior-baseline.md` — owner optimization baseline `GPT-6 Astra`: outcome-first, surface-aware model guidance, ясный стиль и stop rules
 * `instructions/core/tool-execution-baseline.md` — обязательный owner preflight, paths/globs, PowerShell, patch, Git и failure classification для tool-heavy задач
 * `instructions/governance/openai-responses-api.md` — trigger-based owner wire-level контрактов OpenAI Responses API
 * `instructions/core/quest-governance.md` — gate `SPEC → EXEC` для инженерных изменений
@@ -197,7 +198,7 @@ specs/             # рабочие спецификации изменений 
 Важно:
 
 * `SPEC gate` применяется к инженерным изменениям каталога, кода, инфраструктуры и канонических файлов проекта
-* `model-behavior-baseline` применяется ко всем сценариям и задаёт GPT-5.6 optimization contract: outcome-first цель, surface evidence, критерии успеха, ограничения, output contract и stop rules
+* `model-behavior-baseline` применяется ко всем сценариям и задаёт Astra optimization contract: outcome-first цель, surface evidence, критерии успеха, ограничения, output contract и stop rules
 * `tool-execution-baseline` применяется до первого значимого tool call и не занимает место task-specific context
 * `openai-responses-api` подключается только для API-specific задач; ordinary Markdown review или работа в product UI не должны тянуть wire-level API правила
 * на фазе `SPEC` рабочая spec в локальном `./specs/` может обновляться до подтверждения пользователя; остальные файлы менять нельзя

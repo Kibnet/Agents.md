@@ -2,6 +2,25 @@
 
 All notable changes to this instruction catalog are documented in this file.
 
+## [3.3.0] - 2026-09-06
+
+### Changed
+
+- Целевая optimization baseline переведена на GPT-6 Astra; AGENTS, routing и README согласованы с model behavior owner. Роли Sol/Terra/Luna и явный выбор пользователя сохранены.
+- Collaboration owner уточняет продолжение разрешённой работы, сохранение approval в рамках scope, применимость skill guidelines, обработку уточнений/отмены и условия полезного делегирования.
+- Model/testing owners задают ясный стиль и остановку повторных проверок после mandatory green; новые изменения, failures и незакрытые риски остаются основаниями для проверки.
+
+### Added
+
+- API owner получил отдельный Astra contract: supported efforts, обязательный Responses для tools, unsupported sampling/logprobs, EU fast restrictions и ограничения async/steering/configuration_update.
+- Validator и negative fixtures защищают Astra target, API compatibility и validation stop rule; fixtures проверяют, что исходный текст действительно изменён.
+
+### Compatibility / Migration / Rollback
+
+- QUEST, внешняя авторизация, обязательные full tests и before/after behavioral smoke сохранены. Настройки модели, skills, hooks и opt-in runtime features потребителей автоматически не меняются.
+- Для model-sensitive проверок требуется клиент, действительно поддерживающий Astra; наличие CLI в PATH или модели в документации не доказывает runtime access.
+- Активация общего каталога выполняется одним проверенным change set после isolated validation и drift check. Rollback восстанавливает только файлы этого change set из сохранённого baseline, не затрагивая пользовательские изменения или настройки.
+
 ## [3.2.0] - 2026-07-23
 
 ### Added

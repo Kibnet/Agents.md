@@ -17,7 +17,7 @@
 Дополнительно:
 
 1. Для постоянной lightweight intent/outcome линзы и условной загрузки полного external skill использовать [instructions/core/creator-vibe-lens.md](instructions/core/creator-vibe-lens.md); exact, factual и safety boundaries остаются у более специфичных owner-документов.
-2. Для optimization baseline семейства `GPT-5.6`, outcome-first формулировок, surface-aware model guidance и stop rules использовать [instructions/core/model-behavior-baseline.md](instructions/core/model-behavior-baseline.md). Это целевой behavior contract, а не гарантия доступности модели в текущей поверхности/runtime.
+2. Для optimization baseline `GPT-6 Astra`, outcome-first формулировок, surface-aware model guidance и stop rules использовать [instructions/core/model-behavior-baseline.md](instructions/core/model-behavior-baseline.md). Это целевой behavior contract, а не гарантия доступности модели в текущей поверхности/runtime.
 3. Для обязательного preflight и обработки повторяемых path, PowerShell, patch, Git, timeout и environment failures в `tool-heavy` задачах использовать [instructions/core/tool-execution-baseline.md](instructions/core/tool-execution-baseline.md).
 4. Для applicability и quality gate `QUEST` использовать [instructions/core/quest-governance.md](instructions/core/quest-governance.md).
 5. Для фазового поведения `QUEST`, включая допустимые мутации файлов на `SPEC` и `EXEC`, использовать [instructions/core/quest-mode.md](instructions/core/quest-mode.md).

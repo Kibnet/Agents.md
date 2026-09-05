@@ -279,8 +279,8 @@ $semanticContracts = @(
     },
     @{
         Path = "instructions/core/model-behavior-baseline.md"
-        Pattern = 'семейство `GPT-5\.6` целевой optimization baseline'
-        Description = "GPT-5.6 target baseline"
+        Pattern = '`GPT-6 Astra` целевой optimization baseline'
+        Description = "GPT-6 Astra target baseline"
     },
     @{
         Path = "instructions/core/model-behavior-baseline.md"
@@ -319,8 +319,48 @@ $semanticContracts = @(
     },
     @{
         Path = "README.md"
-        Pattern = '# Surface Contract Matrix для GPT-5\.6'
+        Pattern = '# Surface Contract Matrix для GPT-6 Astra'
         Description = "surface contract matrix"
+    },
+    @{
+        Path = "AGENTS.md"
+        Pattern = 'optimization baseline `GPT-6 Astra`'
+        Description = "Astra entry point"
+    },
+    @{
+        Path = "instructions/governance/routing-matrix.md"
+        Pattern = 'baseline оптимизации под `GPT-6 Astra`'
+        Description = "Astra routing baseline"
+    },
+    @{
+        Path = "instructions/governance/openai-responses-api.md"
+        Pattern = 'Для `gpt-6-astra` допустимы `low`, `medium`, `high`, `xhigh`, `max`; `none` и `minimal` не поддерживаются'
+        Description = "Astra supported reasoning efforts"
+    },
+    @{
+        Path = "instructions/governance/openai-responses-api.md"
+        Pattern = 'Для tool calling в `gpt-6-astra` обязателен Responses API'
+        Description = "Astra Responses tool requirement"
+    },
+    @{
+        Path = "instructions/governance/openai-responses-api.md"
+        Pattern = 'Для `gpt-6-astra` не передавать `temperature`, `top_p`, `top_logprobs`'
+        Description = "Astra unsupported sampling parameters"
+    },
+    @{
+        Path = "instructions/governance/openai-responses-api.md"
+        Pattern = 'Использовать `configuration_update` только в Astra standard single-agent'
+        Description = "Astra configuration update mode boundary"
+    },
+    @{
+        Path = "instructions/governance/openai-responses-api.md"
+        Pattern = 'Не сочетать `configuration_update` с automatic compaction/truncation или standalone `/responses/compact`'
+        Description = "Astra configuration update compaction boundary"
+    },
+    @{
+        Path = "instructions/core/testing-baseline.md"
+        Pattern = 'После успешных обязательных проверок не расширять и не повторять набор без нового изменения, failure или конкретного незакрытого риска'
+        Description = "validation repetition stop rule"
     },
     @{
         Path = "templates/specs/_template.md"

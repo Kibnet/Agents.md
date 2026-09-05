@@ -3,7 +3,7 @@
 ## Когда применять
 
 - При проектировании, реализации или review интеграций с OpenAI Responses API.
-- Когда задача затрагивает API model/tier selection, persisted reasoning, `reasoning.context`, stateless replay, Programmatic Tool Calling или Responses multi-agent.
+- Когда задача затрагивает API model/tier selection, persisted reasoning, `reasoning.context`, stateless replay, Programmatic Tool Calling, Responses multi-agent, async tool calls, mid-turn steering или `configuration_update`.
 
 ## Когда не применять
 
@@ -13,8 +13,11 @@
 ## MUST
 
 - Фиксировать поверхность как `OpenAI API`, точный model ID либо осознанное использование alias, `reasoning.effort`, `reasoning.mode` и `reasoning.context`, если они влияют на контракт или eval evidence.
-- Для воспроизводимого routing использовать точный tier `gpt-5.6-sol`, `gpt-5.6-terra` или `gpt-5.6-luna`; alias `gpt-5.6` использовать только когда намеренно принимается его API-routing на текущий Sol tier и возможное будущее обновление alias.
-- Задавать `reasoning.effort` осознанно из поддерживаемых GPT-5.6 значений `none`, `low`, `medium`, `high`, `xhigh`, `max`; не считать самый высокий уровень автоматическим optimum.
+- Для Astra использовать точный model ID `gpt-6-astra`. Сохранять осознанно выбранные workload-роли `gpt-5.6-sol`, `gpt-5.6-terra` и `gpt-5.6-luna`; не заменять весь router на Astra. Alias `gpt-5.6` направляет на текущий Sol tier и не является alias Astra; использовать его только при принятии возможного будущего обновления routing.
+- Для `gpt-6-astra` допустимы `low`, `medium`, `high`, `xhigh`, `max`; `none` и `minimal` не поддерживаются. Для GPT-5.6 отдельно допустимы `none`, `low`, `medium`, `high`, `xhigh`, `max`. Не переносить Codex Ultra в API `reasoning.effort` и не приравнивать его к `reasoning.mode: "pro"`; самый высокий effort не является автоматическим optimum.
+- Для tool calling в `gpt-6-astra` обязателен Responses API. Поддержка Astra в Chat Completions не означает поддержку tools на этом endpoint.
+- Для `gpt-6-astra` не передавать `temperature`, `top_p`, `top_logprobs`, в Chat Completions также `logprobs`, а в Responses исключить `message.output_text.logprobs` из `include`.
+- Для Astra с EU data residency использовать Standard: `service_tier: "fast"` и `service_tier: "priority"` не поддерживаются. Не обещать latency SLA для Astra fast mode.
 - Проверять поддержку выбранного `reasoning.context` моделью и читать effective `response.reasoning.context` на каждом ответе; не считать requested value фактически применённым без этого evidence.
 - Для multi-turn reasoning использовать `previous_response_id`, conversation state либо полный manual replay. При manual replay сохранять все output items в исходном порядке, включая reasoning items, assistant messages, tool calls, tool outputs и имеющийся `phase`.
 - Для stateless/ZDR replay запрашивать `include: ["reasoning.encrypted_content"]` на каждом вызове и возвращать encrypted reasoning items без преобразования.
@@ -23,30 +26,36 @@
 - Для nested `function_call` возвращать `function_call_output` с тем же `call_id` и без потери `caller`; `caller.type: "program"` и `caller.caller_id` связывают nested call с исходным program call.
 - Считать `program_output.result` отдельным application-level JSON-string contract внутри wire-level item; продолжать Responses loop до получения финального `message`, потому что `program_output` может прийти раньше него.
 - В multi-agent workflow сохранять authority boundaries и разрешённые tools каждого subagent, не расширять side effects через delegation и оставлять root agent ответственным за синтез и проверку финального ответа.
+- При async function/custom tools приложение выполняет вызов и хранит pending state; результат возвращать с исходным `call_id`. Продолжать только независимую работу до получения нужного результата; поддержка async моделью не создаёт scheduler или новые полномочия приложения.
+- Для API mid-turn steering проверять поддержку Astra и WebSocket transport. Считать `response.steer.accepted` подтверждением очереди, а не применения input: ранее запущенные tools не отменяются автоматически, для continuation могут требоваться tool results/approval. Сохранять их идентификаторы и не повторять уже принятое уточнение. Не переносить API event names на Codex App Server.
+- Использовать `configuration_update` только в Astra standard single-agent; режимы pro и multi-agent не поддерживаются. Оставлять request-level `reasoning.effort` прежним для стабильного prefix; effective effort отслеживать по упорядоченной истории updates, потому что `response.reasoning.effort` продолжает показывать request-level значение.
+- Не сочетать `configuration_update` с automatic compaction/truncation или standalone `/responses/compact`; не помещать два updates рядом. Сохранять updates на исходных позициях при replay. Если выбран поддерживаемый ручной `compaction_trigger`, после compaction добавлять свежий update перед следующим user message по текущему reasoning guide.
 - Если приложение обслуживает отдельных end users, передавать стабильный privacy-preserving `safety_identifier` с каждым запросом.
 - Учитывать safeguards и возможную синхронную задержку/отказ в dual-use областях как runtime outcome, а не автоматически классифицировать их как network failure.
 
 ## SHOULD
 
-- Использовать Responses API для reasoning, tool-calling и multi-turn workflows семейства `GPT-5.6`.
-- При миграции с `GPT-5.5` начинать с текущего `reasoning.effort`, затем сравнивать тот же уровень и один уровень ниже на representative eval set; `medium` использовать как balanced starting point, если baseline отсутствует.
+- Использовать Responses API для reasoning и multi-turn workflows Astra и GPT-5.6; обязательность Responses для Astra tools определена выше.
+- При миграции на Astra сохранять текущий effective effort; для `none`/`minimal` начинать с `low` и проверять результат. Затем сравнивать поддерживаемые уровни на representative eval set; если baseline отсутствует, `medium` допустим как локальная стартовая эвристика.
 - Включать `reasoning.mode: "pro"` на том же выбранном model ID только для quality-first workload после сравнения standard/pro по качеству, полноте, latency, tokens и cost.
 - Применять Programmatic Tool Calling только к bounded tool-heavy подзадачам, где между вызовами не требуется новое model judgement.
 - Применять Responses multi-agent только когда задача естественно делится на независимые workstreams и выигрыш покрывает orchestration overhead.
 - Для prompt caching держать стабильный reusable prefix раньше динамических данных и измерять cache hit/write behavior до ручной оптимизации.
+- При миграции с GPT-5.5 и ранее на Astra проверить замену `prompt_cache_retention` на `prompt_cache_options.ttl: "30m"`, cache boundaries и cache-write billing по текущему caching guide. Не переписывать unrelated cache configuration.
 - Для image inputs выбирать `original` только когда исходные размеры materially нужны для результата и дополнительная token/latency стоимость оправдана.
 
 ## MAY
 
 - Использовать `reasoning.context: "all_turns"`, если модель поддерживает его и запрос имеет доступ к полному предыдущему response history.
 - Использовать explicit prompt caching, Programmatic Tool Calling, multi-agent beta или Pro mode после отдельной оценки применимости и стоимости.
-- Использовать alias `gpt-5.6` для API workload, который намеренно должен следовать за текущим flagship routing.
+- Использовать alias `gpt-5.6` для API workload, который намеренно должен следовать за Sol routing семейства GPT-5.6.
+- Включать async tools, steering и configuration updates только при подтверждённой поддержке выбранного harness и их применимости к задаче; не подключать новые runtime features автоматически из-за смены baseline каталога.
 
 ## Команды
 
 ```powershell
 # Поиск API-specific contract markers
-rg -n "Responses API|gpt-5\.6-(sol|terra|luna)|reasoning\.context|reasoning\.mode|encrypted_content|allowed_callers|program_output|safety_identifier" .
+rg -n "Responses API|gpt-6-astra|gpt-5\.6-(sol|terra|luna)|reasoning\.context|reasoning\.mode|configuration_update|response\.steer|encrypted_content|allowed_callers|program_output|safety_identifier" .
 ```
 
 ## Связанные документы
@@ -56,3 +65,9 @@ rg -n "Responses API|gpt-5\.6-(sol|terra|luna)|reasoning\.context|reasoning\.mod
 - [instructions/core/collaboration-baseline.md](../core/collaboration-baseline.md)
 - [instructions/governance/review-loops.md](./review-loops.md)
 - [instructions/profiles/product-system-design.md](../profiles/product-system-design.md)
+- [OpenAI: Using GPT-6 Astra](https://developers.openai.com/api/docs/guides/latest-model?model=gpt-6-astra)
+- [OpenAI: GPT-6 Astra model](https://developers.openai.com/api/docs/models/gpt-6-astra)
+- [OpenAI: Async tool calling](https://developers.openai.com/api/docs/guides/async-tool-calling)
+- [OpenAI: Mid-turn steering](https://developers.openai.com/api/docs/guides/steering)
+- [OpenAI: Change reasoning mid-conversation](https://developers.openai.com/api/docs/guides/reasoning#change-reasoning-mid-conversation)
+- [OpenAI: Prompt caching](https://developers.openai.com/api/docs/guides/prompt-caching)
