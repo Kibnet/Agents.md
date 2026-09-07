@@ -41,6 +41,22 @@
   -RequiredPath @(".")
 ```
 
+
+## Состояния и область активации
+
+| Действие | Согласованный scope / evidence | Результат |
+| --- | --- | --- |
+| Применить каталог | Approved repository change set, isolated validation, drift/backup | Новый central catalog; installed runtime не меняется |
+| Установить runtime | Отдельно approved exact installer proposal/hash | installed-awaiting-trust |
+| Доверить hooks | Пользователь проверил exact definition в host `/hooks` | Manual trust, ещё не active |
+| Probe / MarkActive | Current install/config/runtime + свежие controlled runtime/reviewer observations, полный approved postimage | active |
+
+Разрешение действует внутри указанного scope и не запрашивается повторно для того же действия. Смена external side effects требует соответствующего scope. Reviewer evidence v1 не принимается для новой активации; существующий active manifest не дезактивируется автоматически. Предсуществующий reviewer installer не принимает под lifecycle ownership; uninstall его сохраняет.
+
+Telemetry runtime 3.2.0 использует только Windows local NTFS. Unsupported filesystem/API, reparse/hardlink/ownership conflict или deadline приводят к skip telemetry, сохраняя warn-only классификацию. Legacy logs без identity/generation binding не удаляются и не усыновляются автоматически; при конфликте пути нужен отдельно согласованный migration scope. На следующем успешном maintenance owned segments с событиями старше 45 дней удаляются; append срок не продлевает, фонового удаления без запусков hook нет. Для ограничения retention может удаляться целый сегмент вместе с более свежими событиями.
+
+Analyzer metrics относятся к selected-stratified-sample; recall/FPR не являются population estimate и не доказывают причинное снижение ошибок. TCP endpoint preflight имеет `level=tcp-connect`; он не доказывает HTTP/auth/TLS readiness — эти проверки добавляет consumer.
+
 ## Связанные документы
 
 - [AGENTS.md](../../AGENTS.md)

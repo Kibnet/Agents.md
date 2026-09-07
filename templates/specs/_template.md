@@ -206,72 +206,21 @@ Definition of Done / критерии готовности описывают, �
 | Delivery / operations / security | applicable / not applicable | Are git/CI/config/deploy/secrets/runtime risks handled and rollback clear? | PASS/NEEDS-FIX/ASK-HUMAN | ... |
 
 ### Post-SPEC Review
-- Статус: PASS / NEEDS-FIX / ASK-HUMAN
-- Scope reviewed: spec path, instruction stack, selected profile, open questions, planned changed files
-- Decision: можно запрашивать подтверждение / нужно исправить / нужен выбор пользователя
-- Review passes:
-  - Scope/Evidence pass:
-  - Contract pass:
-  - Adversarial risk pass:
-  - Role-Based pass:
-  - Re-review after fixes / Fix and re-review:
-  - Stop decision:
-- Evidence inspected:
-- Depth checklist:
-  - Scope drift / unrelated changes:
-  - Acceptance criteria:
-  - User-observable scenarios / Decision ledger / Expected objections:
-  - Validation evidence:
-  - Unsupported claims:
-  - Regression / edge case:
-  - Comments/docs/changelog:
-  - Hidden contract change:
-  - Manual-review challenge: что бы я нашёл, если пользователь после моего `PASS` попросит отдельное ручное ревью?
-- No-findings justification:
-
-| Severity | Area | Finding | Required action | Status |
-| --- | --- | --- | --- | --- |
-| BLOCKER/HIGH/MEDIUM/LOW | scope / design / acceptance / risk / evidence / profile / prompt-quality | ... или `Нет находок` | ... | fixed / accepted-risk / ask-human / follow-up |
-
-- Fixed before continuing:
-- Checks rerun:
-- Needs human:
-- Residual risks / follow-ups:
+- Статус / stop decision: PASS / NEEDS-FIX / ASK-HUMAN.
+- Scope/Evidence pass: реально прочитанные spec, owner, профиль, файлы, источники.
+- Contract pass: границы, AC и выбранные решения.
+- Adversarial risk / Role-Based pass: counterexamples и применимые роли по таблице выше.
+- Findings: severity, area, action, status; если нет — «Нет находок» с обоснованием.
+- Fix and re-review: исправления, повторённые проверки, no-findings justification.
+- Manual-review challenge / остаточные риски / needs human.
 
 ### Post-EXEC Review
-- Статус: PASS / NEEDS-FIX / ASK-HUMAN / Не выполнен до EXEC
-- Scope reviewed: approved spec, `git status --short`, `git diff --stat`, relevant diff, tests/validation evidence, docs/changelog impact
-- Decision: можно завершать / нужно исправить / нужен выбор пользователя / Не применимо до EXEC
-- Review passes:
-  - Scope/Evidence pass:
-  - Contract pass:
-  - Adversarial risk pass:
-  - Role-Based pass:
-  - Re-review after fixes / Fix and re-review:
-  - Stop decision:
-- Evidence inspected:
-- Depth checklist:
-  - Scope drift / unrelated changes:
-  - Acceptance criteria:
-  - User-observable scenarios / Acceptance-to-test matrix / Expected objections:
-  - Validation evidence:
-  - Unsupported claims:
-  - Regression / edge case:
-  - Comments/docs/changelog:
-  - Hidden contract change:
-  - Manual-review challenge: что бы я нашёл, если пользователь после моего `PASS` попросит отдельное ручное ревью?
-- No-findings justification:
-
-| Severity | Area | Finding | Required action | Status |
-| --- | --- | --- | --- | --- |
-| BLOCKER/HIGH/MEDIUM/LOW | spec compliance / regression / tests / docs / comments / unrelated changes / evidence / follow-up | ... или `Нет находок` | ... | fixed / accepted-risk / ask-human / follow-up |
-
-- Fixed before final report:
-- Checks rerun:
-- Validation evidence:
-- Unrelated changes:
-- Needs human:
-- Residual risks / follow-ups:
+- До EXEC: «Не выполнен»; после — полный review-loop по central review-loops.
+- Scope: approved spec, status/diff, изменённые файлы, tests/evidence, docs/changelog.
+- Passes: Scope/Evidence, Contract, Adversarial, Role-Based, Fix and re-review, Stop decision.
+- Findings/fixes и no-findings justification; user scenarios→AC evidence (ссылка на общую таблицу без дублирования).
+- Validation, unrelated changes, manual-review challenge, residual risks/needs human.
+- Итог PASS / NEEDS-FIX / ASK-HUMAN с проверяемым основанием.
 
 ## Approval
 Ожидается фраза: "Спеку подтверждаю"

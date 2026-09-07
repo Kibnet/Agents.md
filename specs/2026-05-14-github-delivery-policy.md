@@ -103,7 +103,7 @@ Outcome contract:
 
 Содержание целевого policy:
 
-```markdown
+````markdown
 # Governance: GitHub Delivery Policy
 
 ## Когда применять
@@ -224,7 +224,7 @@ git tag --list "v*"
 - [instructions/governance/versioning-policy.md](./versioning-policy.md)
 - [instructions/governance/routing-matrix.md](./routing-matrix.md)
 - [CHANGELOG.md](../../CHANGELOG.md)
-```
+````
 
 Output/evidence rules:
 - Для внешних factual claims в policy использовать только устойчивые формулировки, основанные на GitHub Docs, SemVer и Conventional Commits.

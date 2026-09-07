@@ -11,12 +11,12 @@
 
 ## MUST
 
-- Создать в репозитории-потребителе локальный `AGENTS.md` на основе шаблона.
-- Указать в нем источник через переменную пути каталога (например, `$env:AGENTS_ROOT\AGENTS.md`).
+- Выбрать схему подключения: local pointer как portable default либо global pointer при проверенном native host loading. В обоих случаях проверить canonical root и применить optional local override после central stack.
+- Для local схемы создать `AGENTS.md` по consumer template и указать источник, например `$env:AGENTS_ROOT\AGENTS.md`. Global-only не требует дублирующего local pointer, но не гарантирует загрузку на другом host/CI.
 - Если нужны проектные уточнения, добавлять только `AGENTS.override.md` как дополнительные локальные инструкции поверх central stack; этот файл не заменяет central `AGENTS.md` и может только ужесточать `MUST`.
-- Проверить, что локальный `AGENTS.md` не дублирует центральные правила.
+- Проверить фактическую загрузку выбранной схемы; pointer не должен дублировать центральные правила.
 - Для `QUEST`-задач сохранять рабочие spec-файлы в локальном `./specs/` репозитория-потребителя.
-- Для `QUEST`-задач всегда использовать central template `$env:AGENTS_ROOT\templates\specs\_template.md`.
+- Для QUEST выбирать central `_template-small.md` либо `_template.md` в `templates/specs/` по `quest-governance.md`; рабочие specs остаются локальными.
 - Для repo-specific SDK/runtime/browser/native dependencies создать проверяемый local-environment preflight по central contract, не скрыто устанавливая toolchain.
 
 ## SHOULD
@@ -37,9 +37,9 @@ $env:AGENTS_ROOT = "C:\path\to\agents-catalog"
 # или
 $env:AGENTS_ROOT = "/path/to/agents-catalog"
 
-# 1) В репозитории-потребителе создать AGENTS.md по шаблону
+# 1) Для portable схемы создать local AGENTS.md; для verified global-only проверить host loading
 # 2) При необходимости создать AGENTS.override.md
-# 3) Для QUEST использовать центральный $env:AGENTS_ROOT\templates\specs\_template.md
+# 3) Для QUEST выбрать central template по риску задачи
 # 4) Проверить, что ссылки на центральный каталог валидны
 # 5) При необходимости подключить templates\codex\local-environment\preflight.ps1 через поддерживаемый Codex Desktop local-environment flow
 
@@ -58,8 +58,8 @@ git clone https://github.com/<owner>/<repo>.git .agents-catalog
 $env:AGENTS_ROOT = "$PWD\.agents-catalog"
 ```
 
-В локальном `AGENTS.md` укажите `<AGENTS_ROOT>\AGENTS.md`.
-Для `QUEST`-workflow агент создаёт итоговую спецификацию в локальном `.\specs\`, а canonical template берёт из `<AGENTS_ROOT>\templates\specs\_template.md`.
+Для local схемы в `AGENTS.md` укажите `<AGENTS_ROOT>\AGENTS.md`.
+Для `QUEST`-workflow агент создаёт итоговую спецификацию в локальном `.\specs\`, а canonical template выбранной формы берёт из `<AGENTS_ROOT>\templates\specs\`.
 Если нужен локальный `AGENTS.override.md`, применять его только после central stack как дополнительные локальные инструкции поверх него.
 
 ## Связанные документы

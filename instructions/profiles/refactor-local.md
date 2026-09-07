@@ -29,13 +29,6 @@
 
 - Добавлять краткую таблицу `было -> стало` для локального hotspot, если diff неочевиден по месту.
 
-## Команды
-
-```text
-dotnet test
-npm test
-```
-
 ## Связанные документы
 
 - [instructions/core/quest-governance.md](../core/quest-governance.md)

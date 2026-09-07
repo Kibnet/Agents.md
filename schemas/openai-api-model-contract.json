@@ -1,0 +1,69 @@
+{
+  "schemaVersion": 1,
+  "surface": "OpenAI API",
+  "reviewedAt": "2026-09-07",
+  "sources": [
+    "https://developers.openai.com/api/docs/guides/latest-model?model=gpt-6-astra",
+    "https://developers.openai.com/api/docs/guides/upgrading-to-gpt-5p6-sol"
+  ],
+  "aliases": {
+    "gpt-5.6": "gpt-5.6-sol"
+  },
+  "models": {
+    "gpt-6-astra": {
+      "reasoningEfforts": [
+        "low",
+        "medium",
+        "high",
+        "xhigh",
+        "max"
+      ],
+      "toolEndpoint": "responses",
+      "unsupportedParameters": [
+        "temperature",
+        "top_p",
+        "top_logprobs"
+      ],
+      "chatCompletionsUnsupportedParameters": [
+        "logprobs"
+      ],
+      "responsesUnsupportedInclude": [
+        "message.output_text.logprobs"
+      ],
+      "euUnsupportedServiceTiers": [
+        "fast",
+        "priority"
+      ]
+    },
+    "gpt-5.6-sol": {
+      "reasoningEfforts": [
+        "none",
+        "low",
+        "medium",
+        "high",
+        "xhigh",
+        "max"
+      ]
+    },
+    "gpt-5.6-terra": {
+      "reasoningEfforts": [
+        "none",
+        "low",
+        "medium",
+        "high",
+        "xhigh",
+        "max"
+      ]
+    },
+    "gpt-5.6-luna": {
+      "reasoningEfforts": [
+        "none",
+        "low",
+        "medium",
+        "high",
+        "xhigh",
+        "max"
+      ]
+    }
+  }
+}

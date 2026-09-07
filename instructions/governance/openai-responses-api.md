@@ -12,6 +12,8 @@
 
 ## MUST
 
+- Точный versioned machine contract model/effort/endpoint/unsupported parameters: [openai-api-model-contract.json](../../schemas/openai-api-model-contract.json). Значения ниже — пояснение этого API contract, не сведения о Desktop availability. При обновлении сверять JSON и пояснения с официальными источниками.
+
 - Фиксировать поверхность как `OpenAI API`, точный model ID либо осознанное использование alias, `reasoning.effort`, `reasoning.mode` и `reasoning.context`, если они влияют на контракт или eval evidence.
 - Для Astra использовать точный model ID `gpt-6-astra`. Сохранять осознанно выбранные workload-роли `gpt-5.6-sol`, `gpt-5.6-terra` и `gpt-5.6-luna`; не заменять весь router на Astra. Alias `gpt-5.6` направляет на текущий Sol tier и не является alias Astra; использовать его только при принятии возможного будущего обновления routing.
 - Для `gpt-6-astra` допустимы `low`, `medium`, `high`, `xhigh`, `max`; `none` и `minimal` не поддерживаются. Для GPT-5.6 отдельно допустимы `none`, `low`, `medium`, `high`, `xhigh`, `max`. Не переносить Codex Ultra в API `reasoning.effort` и не приравнивать его к `reasoning.mode: "pro"`; самый высокий effort не является автоматическим optimum.

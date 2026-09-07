@@ -43,14 +43,9 @@
 
 # Общая архитектура
 
-Основная схема для Codex: один глобальный pointer в `~\.codex\AGENTS.md`
-ссылается на центральный каталог `~\.codex\agents\AGENTS.md`.
-Рабочие репозитории не дублируют инструкции: локально они добавляют только
-`AGENTS.override.md`, если нужны дополнительные строгие правила.
+Portable default: локальный `AGENTS.md` содержит только pointer на каталог. Для Codex также поддерживается global pointer в `~\.codex\AGENTS.md` на `~\.codex\agents\AGENTS.md`, если native loading проверен на текущем host. Тогда local pointer дублировать не нужно; на другом host/CI это не гарантирует подключение. В обеих схемах optional `AGENTS.override.md` только ужесточает central MUST.
 
-То же правило распространяется на базовый шаблон спеки: canonical `_template.md`
-живёт в центральном каталоге по отдельному пути `templates/specs/_template.md`,
-а локальный `specs/` остаётся только каталогом рабочих спецификаций.
+Форму SPEC выбирает [quest-governance](instructions/core/quest-governance.md): short для ограниченного low-risk scope, expanded для остальных задач. Оба canonical template живут в `templates/specs/`; локальный `specs/` содержит рабочие спецификации. Approval и substantive review gates одинаковы.
 
 ```mermaid
 flowchart TD
@@ -223,9 +218,9 @@ specs/             # рабочие спецификации изменений 
 
 Каталог содержит versioned candidate механической защиты от повторяемых tool-ошибок:
 
-* `scripts/hooks/agent-operations-hook.ps1` — fail-open dispatcher только для `PreToolUse` и `PostToolUse`, с physical-path lock, atomic rotation и проверяемым recovery marker для незавершённого rollback;
+* `scripts/hooks/agent-operations-hook.ps1` — fail-open dispatcher только для `PreToolUse` и `PostToolUse`, с безопасным Windows local NTFS handle store, ownership binding, bounded maintenance и rollback;
 * `scripts/install-agent-operations.ps1` — idempotent preview/install/uninstall/prune и evidence-bound `-MarkActive` с physical-alias transaction lock, intermediate reparse guards, fingerprints, backup и rollback; runtime записывается из захваченного и хешированного byte snapshot;
-* `scripts/probe-agent-operations-activation.ps1` — controlled safe/noisy/fail-open probe, проверка agent limits, manual hook trust, подтверждение controlled host task, install-bound runtime challenge и привязанное к fingerprint reviewer write-denial evidence; probe исполняет hash-verified captured runtime bytes из одноразового private staging path и повторно проверяет live runtime;
+* `scripts/probe-agent-operations-activation.ps1` — controlled safe/noisy/fail-open probe, проверка agent limits, manual hook trust, подтверждение controlled host task, install-bound runtime challenge и актуальное reviewer evidence v2, связанное с install/config и ожидаемыми host/runtime/session identity; probe исполняет hash-verified captured runtime bytes из одноразового private staging path и повторно проверяет live runtime;
 * `scripts/analyze-codex-session-errors.ps1` — потоковый privacy-safe отчёт с дедупликацией trace/call IDs, агрегацией child traces в root task, раздельными task/trace/event и envelope/matched/unmatched/boundary denominators и independently sampled private-local gold gate;
 * `templates/codex/agents/independent-reviewer.toml` — read-only reviewer template;
 * `templates/codex/local-environment/` — read-only Windows preflight для consumer rollout.
@@ -237,9 +232,9 @@ pwsh -File scripts/test-agent-operations.ps1
 pwsh -File scripts/install-agent-operations.ps1 -CodexHome <fixture-path> -WhatIf
 ```
 
-Telemetry включается только при наличии созданной installer-ом случайной salt в local manifest и пишет allowlist `schemaVersion/timestamp/runtimeVersion/eventName/category/severity/action/exitClass/repoHash` плюс optional `sessionHash`; raw command/output/path не сохраняются. Межпроцессный file lock сериализует lexical aliases одного physical logs directory. При невозможности откатить ротацию hook сохраняет checksum-bound recovery copies и marker; проверенный комплект после 7 дней проходит bounded quarantine cleanup, а malformed/drifted/partial-cleanup state остаётся для ручной проверки без ложного восстановления marker.
+Telemetry включается только при наличии созданной installer-ом случайной salt в local manifest и пишет allowlist `schemaVersion/timestamp/runtimeVersion/eventName/category/severity/action/exitClass/repoHash` плюс optional `sessionHash`; raw command/output/path не сохраняются. Безопасный store сериализует поддерживаемые case/8.3 aliases по physical identity; reparse aliases не поддержаны. Owned segments ограничены числом и размером, state обновляется с rollback через проверенные handles. Legacy recovery artifacts без нового ownership binding сохраняются для отдельной миграции.
 
-Фраза `Спеку подтверждаю` разрешает только repository implementation. Реальная установка в `%USERPROFILE%\.codex` допустима лишь после отдельного Git delivery, проверки active central checkout, предъявления exact `-WhatIf` proposal с `proposalHash` и фразы `Глобальную активацию подтверждаю` для этого hash. Preview раскрывает exact before/after content для `config.toml`, `hooks.json` и reviewer, immutable runtime hash и только явно перечисленные generated fields. После записи non-managed hooks остаются в состоянии `awaiting-trust`, пока пользователь не проверит exact definition через `/hooks` или актуальный документированный эквивалент, не подтвердит запуск controlled host task, probe не увидит install-bound runtime challenge и reviewer write denial, а отдельный approved `-MarkActive` не переведёт полный manifest postimage в `active`. Activation evidence действительно не более 15 минут и повторно проверяется непосредственно перед commit.
+Фраза `Спеку подтверждаю` разрешает только repository implementation. Реальная установка в `%USERPROFILE%\.codex` допустима лишь после отдельного Git delivery, проверки active central checkout, предъявления exact `-WhatIf` proposal с `proposalHash` и фразы `Глобальную активацию подтверждаю` для этого hash. Preview раскрывает exact before/after content для `config.toml`, `hooks.json` и reviewer, immutable runtime hash и только явно перечисленные generated fields. После записи non-managed hooks остаются в состоянии `awaiting-trust`, пока пользователь не проверит exact definition через `/hooks` или актуальный документированный эквивалент, не подтвердит запуск controlled host task, probe не увидит install-bound runtime challenge и reviewer write denial, а отдельный approved `-MarkActive` не переведёт полный manifest postimage в `active`. Activation evidence v2 действительно до более раннего из двух сроков: runtime observation +15 минут и reviewer observation +15 минут. Probe получает expected runtime/session identity из фактического controlled run, а MarkActive повторно проверяет весь contract непосредственно перед commit. Это согласованное run evidence, не криптоаттестация sandbox.
 
 ---
 
@@ -342,7 +337,7 @@ BDD/Gherkin слой в `storm.json` хранит metadata and traceability, а 
 * `C:\Users\<user>\.codex\AGENTS.md` содержит короткий pointer на центральный `AGENTS.md`
 * в рабочих репозиториях локальный `AGENTS.md` больше не нужен
 * локальный `AGENTS.override.md` применяется только поверх central stack и может только ужесточать `MUST`
-* для `QUEST` рабочие spec-файлы создаются в локальном `.\specs\`, а canonical template берётся из центрального `templates\specs\_template.md`
+* для `QUEST` рабочие spec-файлы создаются в локальном `.\specs\`, а canonical template выбранной формы берётся из центрального `templates\specs\` по quest-governance
 * lightweight `creator-vibe-lens` входит в central stack; полный external skill устанавливается отдельно и остаётся optional
 
 ### 1. Подключить каталог как `~\.codex\agents`
@@ -384,7 +379,7 @@ git clone https://github.com/Kibnet/Agents.md.git "$env:USERPROFILE\.codex\agent
 Для QUEST-задач:
 
 - рабочие spec-файлы создаются в локальном `.\specs\` репозитория
-- canonical template берется из `C:\Users\<user>\.codex\agents\templates\specs\_template.md`
+- canonical template берется из `C:\Users\<user>\.codex\agents\templates\specs\` по central quest-governance
 ```
 
 ### 3. Опционально установить полный `creator-vibe`
@@ -422,7 +417,7 @@ Installer не перезаписывает существующий destination
 Для QUEST-задач:
 
 - рабочие spec-файлы создаются в локальном `.\specs\`
-- canonical template всегда берётся из `<AGENTS_ROOT>\templates\specs\_template.md`
+- canonical template выбранной формы берётся из `<AGENTS_ROOT>\templates\specs\` по central quest-governance
 ```
 
 Где `<AGENTS_ROOT>` указывает на каталог с централизованными инструкциями,
@@ -509,3 +504,19 @@ Catalog/link/semantic checks выполняются на `ubuntu-latest` без 
 # Лицензия
 
 MIT
+
+
+## Состояния и область активации
+
+| Действие | Согласованный scope / evidence | Результат |
+| --- | --- | --- |
+| Применить каталог | Approved repository change set, isolated validation, drift/backup | Новый central catalog; installed runtime не меняется |
+| Установить runtime | Отдельно approved exact installer proposal/hash | installed-awaiting-trust |
+| Доверить hooks | Пользователь проверил exact definition в host `/hooks` | Manual trust, ещё не active |
+| Probe / MarkActive | Current install/config/runtime + свежие controlled runtime/reviewer observations, полный approved postimage | active |
+
+Разрешение действует внутри указанного scope и не запрашивается повторно для того же действия. Смена external side effects требует соответствующего scope. Reviewer evidence v1 не принимается для новой активации; существующий active manifest не дезактивируется автоматически. Предсуществующий reviewer installer не принимает под lifecycle ownership; uninstall его сохраняет.
+
+Telemetry runtime 3.2.0 использует только Windows local NTFS. Unsupported filesystem/API, reparse/hardlink/ownership conflict или deadline приводят к skip telemetry, сохраняя warn-only классификацию. Legacy logs без identity/generation binding не удаляются и не усыновляются автоматически; при конфликте пути нужен отдельно согласованный migration scope. На следующем успешном maintenance owned segments с событиями старше 45 дней удаляются; append срок не продлевает, фонового удаления без запусков hook нет. Для ограничения retention может удаляться целый сегмент вместе с более свежими событиями.
+
+Analyzer metrics относятся к selected-stratified-sample; recall/FPR не являются population estimate и не доказывают причинное снижение ошибок. TCP endpoint preflight имеет `level=tcp-connect`; он не доказывает HTTP/auth/TLS readiness — эти проверки добавляет consumer.

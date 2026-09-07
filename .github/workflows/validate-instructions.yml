@@ -28,3 +28,17 @@ jobs:
       - name: Test agent operations
         shell: pwsh
         run: pwsh ./scripts/test-agent-operations.ps1 -Area All
+
+  storm-python:
+    name: STORM Python ${{ matrix.python }} contracts
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ['3.11', '3.14']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Test STORM contracts
+        run: python -m unittest discover -s scripts/storm/tests -p "test_*.py"

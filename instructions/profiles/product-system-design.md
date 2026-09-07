@@ -26,13 +26,6 @@
 
 - Добавлять альтернативные пути реализации и мотивацию выбора.
 
-## Команды
-
-```text
-dotnet test
-npm test
-```
-
 ## Связанные документы
 
 - [instructions/core/quest-governance.md](../core/quest-governance.md)

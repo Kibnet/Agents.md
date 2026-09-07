@@ -38,6 +38,8 @@
 
 ## Команды
 
+Команды ниже с `--filter` применимы только к подтверждённому VSTest. Для TUnit и discovery runner использовать [testing-dotnet](../contexts/testing-dotnet.md); не переносить VSTest filter в TUnit.
+
 ```powershell
 # Frontend e2e
 npm run test:e2e:with-dev

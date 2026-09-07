@@ -15,7 +15,7 @@
 - До repository delivery определить workspace root, branch/upstream, worktree/Git dir и dirty state; не смешивать unrelated changes с текущей задачей.
 - Перед чтением неизвестного пути выполнить узкий inventory через `rg --files`, `Get-ChildItem -LiteralPath` или `Test-Path -LiteralPath`.
 - Разделять literal path и glob: для `rg` передавать glob через `-g`, а wildcard не передавать в `-LiteralPath`.
-- Нормализовать `rg` outcomes: `0` — matches, `1` без stderr — expected no-match, `>=2` или stderr — tool failure.
+- Нормализовать outcomes отдельного непосредственного `rg`: `0` — matches, `1` без stderr — expected no-match, `>=2` или stderr — tool failure. Общий exit составной команды, pipeline или wrapper не приписывать внутреннему rg без per-command evidence.
 - В PowerShell использовать here-string вместо Bash heredoc; перед `:` после переменной применять `${name}` или format operator.
 - Перед длинным build/test проверять runner/SDK/dependencies и заранее фиксировать команду, progress evidence и repo-specific timeout strategy.
 - Классифицировать permission/auth/network/lock/missing dependency отдельно от product defect; не менять код для маскировки environment blocker.

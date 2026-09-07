@@ -4,9 +4,13 @@
 
 Источник: повторяющиеся проблемы и ожидания пользователя из Codex-сессий. Это backlog предложений, а не уже утверждённые изменения `instructions/*`. Перед внесением в центральные инструкции нужен обычный governance flow.
 
+Статусы сверены 2026-09-07: `promoted` — outcome принят owner, `partially-addressed` — указан остаток, `open` — предложение не реализовано. Исходные Problem/Proposal/Acceptance ниже сохранены как историческое evidence.
+
 ## P0 - Highest ROI
 
 ### 1. Add Windows PowerShell Command Safety Profile
+
+Статус: **partially-addressed**. [Owner / проверенный источник](../instructions/core/tool-execution-baseline.md). Here-string, literal paths и interpolation приняты; полный набор examples/range cases остаётся в cookbook.
 
 Problem:
 
@@ -23,6 +27,8 @@ Acceptance:
 - Агент не генерирует `$file:$line`.
 
 ### 2. Add .NET/TUnit Validation Profile
+
+Статус: **promoted**. [Owner / проверенный источник](../instructions/contexts/testing-dotnet.md). Runner discovery и TUnit/VSTest filtering заданы; mandatory full suite не отменяется targeted проверкой.
 
 Problem:
 
@@ -44,6 +50,8 @@ Acceptance:
 
 ### 3. Add UI Visual Evidence Gate
 
+Статус: **promoted**. [Owner / проверенный источник](../instructions/profiles/ui-automation-testing.md). Обязательные before/after visual/video evidence и fallback определены.
+
 Problem:
 
 - Пользователь часто возвращал UI-задачи из-за визуального качества после формально успешной сборки.
@@ -62,6 +70,8 @@ Acceptance:
 
 ### 4. Add Repo Runbook Discovery Rule
 
+Статус: **promoted**. [Owner / проверенный источник](../instructions/contexts/session-insights-context.md). Targeted retrieval с проверкой текущего состояния принят.
+
 Problem:
 
 - Повторные ошибки в одних и тех же repo: wrong tests, wrong paths, slow suites.
@@ -77,6 +87,8 @@ Acceptance:
 ## P1 - Strong Improvements
 
 ### 5. GitHub Delivery Preflight
+
+Статус: **partially-addressed**. [Owner / проверенный источник](../instructions/governance/github-delivery-policy.md). Branch/PR/validation и tool preflight заданы; отсутствие duplicate PR/auth нужно проверять в реальном delivery flow.
 
 Problem:
 
@@ -97,6 +109,8 @@ Acceptance:
 
 ### 6. Environment Blocker Classification
 
+Статус: **promoted**. [Owner / проверенный источник](../instructions/core/tool-execution-baseline.md). Environment blocker отделён от product defect.
+
 Problem:
 
 - NuGet SSL/auth, SSH host key permission, API fetch failed were sometimes treated like code bugs.
@@ -110,6 +124,8 @@ Acceptance:
 - Agent reports blocker category and next-best evidence.
 
 ### 7. Stale Patch Prevention
+
+Статус: **promoted**. [Owner / проверенный источник](../instructions/core/tool-execution-baseline.md). Stale context перечитывается; одинаковый retry запрещён.
 
 Problem:
 
@@ -125,6 +141,8 @@ Acceptance:
 - No repeated identical failed patch hunk.
 
 ### 8. Editable Artifact Requirement
+
+Статус: **open**. [Owner / проверенный источник](../instructions/core/model-behavior-baseline.md). Visual planning/inspection есть, общий editable-versus-raster contract не введён.
 
 Problem:
 
@@ -146,6 +164,8 @@ Acceptance:
 
 ### 9. Slow Test Registry Integration
 
+Статус: **partially-addressed**. [Owner / проверенный источник](../instructions/contexts/session-insights-context.md). Targeted runbooks доступны; централизованный актуальный slow registry не является гарантией.
+
 Problem:
 
 - Agent repeatedly paid timeout costs for known slow suites.
@@ -161,6 +181,8 @@ Acceptance:
 
 ### 10. Secret Diff Guard
 
+Статус: **open**. [Owner / проверенный источник](../instructions/governance/github-delivery-policy.md). Отдельный staged secret heuristic и его acceptance не реализованы этим owner.
+
 Problem:
 
 - Many bot/API/deploy tasks involve tokens/configs.
@@ -174,6 +196,8 @@ Acceptance:
 - Final says secret-sensitive diff was checked when applicable.
 
 ### 11. Russian Language Consistency Rule
+
+Статус: **partially-addressed**. [Owner / проверенный источник](../instructions/core/collaboration-baseline.md). Русское общение и стиль проекта обязательны; универсальное правило языка всех code comments не вводилось.
 
 Problem:
 
@@ -189,6 +213,8 @@ Acceptance:
 
 ### 12. Session-Derived Command Cookbook
 
+Статус: **promoted**. [Owner / проверенный источник](./COMMAND_COOKBOOK_FROM_SESSIONS.md). Cookbook существует; текущие команды перепроверяются через session-insights owner.
+
 Problem:
 
 - Useful commands are hidden in session history.
@@ -203,7 +229,7 @@ Acceptance:
 
 ## Candidate Instruction Locations
 
-Potential owner docs to update, depending on final design:
+Исторические candidate locations; актуальные статусы и реальные owners указаны у каждого предложения выше:
 
 - `instructions/contexts/testing-dotnet.md` - TUnit/VSTest detection and command strategy.
 - `instructions/contexts/testing-frontend.md` or UI profile - visual evidence gate.

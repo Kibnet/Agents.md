@@ -2,6 +2,36 @@
 
 All notable changes to this instruction catalog are documented in this file.
 
+## [4.0.0] - 2026-09-07
+
+### Fixed
+
+- TOML-aware managed settings сохраняют multiline instructions и меняют только реальные assignments; неоднозначные формы блокируются до записи. Installer и probe используют общий captured contract module.
+- Uninstall сохраняет предсуществующий reviewer по provenance, даже при совпадении с template; legacy unknown ownership не даёт права удаления.
+- Telemetry использует проверенные NTFS handles и identity-bound ownership. Симлинки, hardlinks, подмена путей и legacy-файлы без binding не становятся целями записи/очистки.
+- Составной shell failure не нормализуется как rg no-match; успешный вывод документации не становится failure из-за error keywords.
+- STORM validator и ranking используют одну structural/numeric/graph модель: неправильные типы отклоняются, нулевой RICE сохраняется, ST/CN/EN зависимости и циклы учитываются одинаково.
+- Исправлены непереносимая ссылка на личное evidence и nested code fences; Markdown structure проверяется вне code, с учётом символа и длины fences.
+
+### Changed
+
+- Short SPEC доступна для явно ограниченных обратимых задач без config/storage/security/public contract/migration/external side effects; expanded остаётся для остальных. Exact approval, substantive review и evidence gates сохранены.
+- Applicability, phase mutations и review имеют отдельных owners; prompt wrappers и expanded template меньше повторяют review audit. Финал содержит outcome, validation и существенные ограничения со ссылкой на SPEC.
+- Document contract требует scope, MUST и owner/связи; SHOULD/MAY/команды необязательны. Profiles выбираются по stack/domain/change-type, включая desktop + RavenDB + UI automation.
+- Onboarding описывает portable local pointer и verified global-only; endpoint preflight явно сообщает `tcp-connect`. .NET examples различают VSTest/TUnit.
+- Структурные проверки, machine API contract и text guards разделены. Python STORM unittest выполняются отдельным CI job; backlog помечен подтверждёнными статусами.
+
+### Breaking / Migration
+
+- Новая operational activation требует reviewer/combined evidence schema 2 с current install/config/host/runtime/session binding и двумя свежими observations. Existing active manifest schema 1 сохраняется; автоматической переустановки/деактивации нет.
+- Runtime 3.2.0 остаётся immutable single-file artifact. Запись telemetry поддержана только на Windows local NTFS; unsupported paths/API и ownership conflicts дают fail-open skip. Legacy logs не усыновляются автоматически: отдельная миграция при конфликте пути. Retention удаляет owned segments с событиями старше 45 дней при следующем успешном maintenance, без фонового таймера.
+- STORM starter schema 1.2.0 добавляет optional enablers. Legacy 1.1.0 читается без auto-rewrite, но invalid types/numbers/statuses/undefined references теперь ошибки. CN/EN prerequisites влияют на стоимость/порядок; `supports` остаётся traceability и не создаёт dependency.
+- `step_reuse_ratio` исправлен: доля используемых SD в двух и более active scenarios; прежнее разрешение ссылок называется `resolved_step_reference_ratio`, audit metrics_version=2. Старые audit reports не переписываются автоматически. Analyzer precision/recall/FPR относятся только к выбранной stratified sample.
+
+### Rollback
+
+- Каталог применяется из isolated candidate после drift/hash проверки и backup затронутых файлов; откат восстанавливает только этот change set. Установленный runtime, config и host hook trust этим repository change не меняются. Новые STORM entities при downgrade не удаляются автоматически.
+
 ## [3.3.0] - 2026-09-06
 
 ### Changed

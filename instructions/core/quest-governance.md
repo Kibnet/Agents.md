@@ -2,65 +2,40 @@
 
 ## Когда применять
 
-- Для любых изменений кода, инфраструктуры или канонической документации проекта, если работа требует принятия инженерных решений.
-- Для всех задач, где нужен управляемый цикл `SPEC -> EXECUTION`.
+- Для инженерных изменений кода, инфраструктуры или канонических документов, включая любые изменения этого каталога.
+- Для управляемого цикла SPEC → EXEC с согласованием результата до реализации.
 
 ## Когда не применять
 
-- Для простых одношаговых запросов, не меняющих проектные файлы (например, вывести текущее время).
-- Для чисто справочных ответов без мутаций репозитория.
-- Для выполнения существующего workflow с выдачей пользовательских артефактов по шагам, если агент не меняет код, инфраструктуру, `instructions/*`, `scripts/*` или другие канонические проектные файлы.
+- Для справочных ответов и read-only анализа.
+- Для выполнения существующего workflow с выдачей пользовательских артефактов, если не меняются код, инфраструктура или канонические файлы проекта.
 
 ## MUST
 
-- Перед реализацией создать рабочую спецификацию в локальном `./specs/` репозитория задачи.
-- Для шаблона спецификации использовать canonical путь `templates/specs/_template.md` из каталога инструкций, откуда был загружен текущий instruction stack.
-- Не использовать локальный template из репозитория задачи как source template.
-- Если canonical template не найден в центральном каталоге, остановиться на фазе `SPEC` и явно указать, что consumer-onboarding настроен неполно.
-- Выбрать профиль из `instructions/profiles/*` и явно зафиксировать его в спецификации.
-- Вести в рабочей спецификации финальный раздел `Журнал действий агента` по canonical template и пополнять его инкрементально после каждого значимого блока работ.
-- Считать `instructions/core/quest-mode.md` каноническим owner-документом для фазового поведения `QUEST`, включая допустимые мутации файлов на `SPEC` и `EXEC`.
-- Прогнать самопроверку по `instructions/governance/spec-linter.md`.
-- Оценить спецификацию по `instructions/governance/spec-rubric.md`.
-- Выполнить full `post-SPEC review-loop` по `instructions/governance/review-loops.md` и встроить в spec все улучшения, которые не требуют выбора пользователя.
-- Выполнить `Pre-Approval Rework Prevention Gate`: до запроса approval проверить user-observable scenarios, decision ledger, acceptance-to-test mapping, expected user objections и role-based review applicability по canonical template.
-- Если итог по рубрике < 21, явно пометить автономное выполнение как рискованное и предложить снижение рисков.
-- До утверждения спецификации пользователем не выполнять реализацию.
-- После утверждения реализовывать строго в границах `Non-Goals` и ограничений.
-- Перед финальным отчётом сверить реализацию с `User-Observable Scenarios`, `Acceptance-to-Test Matrix` и `Expected User Review Objections`, если эти секции применимы к утверждённой spec.
-- После реализации и обязательных проверок применять full `post-EXEC review-loop` и правила завершения задачи по `instructions/core/quest-mode.md` и `instructions/governance/review-loops.md`.
+- Классифицировать риск и выбрать форму рабочей SPEC в локальном `./specs/` по таблице ниже. Фазовые мутации, approval и completion определяет только `quest-mode.md`; глубину review — `review-loops.md`.
+- Брать выбранный шаблон из центрального каталога текущего instruction stack. Consumer-local template не является source of truth. Если canonical template отсутствует, сообщить onboarding blocker до реализации.
+- Зафиксировать применимый профиль и выбранную форму с причиной. Число файлов/строк само по себе не определяет риск.
+
+## Выбор формы SPEC
+
+| Форма | Условия | Canonical template |
+| --- | --- | --- |
+| Short | Одновременно: один ограниченный outcome; локальное обратимое изменение; нет config/storage/security/публичного контракта/миграции/внешнего side effect; нет существенной межкомпонентной неопределённости | `templates/specs/_template-small.md` |
+| Expanded | Хотя бы одно условие short не выполнено либо риск пока не установлен | `templates/specs/_template.md` |
+
+Short объединяет повторяющиеся сведения, но сохраняет observable result, решения, AC→check, риск/objection, review, approval и финальный журнал. Требования безопасности и доказательств одинаковы для обеих форм. При обнаружении нового риска перейти к expanded до реализации; изменение scope согласуется по фазовому owner.
 
 ## SHOULD
 
-- Формулировать одну корневую проблему на одну спецификацию.
-- Фиксировать измеримые критерии приемки и команды проверки.
-- Для значимых изменений декомпозировать реализацию на этапы с явным порядком.
-- Кратко фиксировать результат full `post-SPEC review-loop` в секции quality gate спецификации, а результат full `post-EXEC review-loop` в итоговом отчёте.
-
-## MAY
-
-- Использовать `instructions/core/quest-prompt-spec.md` и `instructions/core/quest-prompt-exec.md` как prompt-обёртки поверх этого governance-контракта.
-- Добавлять доменные проверки в spec quality gate, если это повышает воспроизводимость решения.
-
-## Команды
-
-```powershell
-# Создать или обновить рабочую спецификацию
-Copy-Item <AGENTS_ROOT>\templates\specs\_template.md .\specs\YYYY-MM-DD-short-name.md
-
-# Проверка качества (ручная по документам)
-Get-Content instructions/governance/spec-linter.md
-Get-Content instructions/governance/spec-rubric.md
-Get-Content instructions/governance/review-loops.md
-```
+- Описывать один связный outcome и измеримые критерии, не заполнять неприменимые матрицы ради формы.
+- Для нескольких независимых частей фиксировать зависимости и ownership; порядок задавать только при реальном инварианте.
 
 ## Связанные документы
 
-- [AGENTS.md](../../AGENTS.md)
-- [instructions/core/quest-mode.md](./quest-mode.md)
-- [instructions/core/quest-prompt-spec.md](./quest-prompt-spec.md)
-- [instructions/core/quest-prompt-exec.md](./quest-prompt-exec.md)
-- [instructions/governance/spec-linter.md](../governance/spec-linter.md)
-- [instructions/governance/spec-rubric.md](../governance/spec-rubric.md)
-- [instructions/governance/review-loops.md](../governance/review-loops.md)
-- [templates/specs/_template.md](../../templates/specs/_template.md)
+- [Фазы и разрешения](./quest-mode.md)
+- [Review](../governance/review-loops.md)
+- [Linter](../governance/spec-linter.md)
+- [Rubric](../governance/spec-rubric.md)
+- [Expanded template](../../templates/specs/_template.md)
+- [Short template](../../templates/specs/_template-small.md)
+- [Маршрутизация](../governance/routing-matrix.md)

@@ -58,6 +58,12 @@ pwsh -File scripts/validate-instructions.ps1
 pwsh -File scripts/test-validate-instructions.ps1
 ```
 
+При изменении STORM/scripts/schema дополнительно выполнить:
+
+```powershell
+python -m unittest discover -s scripts/storm/tests -p "test_*.py"
+```
+
 ## Документы управления
 
 - [instructions/governance/document-contract.md](instructions/governance/document-contract.md)

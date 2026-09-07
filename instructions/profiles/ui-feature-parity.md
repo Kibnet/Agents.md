@@ -28,6 +28,8 @@
 
 ## Команды
 
+Пример с `--filter` ниже — только для подтверждённого VSTest. Runner discovery и TUnit `--treenode-filter` определяет [testing-dotnet](../contexts/testing-dotnet.md).
+
 ```text
 npm run test:e2e:with-dev
 dotnet test --filter "FullyQualifiedName~UITests"

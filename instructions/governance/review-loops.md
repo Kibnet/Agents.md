@@ -71,7 +71,7 @@
 
 ## SHOULD
 
-- Кратко фиксировать результат full `post-SPEC review-loop` в самой спецификации.
+- Кратко фиксировать результаты full `post-SPEC review-loop` и `post-EXEC review-loop` в самой спецификации. Short может объединять повторяющиеся сведения, но все passes, применимые роли, findings/fixes, evidence и stop decision сохраняются; в чате достаточно outcome, validation, существенных ограничений и ссылки на audit.
 - Проверять design, correctness, tests, docs, comments, style/consistency и context как отдельные areas там, где они применимы к change set.
 - Для значимых repository changes явно указывать validation/build evidence и повторные проверки после исправлений.
 - В `Depth checklist` покрывать минимум: scope drift / unrelated changes, acceptance criteria, validation evidence, unsupported claims, regression / edge case risk, comments/docs/changelog, hidden behavior/API/UX/operations contract change и manual-review challenge.

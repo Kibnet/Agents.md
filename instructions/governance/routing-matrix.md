@@ -18,10 +18,8 @@
 - До классификации каждой задачи подключать `instructions/core/creator-vibe-lens.md` как lightweight interpretive owner; полный skill `creator-vibe` загружать только по его creative/human-experience trigger.
 - Для каждой задачи подключать `instructions/core/model-behavior-baseline.md` как обязательный core baseline оптимизации под `GPT-6 Astra`, не подменяя им проверку фактической surface/runtime availability.
 - Для каждой `tool-heavy` задачи подключать `instructions/core/tool-execution-baseline.md` до первого значимого tool call; этот owner добавляется поверх task-type core и не конкурирует с выбранным context.
-- Для каждой задачи фиксировать минимум один core-документ и при необходимости один context + один profile.
-- Использовать не более двух profile-документов одновременно:
-  - один профиль стека приложения;
-  - один профиль типа изменений (если нужен).
+- Для каждой задачи фиксировать core stack и context текущего этапа; profiles выбирать по stack/domain/change-type триггерам ниже.
+- Выбирать один основной stack profile, необходимые domain profiles и один профиль типа изменения (если нужен). Каждый domain profile требует конкретного триггера и уникального контракта. Лимита «два файла» нет; минимизировать дублирование, не исключать нужную норму ради количества.
 - Для аналитических задач без выраженного технологического стека допускается использовать один профиль сценария без `stack profile`, если результатом являются process artifacts, а не код.
 - Summary-документы (`AGENTS.md`, `README.md`) считать только точками входа и обзором; они не вводят отдельную conflict model поверх owner-документов.
 - Локальный `AGENTS.override.md` в репозитории-потребителе применять только после central stack как дополнительные локальные инструкции поверх него; он не заменяет central stack и может только ужесточать MUST.
@@ -54,7 +52,7 @@ Get-ChildItem instructions/profiles
 4. Если задача `tool-heavy`, добавить `tool-execution-baseline`.
 5. Выбрать один `context` по типу выполнения.
 6. Выбрать один профиль технологического стека (`stack profile`), если задача привязана к реализации в конкретном стеке.
-7. При необходимости добавить один профиль типа изменения (`overlay profile`) или использовать один профиль сценария для аналитической задачи без стековой привязки.
+7. Добавить domain profiles по фактическим зависимостям и один change-type overlay либо сценарный профиль без стека. Например, Avalonia + RavenDB + UI automation требует dotnet-desktop-client, dotnet-ravendb и ui-automation-testing: UI, данные и проверка окна имеют разные контракты.
 8. Добавить governance overlays по триггерам задачи.
 9. Если full-skill trigger сработал и `creator-vibe` установлен, загрузить его до более узких skills/profiles; отсутствие skill не блокирует задачу, если пользователь не потребовал его явно.
 10. Если задача выполняется в consumer-репозитории и есть локальный `AGENTS.override.md`, применить его после central stack как дополнительные локальные инструкции поверх него и использовать только для ужесточения central `MUST`.
@@ -105,7 +103,7 @@ Get-ChildItem instructions/profiles
 |---|---|
 | .NET backend/API | `dotnet-backend-api` |
 | .NET desktop (Avalonia/WPF/WinUI) | `dotnet-desktop-client` |
-| .NET + RavenDB | `dotnet-ravendb` |
+| RavenDB (domain дополнение к выбранному .NET stack) | `dotnet-ravendb` |
 | Frontend SPA TypeScript | `frontend-spa-typescript` |
 | Python hardware/GPIO | `python-hardware-gpio` |
 

@@ -5,6 +5,8 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
+Import-Module (Join-Path $PSScriptRoot 'lib/Catalog.Markdown.psm1') -Force
+
 $resolvedRoot = (Resolve-Path $RootPath).Path
 $errors = New-Object System.Collections.Generic.List[string]
 
@@ -26,6 +28,15 @@ $requiredPaths = @(
     "CHANGELOG.md",
     ".github/workflows/validate-instructions.yml",
     "templates/specs/_template.md",
+    "templates/specs/_template-small.md",
+    "scripts/lib/Catalog.Markdown.psm1",
+    "scripts/lib/AgentOperations.Contracts.psm1",
+    "scripts/test-catalog-contracts.ps1",
+    "scripts/test-agent-operations-installer-remediation.ps1",
+    "scripts/test-agent-operations-telemetry-remediation.ps1",
+    "schemas/agent-operations-activation-evidence.schema.json",
+    "schemas/agent-operations-reviewer-evidence.schema.json",
+    "schemas/openai-api-model-contract.json",
     "instructions/core/creator-vibe-lens.md",
     "instructions/core/model-behavior-baseline.md",
     "instructions/core/quest-governance.md",
@@ -103,6 +114,7 @@ $requiredPaths = @(
     "schemas/agent-operations-smoke-review.schema.json",
     "scripts/storm/validate-artifacts.py",
     "scripts/storm/rank-backlog.py",
+    "scripts/storm/storm_model.py",
     "templates/codex/agent-operations-hooks.json",
     "templates/codex/agents/independent-reviewer.toml",
     "templates/codex/local-environment/README.md",
@@ -159,11 +171,7 @@ else {
 
     $requiredHeadings = @(
         "## Когда применять",
-        "## Когда не применять",
         "## MUST",
-        "## SHOULD",
-        "## MAY",
-        "## Команды",
         "## Связанные документы"
     )
 
@@ -174,11 +182,10 @@ else {
             Add-Error "Имя файла не соответствует kebab-case: $($file.FullName)"
         }
 
-        $content = Get-Content -Path $file.FullName -Raw
+        $content = (Get-CatalogMarkdownStructure -Markdown (Get-Content -LiteralPath $file.FullName -Raw)).Content
 
         foreach ($heading in $requiredHeadings) {
-            $escaped = [regex]::Escape($heading)
-            if ($content -notmatch "(?m)^$escaped\s*$") {
+            if (-not (Test-CatalogSection -Content $content -Heading $heading)) {
                 Add-Error "В файле $($file.FullName) отсутствует секция '$heading'"
             }
         }
@@ -251,7 +258,7 @@ foreach ($mdFile in $activeTemplateScanFiles) {
     }
 }
 
-$semanticContracts = @(
+$textGuards = @(
     @{
         Path = "instructions/core/creator-vibe-lens.md"
         Pattern = 'Эта линза не переопределяет явные инструкции пользователя, factual accuracy, safety, exact-output contract, authorization, scope, QUEST phase gates или более специфичные owner-документы'
@@ -299,11 +306,6 @@ $semanticContracts = @(
     },
     @{
         Path = "instructions/governance/openai-responses-api.md"
-        Pattern = '`none`, `low`, `medium`, `high`, `xhigh`, `max`'
-        Description = "GPT-5.6 reasoning effort levels"
-    },
-    @{
-        Path = "instructions/governance/openai-responses-api.md"
         Pattern = 'allowed_callers: \["programmatic"\]'
         Description = "Programmatic Tool Calling contract"
     },
@@ -331,21 +333,6 @@ $semanticContracts = @(
         Path = "instructions/governance/routing-matrix.md"
         Pattern = 'baseline оптимизации под `GPT-6 Astra`'
         Description = "Astra routing baseline"
-    },
-    @{
-        Path = "instructions/governance/openai-responses-api.md"
-        Pattern = 'Для `gpt-6-astra` допустимы `low`, `medium`, `high`, `xhigh`, `max`; `none` и `minimal` не поддерживаются'
-        Description = "Astra supported reasoning efforts"
-    },
-    @{
-        Path = "instructions/governance/openai-responses-api.md"
-        Pattern = 'Для tool calling в `gpt-6-astra` обязателен Responses API'
-        Description = "Astra Responses tool requirement"
-    },
-    @{
-        Path = "instructions/governance/openai-responses-api.md"
-        Pattern = 'Для `gpt-6-astra` не передавать `temperature`, `top_p`, `top_logprobs`'
-        Description = "Astra unsupported sampling parameters"
     },
     @{
         Path = "instructions/governance/openai-responses-api.md"
@@ -499,7 +486,7 @@ $semanticContracts = @(
     }
 )
 
-foreach ($contract in $semanticContracts) {
+foreach ($contract in $textGuards) {
     $contractPath = Join-Path $resolvedRoot $contract.Path
     if (-not (Test-Path $contractPath)) {
         continue
@@ -507,8 +494,29 @@ foreach ($contract in $semanticContracts) {
 
     $contractContent = Get-Content -Path $contractPath -Raw
     if ($contractContent -notmatch $contract.Pattern) {
-        Add-Error "Нарушен semantic contract '$($contract.Description)' в $($contract.Path)"
+        Add-Error "Нарушен text guard '$($contract.Description)' в $($contract.Path)"
     }
+}
+
+
+# Machine data is checked independently from text guards and runtime behavior.
+$modelContractPath = Join-Path $resolvedRoot 'schemas/openai-api-model-contract.json'
+if (Test-Path -LiteralPath $modelContractPath) {
+    try {
+        $models = Get-Content -LiteralPath $modelContractPath -Raw | ConvertFrom-Json -AsHashtable
+        if ($models.schemaVersion -ne 1 -or $models.surface -cne 'OpenAI API') { throw 'schema/surface mismatch' }
+        $astra = $models.models['gpt-6-astra']
+        if (($astra.reasoningEfforts -join ',') -cne 'low,medium,high,xhigh,max') { throw 'Astra effort contract' }
+        if ($astra.toolEndpoint -cne 'responses') { throw 'Astra tools require Responses' }
+        if (($astra.unsupportedParameters -join ',') -cne 'temperature,top_p,top_logprobs') { throw 'Astra sampling contract' }
+        if (($astra.chatCompletionsUnsupportedParameters -join ',') -cne 'logprobs' -or
+            ($astra.responsesUnsupportedInclude -join ',') -cne 'message.output_text.logprobs') { throw 'Astra logprobs contract' }
+        if (($astra.euUnsupportedServiceTiers -join ',') -cne 'fast,priority') { throw 'Astra EU tier contract' }
+        foreach ($model in @('gpt-5.6-sol','gpt-5.6-terra','gpt-5.6-luna')) {
+            if (($models.models[$model].reasoningEfforts -join ',') -cne 'none,low,medium,high,xhigh,max') { throw "$model effort contract" }
+        }
+        if ($models.aliases['gpt-5.6'] -cne 'gpt-5.6-sol' -or [string]::IsNullOrWhiteSpace($models.reviewedAt) -or $models.sources.Count -lt 1) { throw 'provenance/alias contract' }
+    } catch { Add-Error "Нарушен machine contract OpenAI API: $($_.Exception.Message)" }
 }
 
 $hookTemplateFile = Join-Path $resolvedRoot "templates/codex/agent-operations-hooks.json"
@@ -574,31 +582,6 @@ foreach ($relativePath in $staleTargetFiles) {
     }
 }
 
-function Remove-CodeFenceContent {
-    param([string]$Markdown)
-
-    $lines = $Markdown -split "\r?\n"
-    $inFence = $false
-    $buffer = New-Object System.Text.StringBuilder
-
-    foreach ($line in $lines) {
-        if ($line -match '^\s*(```|~~~)') {
-            $inFence = -not $inFence
-            [void]$buffer.AppendLine("")
-            continue
-        }
-
-        if ($inFence) {
-            [void]$buffer.AppendLine("")
-            continue
-        }
-
-        [void]$buffer.AppendLine($line)
-    }
-
-    return $buffer.ToString()
-}
-
 function Get-InlineMarkdownTargets {
     param([string]$Markdown)
 
@@ -619,6 +602,10 @@ function Get-InlineMarkdownTargets {
             $i++
             continue
         }
+
+        $slashes = 0
+        for ($escapeIndex = $i - 1; $escapeIndex -ge 0 -and $Markdown[$escapeIndex] -eq '\'; $escapeIndex--) { $slashes++ }
+        if ($slashes % 2 -eq 1) { $i++; continue }
 
         $j = $i + 1
         while ($j -lt $length) {
@@ -711,7 +698,7 @@ function Get-ReferenceUsages {
     param([string]$Markdown)
 
     $usages = New-Object System.Collections.Generic.List[string]
-    $pattern = '(?<!\!)\[[^\]]+\]\[([^\]]+)\]'
+    $pattern = '(?<![!\\])\[[^\]]+\]\[([^\]]+)\]'
     $matches = [regex]::Matches($Markdown, $pattern)
 
     foreach ($match in $matches) {
@@ -753,6 +740,11 @@ function Test-LinkTarget {
 
     $targetWithoutAnchor = [System.Uri]::UnescapeDataString($targetWithoutAnchor)
 
+    if ($targetWithoutAnchor -match '^(?:[A-Za-z]:[\\/]|[/\\])') {
+        Add-Error "Непереносимая абсолютная ссылка '$Target' в файле $SourceFile; используйте repo-relative link или local-only literal path"
+        return
+    }
+
     $resolvedTarget = $null
     if ([System.IO.Path]::IsPathRooted($targetWithoutAnchor)) {
         $resolvedTarget = $targetWithoutAnchor
@@ -767,6 +759,12 @@ function Test-LinkTarget {
     }
     catch {
         Add-Error "Некорректный путь в ссылке '$Target' (файл $SourceFile)"
+        return
+    }
+
+    $relativeTarget = [System.IO.Path]::GetRelativePath($resolvedRoot, $normalized)
+    if ([System.IO.Path]::IsPathRooted($relativeTarget) -or $relativeTarget -eq '..' -or $relativeTarget -match '^\.\.[\\/]') {
+        Add-Error "Непереносимая ссылка вне каталога '$Target' в файле $SourceFile"
         return
     }
 
@@ -789,7 +787,9 @@ foreach ($mdFile in $markdownFiles) {
     }
 
     $raw = Get-Content -Path $mdFile.FullName -Raw
-    $content = Remove-CodeFenceContent -Markdown $raw
+    $structure = Get-CatalogMarkdownStructure -Markdown $raw
+    foreach ($problem in $structure.Errors) { Add-Error "$problem в $relativeMarkdownPath" }
+    $content = $structure.LinkContent
 
     $inlineTargets = Get-InlineMarkdownTargets -Markdown $content
     foreach ($target in $inlineTargets) {

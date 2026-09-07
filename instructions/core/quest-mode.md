@@ -13,7 +13,7 @@
 ## MUST
 
 - Перед любым изменением создавать/обновлять рабочую спецификацию в локальном `./specs/` репозитория задачи.
-- Для шаблона использовать canonical путь `templates/specs/_template.md` из каталога инструкций, откуда загружены текущие правила.
+- Форму и canonical шаблон выбирать по `quest-governance.md`: `templates/specs/_template-small.md` для допустимого low-risk scope, иначе `templates/specs/_template.md`, из каталога текущего instruction stack.
 - Не использовать локальный template из репозитория задачи как source template.
 - Если canonical template не найден в центральном каталоге, останавливать фазу `SPEC` с явным сообщением о сломанном onboarding-контракте.
 - Выбрать профиль из `instructions/profiles/*` и зафиксировать его в спецификации.
@@ -23,7 +23,7 @@
 - На фазе SPEC использовать `instructions/governance/spec-linter.md`, `instructions/governance/spec-rubric.md` и `instructions/governance/review-loops.md`.
 - Перед запросом подтверждения спецификации выполнять full `post-SPEC review-loop` по `instructions/governance/review-loops.md`, вносить объективно лучшие правки в spec и повторять затронутые quality gate проверки.
 - Перед запросом подтверждения спецификации выполнять `Pre-Approval Rework Prevention Gate`: заполнить или явно пометить как `Не применимо` с причиной `User-Observable Scenarios`, `Decision Ledger`, `Acceptance-to-Test Matrix`, `Expected User Review Objections` и `Role-Based Review Result`; если `Decision Ledger` содержит user-owned решение, блокирующее EXEC, задать точный вопрос вместо запроса approval.
-- В `Pre-Approval Rework Prevention Gate` для small-задач допустимо компактное заполнение, но нельзя пропускать user-observable scenario, decision ledger, acceptance-to-test mapping или likely objection без проверяемой причины.
+- В short SPEC эти сведения можно объединить в общие строки: user-observable scenario, decision ledger, acceptance-to-test mapping и likely objection должны оставаться проверяемыми. Названия отдельных матриц не обязательны; substantive gates сохраняются.
 - Фразу пользователя `Спеку подтверждаю` считать единственным переходом из фазы `SPEC` в фазу `EXEC`.
 - На фазах `SPEC` и `EXEC` после каждого значимого блока работ обновлять журнал действий агента в текущей рабочей спецификации, отдельно фиксируя ожидаемую передачу решения человеку и фактическое обращение к человеку / решение человека.
 - На фазе EXEC реализовывать только в границах `Non-Goals` и ограничений спецификации.
@@ -35,7 +35,7 @@
 
 - Перед утверждением спецификации убедиться, что нет блокирующих `Открытых вопросов`.
 - Включать `Acceptance Criteria` и список проверочных команд в конце спеки.
-- Хранить отчёт в формате, удобном для последующего аудита (`Summary`, `Changed files`, `Tests`, `Review`, `Commands`, `How to verify`, `Follow-ups`).
+- Полный audit и review evidence хранить в SPEC; финальный ответ давать по outcome, проверкам и существенным ограничениям со ссылкой на артефакт. Не повторять весь audit в чате.
 
 ## MAY
 

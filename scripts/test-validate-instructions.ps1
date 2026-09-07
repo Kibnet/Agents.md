@@ -74,7 +74,7 @@ try {
     $targetFile = Join-Path $scenarioRoot "instructions/core/collaboration-baseline.md"
     $original = Get-Content -Path $targetFile -Raw
     try {
-        $modified = $original -replace "## SHOULD", "## SHOULD_REMOVED"
+        $modified = $original -replace "## MUST", "## MUST_REMOVED"
         Set-Content -Path $targetFile -Value $modified -Encoding UTF8
         if (-not (Invoke-Validation -ScenarioName "отсутствует обязательная секция" -ScenarioPath $scenarioRoot -ShouldPass $false)) {
             $failed = $true
@@ -90,7 +90,7 @@ try {
     try {
         $modified = $original -replace "## Команды", "## COMMANDS_REMOVED"
         Set-Content -Path $commandsFile -Value $modified -Encoding UTF8
-        if (-not (Invoke-Validation -ScenarioName "отсутствует секция команды" -ScenarioPath $scenarioRoot -ShouldPass $false)) {
+        if (-not (Invoke-Validation -ScenarioName "необязательная секция команды" -ScenarioPath $scenarioRoot -ShouldPass $true)) {
             $failed = $true
         }
     }
@@ -194,26 +194,42 @@ try {
         Set-Content -Path $modelBaselineFile -Value $original -Encoding UTF8
     }
 
+    # Machine facts are mutated structurally, independent of prose spelling.
+    $modelDataPath = Join-Path $scenarioRoot 'schemas/openai-api-model-contract.json'
+    $modelOriginal = Get-Content -LiteralPath $modelDataPath -Raw
+    foreach ($case in @('effort','tools','sampling','missing-provenance')) {
+        try {
+            $modelData = $modelOriginal | ConvertFrom-Json -AsHashtable
+            switch ($case) {
+                'effort' { $modelData.models['gpt-6-astra'].reasoningEfforts = @('none','low','medium','high','xhigh','max') }
+                'tools' { $modelData.models['gpt-6-astra'].toolEndpoint = 'chat-completions' }
+                'sampling' { $modelData.models['gpt-6-astra'].unsupportedParameters = @() }
+                'missing-provenance' { $modelData.sources = @() }
+            }
+            $modelData | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $modelDataPath
+            if (-not (Invoke-Validation -ScenarioName "machine contract $case" -ScenarioPath $scenarioRoot -ShouldPass $false)) { $failed = $true }
+        } finally { Set-Content -LiteralPath $modelDataPath -Value $modelOriginal -Encoding utf8 }
+    }
+
+    $structureFixture = Join-Path $scenarioRoot 'README.md'
+    $structureOriginal = Get-Content -LiteralPath $structureFixture -Raw
+    foreach ($case in @(
+        @{ Name='незакрытый fence'; Text=('```text' + "`n" + '## MUST'); Pass=$false },
+        @{ Name='inline code и escaped link'; Text='`[literal](missing.md)` and \[escaped](missing.md)'; Pass=$true },
+        @{ Name='mixed outer fence'; Text=('````markdown' + "`n" + '```' + "`n" + '[literal](missing.md)' + "`n" + '```' + "`n" + '````'); Pass=$true },
+        @{ Name='private absolute link'; Text=('[private](<' + $validator.Replace('\','/') + '>)'); Pass=$false },
+        @{ Name='existing relative link outside catalog'; Text=('[outside](<' + [IO.Path]::GetRelativePath($scenarioRoot, $validator).Replace('\','/') + '>)'); Pass=$false },
+        @{ Name='escaped opening backtick exposes link'; Text='\`[private](C:/Users/Kibnet/private.md)`'; Pass=$false }
+        @{ Name='separate paragraph backticks expose link'; Text=('First unmatched `' + "`n`n" + '[private](C:/Users/Kibnet/private.md)' + "`n`n" + 'Last unmatched `'); Pass=$false }
+    )) {
+        try {
+            Set-Content -LiteralPath $structureFixture -Value ($structureOriginal + "`n" + $case.Text) -Encoding utf8
+            if (-not (Invoke-Validation -ScenarioName $case.Name -ScenarioPath $scenarioRoot -ShouldPass $case.Pass)) { $failed = $true }
+        } finally { Set-Content -LiteralPath $structureFixture -Value $structureOriginal -Encoding utf8 }
+    }
+
     # Astra compatibility regressions must remove a real guard, not silently no-op.
     $astraMutations = @(
-        @{
-            Name = "Astra допускает none"
-            Path = "instructions/governance/openai-responses-api.md"
-            From = 'Для `gpt-6-astra` допустимы `low`, `medium`, `high`, `xhigh`, `max`; `none` и `minimal` не поддерживаются'
-            To = 'Для `gpt-6-astra` допустимы `none`, `low`, `medium`, `high`, `xhigh`, `max`'
-        },
-        @{
-            Name = "Astra tools ошибочно допускают Chat Completions"
-            Path = "instructions/governance/openai-responses-api.md"
-            From = 'Для tool calling в `gpt-6-astra` обязателен Responses API'
-            To = 'Для tool calling в `gpt-6-astra` допустим Chat Completions'
-        },
-        @{
-            Name = "Astra sampling guard удалён"
-            Path = "instructions/governance/openai-responses-api.md"
-            From = 'Для `gpt-6-astra` не передавать `temperature`, `top_p`, `top_logprobs`'
-            To = 'Для `gpt-6-astra` передавать `temperature`, `top_p`, `top_logprobs`'
-        },
         @{
             Name = "configuration_update ошибочно допускает pro multi-agent"
             Path = "instructions/governance/openai-responses-api.md"
@@ -406,9 +422,15 @@ try {
 }
 finally {
     if (Test-Path $tempRoot) {
-        Remove-Item -Path $tempRoot -Recurse -Force
+        $resolvedTemp = [IO.Path]::GetFullPath($tempRoot)
+        $expectedParent = [IO.Path]::GetFullPath([IO.Path]::GetTempPath()).TrimEnd('\','/') + [IO.Path]::DirectorySeparatorChar
+        if (-not $resolvedTemp.StartsWith($expectedParent, [StringComparison]::OrdinalIgnoreCase) -or [IO.Path]::GetFileName($resolvedTemp) -notlike 'agents-validator-*') { throw 'Unsafe test cleanup path' }
+        Remove-Item -LiteralPath $resolvedTemp -Recurse -Force
     }
 }
+
+& pwsh -NoProfile -File (Join-Path $root 'scripts/test-catalog-contracts.ps1')
+if ($LASTEXITCODE -ne 0) { $failed = $true }
 
 if ($SkipAgentOperations) {
     Write-Host "INFO: Windows operational suite пропущен явным CI split; его запускает отдельный windows-latest job" -ForegroundColor Cyan
