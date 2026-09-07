@@ -1,0 +1,358 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Activation probe result v2",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": {
+      "const": 2
+    },
+    "reviewerEvidence": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "contractsHash": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        {
+          "type": "null"
+        },
+        {
+          "const": ""
+        }
+      ]
+    },
+    "reviewerEvidenceHash": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        {
+          "type": "null"
+        },
+        {
+          "const": ""
+        }
+      ]
+    },
+    "runtimeHash": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        {
+          "type": "null"
+        },
+        {
+          "const": ""
+        }
+      ]
+    },
+    "runtimeMarkerHash": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        {
+          "type": "null"
+        },
+        {
+          "const": ""
+        }
+      ]
+    },
+    "configHash": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        {
+          "type": "null"
+        },
+        {
+          "const": ""
+        }
+      ]
+    },
+    "hooksHash": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        {
+          "type": "null"
+        },
+        {
+          "const": ""
+        }
+      ]
+    },
+    "reviewerHash": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        {
+          "type": "null"
+        },
+        {
+          "const": ""
+        }
+      ]
+    },
+    "reviewerFingerprint": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        {
+          "type": "null"
+        },
+        {
+          "const": ""
+        }
+      ]
+    },
+    "activationBindingHash": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        {
+          "type": "null"
+        },
+        {
+          "const": ""
+        }
+      ]
+    },
+    "reviewerObservationAtUtc": {
+      "anyOf": [
+        {
+          "type": "string",
+          "format": "date-time"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "runtimeObservationAtUtc": {
+      "anyOf": [
+        {
+          "type": "string",
+          "format": "date-time"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "evidenceCreatedAtUtc": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "expiresAtUtc": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "expectedReviewerRuntimeFingerprint": {
+      "type": "string"
+    },
+    "expectedReviewerSessionId": {
+      "type": "string"
+    },
+    "reviewerEvidenceReason": {
+      "type": "string"
+    },
+    "agentLimitsReason": {
+      "type": "string"
+    },
+    "runtimeVersion": {
+      "type": "string"
+    },
+    "activationTelemetryReason": {
+      "type": "string"
+    },
+    "manualHookTrustConfirmed": {
+      "type": "boolean"
+    },
+    "controlledHostTaskConfirmed": {
+      "type": "boolean"
+    },
+    "hookDefinitionsPassed": {
+      "type": "boolean"
+    },
+    "activationTelemetryObserved": {
+      "type": "boolean"
+    },
+    "runtimeChallengeObserved": {
+      "type": "boolean"
+    },
+    "runtimeStillInstalled": {
+      "type": "boolean"
+    },
+    "safeCallPassed": {
+      "type": "boolean"
+    },
+    "knownBadPreToolUsePassed": {
+      "type": "boolean"
+    },
+    "postToolUsePassed": {
+      "type": "boolean"
+    },
+    "failOpenPassed": {
+      "type": "boolean"
+    },
+    "agentLimitsPassed": {
+      "type": "boolean"
+    },
+    "reviewerWriteDenied": {
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "reviewerEvidence",
+    "contractsHash",
+    "reviewerEvidenceHash",
+    "runtimeHash",
+    "runtimeMarkerHash",
+    "configHash",
+    "hooksHash",
+    "reviewerHash",
+    "reviewerFingerprint",
+    "activationBindingHash",
+    "reviewerObservationAtUtc",
+    "runtimeObservationAtUtc",
+    "evidenceCreatedAtUtc",
+    "expiresAtUtc",
+    "expectedReviewerRuntimeFingerprint",
+    "expectedReviewerSessionId",
+    "reviewerEvidenceReason",
+    "agentLimitsReason",
+    "runtimeVersion",
+    "activationTelemetryReason",
+    "manualHookTrustConfirmed",
+    "controlledHostTaskConfirmed",
+    "hookDefinitionsPassed",
+    "activationTelemetryObserved",
+    "runtimeChallengeObserved",
+    "runtimeStillInstalled",
+    "safeCallPassed",
+    "knownBadPreToolUsePassed",
+    "postToolUsePassed",
+    "failOpenPassed",
+    "agentLimitsPassed",
+    "reviewerWriteDenied"
+  ],
+  "$defs": {
+    "reviewer": {
+      "title": "Controlled reviewer observation v2",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schemaVersion": {
+          "const": 2
+        },
+        "reviewerFingerprint": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "activationBindingHash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "configHash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "runtimeFingerprint": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "observedAtUtc": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "hostIdentity": {
+          "type": "string",
+          "minLength": 1
+        },
+        "childSessionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "effectiveSandbox": {
+          "const": "read-only"
+        },
+        "readSucceeded": {
+          "type": "boolean"
+        },
+        "writeDenied": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "reviewerFingerprint",
+        "activationBindingHash",
+        "configHash",
+        "runtimeFingerprint",
+        "observedAtUtc",
+        "hostIdentity",
+        "childSessionId",
+        "effectiveSandbox",
+        "readSucceeded",
+        "writeDenied"
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "reviewerWriteDenied": {
+            "const": true
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "reviewerEvidence": {
+            "$ref": "#/$defs/reviewer"
+          },
+          "reviewerEvidenceHash": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "reviewerObservationAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "expectedReviewerRuntimeFingerprint": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "expectedReviewerSessionId": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  ]
+}

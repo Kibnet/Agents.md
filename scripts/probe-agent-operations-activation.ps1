@@ -2,6 +2,8 @@
 param(
     [string]$CodexHome = (Join-Path $HOME ".codex"),
     [string]$ReviewerEvidencePath,
+    [string]$ExpectedReviewerRuntimeFingerprint,
+    [string]$ExpectedReviewerSessionId,
     [switch]$ManualHookTrustConfirmed,
     [switch]$ControlledHostTaskConfirmed,
     [string]$SimulateRuntimeReplacementAfterCapturePath,
@@ -12,6 +14,14 @@ param(
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
+
+# Import the captured module, so disk replacement cannot change this run's contract.
+$contractsPath = Join-Path $PSScriptRoot "lib/AgentOperations.Contracts.psm1"
+$contractsBytes = [IO.File]::ReadAllBytes($contractsPath)
+$contractsHash = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($contractsBytes)).ToLowerInvariant()
+$contractsModule = New-Module -Name AgentOperationsCapturedContracts -ScriptBlock ([scriptblock]::Create([Text.Encoding]::UTF8.GetString($contractsBytes)))
+Import-Module $contractsModule -Force
+
 
 function Get-PropertyValue {
     param(
@@ -73,19 +83,7 @@ function Write-TextAtomic {
 
 function Get-AgentLimits {
     param([string]$Content)
-
-    $values = [ordered]@{ max_threads = $null; max_depth = $null }
-    $inAgents = $false
-    foreach ($line in ($Content -split "\r?\n")) {
-        if ($line -match '^\s*\[([^\]]+)\]\s*(?:#.*)?$') {
-            $inAgents = $Matches[1] -eq "agents"
-            continue
-        }
-        if ($inAgents -and $line -match '^\s*(max_threads|max_depth)\s*=\s*([^#\r\n]+?)\s*(?:#.*)?$') {
-            $values[$Matches[1]] = $Matches[2].Trim()
-        }
-    }
-    return [pscustomobject]$values
+    (Read-AgentOperationsToml $Content).Values
 }
 
 function Get-HookFingerprint {
@@ -207,7 +205,7 @@ function Get-ActivationTelemetryObservation {
         return [pscustomobject]@{ Observed = $false; Reason = "invalid-installed-at"; ObservedAtUtc = $null }
     }
     $freshnessCutoff = [DateTimeOffset]::UtcNow.AddMinutes(-15)
-    $futureTolerance = [DateTimeOffset]::UtcNow.AddMinutes(5)
+    $futureTolerance = [DateTimeOffset]::UtcNow.AddSeconds(30)
     $reasons = [System.Collections.Generic.List[string]]::new()
 
     foreach ($name in @("agent-operations.jsonl", "agent-operations.1.jsonl", "agent-operations.2.jsonl")) {
@@ -361,9 +359,16 @@ $activationTelemetryObservation = Get-ActivationTelemetryObservation -LogsRoot $
 $activationTelemetryObserved = [bool]$activationTelemetryObservation.Observed
 $runtimeChallengeObserved = $hooksPassed -and $activationTelemetryObserved
 
-$configText = if ($basePathsSafe -and (Test-Path -LiteralPath $configPath -PathType Leaf)) { [System.IO.File]::ReadAllText($configPath) } else { "" }
-$agentLimits = Get-AgentLimits -Content $configText
-$agentLimitsPassed = $agentLimits.max_threads -eq "4" -and $agentLimits.max_depth -eq "1"
+$configText = ''
+$agentLimitsReason = 'verified'
+try {
+    if ($basePathsSafe -and (Test-Path -LiteralPath $configPath -PathType Leaf)) {
+        $configText = [Text.UTF8Encoding]::new($false, $true).GetString([IO.File]::ReadAllBytes($configPath))
+    }
+    $agentLimits = Get-AgentLimits -Content $configText
+    $agentLimitsPassed = $agentLimits.max_threads -eq "4" -and $agentLimits.max_depth -eq "1"
+    if (!$agentLimitsPassed) { $agentLimitsReason = 'Live limits are not 4/1.' }
+} catch { $agentLimitsPassed = $false; $agentLimitsReason = $_.Exception.Message }
 
 $safeResult = if ($runtimePassed) {
     Invoke-HookProbe -InputJson '{"hook_event_name":"PreToolUse","tool_name":"Bash","tool_input":{"command":"rg TODO src -g \"*.cs\""}}' -RuntimeBytes $capturedRuntimeBytes -ExpectedRuntimeHash $runtimeHash
@@ -385,28 +390,39 @@ $runtimeStillInstalled = $runtimePassed -and
     (Get-Sha256File -Path $runtimePath) -eq $runtimeHash
 
 $reviewerWriteDenied = $false
+$reviewerEvidence = $null
+$reviewerEvidenceReason = 'Reviewer evidence is missing.'
 if (-not [string]::IsNullOrWhiteSpace($ReviewerEvidencePath) -and (Test-Path -LiteralPath $ReviewerEvidencePath -PathType Leaf)) {
     try {
-        $reviewerEvidence = [System.IO.File]::ReadAllText($ReviewerEvidencePath) | ConvertFrom-Json -Depth 20
-        $reviewerWriteDenied = [string]$reviewerEvidence.reviewerFingerprint -eq $reviewerFingerprint -and
-            [string]$reviewerEvidence.effectiveSandbox -eq "read-only" -and
-            $reviewerEvidence.readSucceeded -is [bool] -and $reviewerEvidence.readSucceeded -and
-            $reviewerEvidence.writeDenied -is [bool] -and $reviewerEvidence.writeDenied
-    }
-    catch {
-        $reviewerWriteDenied = $false
-    }
+        $reviewerEvidence = [IO.File]::ReadAllText($ReviewerEvidencePath) | ConvertFrom-Json -Depth 20
+        if ($reviewerEvidence -isnot [pscustomobject]) { $reviewerEvidence = $null; throw 'Reviewer evidence must be an object.' }
+        $reviewerCheck = Test-AgentOperationsReviewerEvidence -Evidence $reviewerEvidence -ReviewerFingerprint $reviewerFingerprint -ActivationBindingHash $expectedActivationHash -ConfigHash (Get-Sha256Text $configText) -InstalledAt $installedAt -ExpectedRuntimeFingerprint $ExpectedReviewerRuntimeFingerprint -ExpectedSessionId $ExpectedReviewerSessionId
+        $reviewerWriteDenied = $reviewerCheck.Passed
+        $reviewerEvidenceReason = $reviewerCheck.Reason
+    } catch { $reviewerEvidenceReason = $_.Exception.Message }
 }
 
 $evidenceCreatedAt = [DateTimeOffset]::UtcNow
 $runtimeObservationAt = if ($runtimeChallengeObserved) { ConvertTo-DateTimeOffsetValue -Value $activationTelemetryObservation.ObservedAtUtc } else { $null }
-$expiresAt = if ($null -eq $runtimeObservationAt) { $evidenceCreatedAt } else { $runtimeObservationAt.AddMinutes(15) }
+$reviewerObservationAt = if ($reviewerWriteDenied) { ConvertTo-AgentOperationsDate $reviewerEvidence.observedAtUtc } else { $null }
+$expiresAt = $evidenceCreatedAt
+if ($null -ne $runtimeObservationAt -and $null -ne $reviewerObservationAt) {
+    $expiresAt = if ($runtimeObservationAt -lt $reviewerObservationAt) { $runtimeObservationAt.AddMinutes(15) } else { $reviewerObservationAt.AddMinutes(15) }
+}
 $evidenceRuntimeMarkerHash = if ($runtimePathSafe) { Get-Sha256File -Path $runtimeMarkerPath } else { $null }
 $evidenceConfigHash = if ($basePathsSafe) { Get-Sha256File -Path $configPath } else { $null }
 $evidenceHooksHash = if ($basePathsSafe) { Get-Sha256File -Path $hooksPath } else { $null }
 $evidenceReviewerHash = if ($basePathsSafe) { Get-Sha256File -Path $reviewerPath } else { $null }
 $evidence = [ordered]@{
-    schemaVersion = 1
+    schemaVersion = 2
+    contractsHash = $contractsHash
+    reviewerEvidence = $reviewerEvidence
+    reviewerEvidenceHash = if ($null -ne $reviewerEvidence) { Get-AgentOperationsEvidenceHash $reviewerEvidence } else { $null }
+    reviewerObservationAtUtc = if ($null -ne $reviewerObservationAt) { $reviewerObservationAt.UtcDateTime.ToString('o') } else { $null }
+    expectedReviewerRuntimeFingerprint = $ExpectedReviewerRuntimeFingerprint
+    expectedReviewerSessionId = $ExpectedReviewerSessionId
+    reviewerEvidenceReason = $reviewerEvidenceReason
+    agentLimitsReason = $agentLimitsReason
     runtimeVersion = $runtimeVersion
     runtimeHash = $runtimeHash
     runtimeMarkerHash = $evidenceRuntimeMarkerHash
@@ -432,7 +448,8 @@ $evidence = [ordered]@{
     agentLimitsPassed = $agentLimitsPassed
     reviewerWriteDenied = $reviewerFingerprintPassed -and $reviewerWriteDenied
 }
-$allPassed = $runtimePassed -and @(
+$freshObservationsPassed = Test-AgentOperationsActivationFreshness -Evidence ([pscustomobject]$evidence) -InstalledAt $installedAt
+$allPassed = $runtimePassed -and $freshObservationsPassed -and @(
     "manualHookTrustConfirmed",
     "controlledHostTaskConfirmed",
     "runtimeChallengeObserved",

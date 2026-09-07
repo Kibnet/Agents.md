@@ -1,0 +1,14 @@
+[
+  {"command":"rg absent .","direct":true},
+  {"command":"rg.exe absent .","direct":true},
+  {"command":"C:\\tools\\rg.exe absent .","direct":true},
+  {"command":"rg absent .; exit 1","direct":false},
+  {"command":"rg absent . | Select-Object -First 1","direct":false},
+  {"command":"rg absent . && echo done","direct":false},
+  {"command":"& rg absent .","direct":false},
+  {"command":"pwsh -Command 'rg absent .'","direct":false},
+  {"command":"rg $(Get-Content query) .","direct":false},
+  {"command":"rg absent . 2>$null","direct":false},
+  {"command":"rg 'unterminated","direct":false},
+  {"command":"{ rg absent . }","direct":false}
+]

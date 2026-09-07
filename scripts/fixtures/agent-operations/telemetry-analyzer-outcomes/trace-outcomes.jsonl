@@ -1,0 +1,21 @@
+{"timestamp":"2026-01-01T00:00:00Z","type":"session_meta","payload":{"id":"telemetry-outcomes","source":"user"}}
+{"timestamp":"2026-01-01T00:00:01Z","type":"response_item","payload":{"type":"function_call","name":"shell_command","call_id":"docs","arguments":"{\"command\":\"Get-Content docs.md\"}"}}
+{"timestamp":"2026-01-01T00:00:02Z","type":"response_item","payload":{"type":"function_call_output","call_id":"docs","output":{"exit_code":0,"output":"401 SSL certificate build failed traceback index.lock"}}}
+{"timestamp":"2026-01-01T00:00:03Z","type":"response_item","payload":{"type":"function_call","name":"shell_command","call_id":"unknown","arguments":"{\"command\":\"Get-Content docs.md\"}"}}
+{"timestamp":"2026-01-01T00:00:04Z","type":"response_item","payload":{"type":"function_call_output","call_id":"unknown","output":"Documentation: 401 SSL certificate build failed traceback"}}
+{"timestamp":"2026-01-01T00:00:05Z","type":"response_item","payload":{"type":"function_call","name":"shell_command","call_id":"rg","arguments":"{\"command\":\"rg missing .\"}"}}
+{"timestamp":"2026-01-01T00:00:06Z","type":"response_item","payload":{"type":"function_call_output","call_id":"rg","output":{"exit_code":1,"stderr":""}}}
+{"timestamp":"2026-01-01T00:00:07Z","type":"response_item","payload":{"type":"function_call","name":"exec_command","call_id":"compound","arguments":"{\"cmd\":\"rg missing .; exit 1\"}"}}
+{"timestamp":"2026-01-01T00:00:08Z","type":"response_item","payload":{"type":"function_call_output","call_id":"compound","output":{"exit_code":1,"stderr":"401 SSL certificate"}}}
+{"timestamp":"2026-01-01T00:00:09Z","type":"response_item","payload":{"type":"function_call","name":"exec_command","call_id":"timeout","arguments":"{\"cmd\":\"run\"}"}}
+{"timestamp":"2026-01-01T00:00:10Z","type":"response_item","payload":{"type":"function_call_output","call_id":"timeout","output":{"timed_out":true}}}
+{"timestamp":"2026-01-01T00:00:11Z","type":"response_item","payload":{"type":"function_call","name":"apply_patch","call_id":"patch","arguments":"{}"}}
+{"timestamp":"2026-01-01T00:00:12Z","type":"response_item","payload":{"type":"function_call_output","call_id":"patch","output":{"success":false}}}
+{"timestamp":"2026-01-01T00:00:13Z","type":"response_item","payload":{"type":"function_call","name":"shell_command","call_id":"outer-error","arguments":"{\"command\":\"rg missing .\"}"}}
+{"timestamp":"2026-01-01T00:00:14Z","type":"response_item","payload":{"type":"function_call_output","call_id":"outer-error","output":{"exit_code":1,"stderr":"","isError":true}}}
+{"timestamp":"2026-01-01T00:00:15Z","type":"response_item","payload":{"type":"function_call","name":"shell_command","call_id":"outer-failure","arguments":"{\"command\":\"rg missing .\"}"}}
+{"timestamp":"2026-01-01T00:00:16Z","type":"response_item","payload":{"type":"function_call_output","call_id":"outer-failure","output":{"exit_code":1,"stderr":"","success":false}}}
+{"timestamp":"2026-01-01T00:00:17Z","type":"response_item","payload":{"type":"function_call","name":"shell_command","call_id":"huge-exit","arguments":"{\"command\":\"run\"}"}}
+{"timestamp":"2026-01-01T00:00:18Z","type":"response_item","payload":{"type":"function_call_output","call_id":"huge-exit","output":"Script failed\nExit code: 9999999999999999999999999999999999999999999999999\nOutput:\n401 SSL build failed"}}
+{"timestamp":"2026-01-01T00:00:19Z","type":"response_item","payload":{"type":"function_call","name":"shell_command","call_id":"after-huge-exit","arguments":"{\"command\":\"Get-Content docs.md\"}"}}
+{"timestamp":"2026-01-01T00:00:20Z","type":"response_item","payload":{"type":"function_call_output","call_id":"after-huge-exit","output":{"exit_code":0,"output":"401 SSL build failed"}}}

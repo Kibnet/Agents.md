@@ -46,7 +46,7 @@ foreach ($uriText in $Endpoint) {
     catch {
         $ok = $false
     }
-    $checks.Add([pscustomobject]@{ kind = "endpoint"; name = $uriText; required = $true; ok = $ok })
+    $checks.Add([pscustomobject]@{ kind = "endpoint"; level = "tcp-connect"; name = $uriText; required = $true; ok = $ok })
 }
 
 $requiredFailures = @($checks | Where-Object { $_.required -and -not $_.ok })
@@ -62,7 +62,8 @@ if ($OutputFormat -eq "Json") {
 else {
     foreach ($check in $checks) {
         $status = if ($check.ok) { "PASS" } elseif ($check.required) { "FAIL" } else { "WARN" }
-        Write-Host ("{0}: {1} {2}" -f $status, $check.kind, $check.name)
+        $label = if ($check.kind -eq "endpoint") { "endpoint tcp-connect" } else { $check.kind }
+        Write-Host ("{0}: {1} {2}" -f $status, $label, $check.name)
     }
 }
 

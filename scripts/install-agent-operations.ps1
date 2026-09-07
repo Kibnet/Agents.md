@@ -21,7 +21,15 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
-$script:RuntimeVersion = "3.1.0"
+# Import the captured module, so disk replacement cannot change this run's contract.
+$contractsPath = Join-Path $PSScriptRoot "lib/AgentOperations.Contracts.psm1"
+$contractsBytes = [IO.File]::ReadAllBytes($contractsPath)
+$contractsHash = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($contractsBytes)).ToLowerInvariant()
+$contractsModule = New-Module -Name AgentOperationsCapturedContracts -ScriptBlock ([scriptblock]::Create([Text.Encoding]::UTF8.GetString($contractsBytes)))
+Import-Module $contractsModule -Force
+
+
+$script:RuntimeVersion = "3.2.0"
 $script:MaxBackups = 10
 $script:BackupAgeDays = 90
 $script:MaxRuntimeVersions = 3
@@ -215,6 +223,13 @@ function Read-TextFile {
         return $null
     }
     return [System.IO.File]::ReadAllText($Path)
+}
+
+function Read-ConfigTextFile {
+    param([string]$Path)
+    if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) { return $null }
+    # UTF-8 decoding keeps a BOM as a character so the exact output bytes preserve it.
+    return [Text.UTF8Encoding]::new($false, $true).GetString([IO.File]::ReadAllBytes($Path))
 }
 
 function Write-TextAtomic {
@@ -423,160 +438,16 @@ function Set-ObjectProperty {
 
 function Get-AgentValues {
     param([AllowNull()][string]$Content)
-
-    $result = [ordered]@{
-        max_threads = $null
-        max_depth = $null
-    }
-    if ([string]::IsNullOrWhiteSpace($Content)) {
-        return [pscustomobject]$result
-    }
-
-    $inAgents = $false
-    foreach ($line in ($Content -split "\r?\n")) {
-        if ($line -match '^\s*\[([^\]]+)\]\s*(?:#.*)?$') {
-            $inAgents = $Matches[1] -eq "agents"
-            continue
-        }
-        if (-not $inAgents) {
-            continue
-        }
-        if ($line -match '^\s*(max_threads|max_depth)\s*=\s*([^#\r\n]+?)\s*(?:#.*)?$') {
-            $result[$Matches[1]] = $Matches[2].Trim()
-        }
-    }
-    return [pscustomobject]$result
+    (Read-AgentOperationsToml -Content $Content).Values
 }
-
 function Set-AgentValues {
-    param(
-        [AllowNull()][string]$Content,
-        [AllowNull()][object]$MaxThreads,
-        [AllowNull()][object]$MaxDepth
-    )
-
-    $original = if ($null -eq $Content) { "" } else { $Content }
-    $newline = if ($original.Contains("`r`n")) { "`r`n" } else { "`n" }
-    $lines = [System.Collections.Generic.List[string]]::new()
-    foreach ($line in ($original -split "\r?\n")) {
-        $lines.Add($line)
-    }
-    if ($lines.Count -eq 1 -and $lines[0] -eq "") {
-        $lines.Clear()
-    }
-
-    $start = -1
-    $end = $lines.Count
-    for ($index = 0; $index -lt $lines.Count; $index++) {
-        if ($lines[$index] -match '^\s*\[([^\]]+)\]\s*(?:#.*)?$') {
-            if ($Matches[1] -eq "agents") {
-                $start = $index
-                for ($next = $index + 1; $next -lt $lines.Count; $next++) {
-                    if ($lines[$next] -match '^\s*\[[^\]]+\]\s*(?:#.*)?$') {
-                        $end = $next
-                        break
-                    }
-                }
-                break
-            }
-        }
-    }
-
-    if ($start -lt 0) {
-        if ($null -eq $MaxThreads -and $null -eq $MaxDepth) {
-            return $original
-        }
-        if ($lines.Count -gt 0 -and $lines[$lines.Count - 1] -ne "") {
-            $lines.Add("")
-        }
-        $lines.Add("[agents]")
-        if ($null -ne $MaxThreads) { $lines.Add("max_threads = $MaxThreads") }
-        if ($null -ne $MaxDepth) { $lines.Add("max_depth = $MaxDepth") }
-        return ($lines -join $newline).TrimEnd("`r", "`n") + $newline
-    }
-
-    $section = [System.Collections.Generic.List[string]]::new()
-    for ($index = $start + 1; $index -lt $end; $index++) {
-        $section.Add($lines[$index])
-    }
-
-    foreach ($entry in @(
-        [pscustomobject]@{ Name = "max_threads"; Value = $MaxThreads },
-        [pscustomobject]@{ Name = "max_depth"; Value = $MaxDepth }
-    )) {
-        $found = -1
-        for ($index = 0; $index -lt $section.Count; $index++) {
-            if ($section[$index] -match ("^\s*" + [regex]::Escape($entry.Name) + "\s*=")) {
-                $found = $index
-                break
-            }
-        }
-
-        if ($null -eq $entry.Value) {
-            if ($found -ge 0) {
-                $section.RemoveAt($found)
-            }
-        }
-        elseif ($found -ge 0) {
-            $comment = ""
-            if ($section[$found] -match '(\s+#.*)$') {
-                $comment = $Matches[1]
-            }
-            $indent = ([regex]::Match($section[$found], '^\s*')).Value
-            $section[$found] = "${indent}$($entry.Name) = $($entry.Value)$comment"
-        }
-        else {
-            $section.Add("$($entry.Name) = $($entry.Value)")
-        }
-    }
-
-    $result = [System.Collections.Generic.List[string]]::new()
-    for ($index = 0; $index -le $start; $index++) { $result.Add($lines[$index]) }
-    foreach ($line in $section) { $result.Add($line) }
-    for ($index = $end; $index -lt $lines.Count; $index++) { $result.Add($lines[$index]) }
-    return ($result -join $newline).TrimEnd("`r", "`n") + $newline
+    param([AllowNull()][string]$Content,[AllowNull()][object]$MaxThreads,[AllowNull()][object]$MaxDepth)
+    Set-AgentOperationsLimits -Content $Content -MaxThreads $MaxThreads -MaxDepth $MaxDepth
 }
-
 function Test-ConfigHasOnlyEmptyAgents {
     param([AllowNull()][string]$Content)
-
-    if ([string]::IsNullOrWhiteSpace($Content)) {
-        return $true
-    }
-    $meaningful = @($Content -split "\r?\n" | ForEach-Object { ($_ -replace '#.*$', '').Trim() } | Where-Object { $_ -ne "" })
-    return $meaningful.Count -eq 1 -and $meaningful[0] -eq "[agents]"
-}
-
-function Test-UnsupportedAgentConfiguration {
-    param([AllowNull()][string]$Content)
-
-    if ([string]::IsNullOrWhiteSpace($Content)) { return $false }
-    if ($Content -match '(?im)^\s*agents\s*=\s*\{' -or
-        $Content -match '(?im)^\s*(?:agents|["'']agents["''])\s*\.' -or
-        $Content -match '(?im)^\s*\[\[\s*agents\s*\]\]' -or
-        $Content -match '(?im)^\s*\[\s*["'']agents["'']\s*\]') {
-        return $true
-    }
-    $semanticHeaders = [regex]::Matches($Content, '(?im)^\s*\[\s*agents\s*\]\s*(?:#.*)?$')
-    $headers = [regex]::Matches($Content, '(?im)^\s*\[agents\]\s*(?:#.*)?$')
-    if ($semanticHeaders.Count -ne $headers.Count) { return $true }
-    if ($headers.Count -gt 1) { return $true }
-    if ($headers.Count -eq 0) { return $false }
-
-    $start = $headers[0].Index + $headers[0].Length
-    $tail = $Content.Substring($start)
-    $nextHeader = [regex]::Match($tail, '(?im)^\s*\[[^\]]+\]\s*(?:#.*)?$')
-    $section = if ($nextHeader.Success) { $tail.Substring(0, $nextHeader.Index) } else { $tail }
-    if ($section -match '(?im)^\s*["''](?:max_threads|max_depth)["'']\s*=' -or
-        $section -match '(?im)^\s*(?:max_threads|max_depth)\s*\.') {
-        return $true
-    }
-    foreach ($name in @("max_threads", "max_depth")) {
-        if ([regex]::Matches($section, ("(?im)^\s*" + [regex]::Escape($name) + "\s*=")).Count -gt 1) {
-            return $true
-        }
-    }
-    return $false
+    $meaningful = @((Read-AgentOperationsToml $Content).Statements | Where-Object { $_.Code.Trim() })
+    return $meaningful.Count -eq 0 -or ($meaningful.Count -eq 1 -and $meaningful[0].Code.Trim() -ceq '[agents]')
 }
 
 function Test-HooksDocumentEmpty {
@@ -1292,7 +1163,9 @@ if (-not (Test-ManagedPathSetSafe -CodexHomePath $codexHomePath -Paths $managedP
     exit 2
 }
 
-$currentConfig = Read-TextFile -Path $configPath
+$configReadFailure = $null
+try { $currentConfig = Read-ConfigTextFile -Path $configPath }
+catch { $currentConfig = $null; $configReadFailure = $_.Exception.Message }
 $currentHooks = Read-TextFile -Path $hooksPath
 $currentReviewer = Read-TextFile -Path $reviewerPath
 $currentManifestText = Read-TextFile -Path $manifestPath
@@ -1330,6 +1203,21 @@ if (-not $manifestRuntimeVersionValid) {
 }
 if (-not [string]::IsNullOrWhiteSpace($existingTelemetrySalt) -and $existingTelemetrySalt -notmatch '^[0-9a-f]{64}$') {
     $blockers.Add("The install manifest contains an invalid telemetrySalt.")
+}
+
+try {
+    if ($null -ne $configReadFailure) { throw $configReadFailure }
+    $configContract = Read-AgentOperationsToml -Content $currentConfig
+    $reviewerProvenance = Get-AgentOperationsReviewerProvenance -Manifest $manifest -ReviewerExists ($null -ne $currentReviewer) -CurrentFingerprint (Get-Sha256File $reviewerPath)
+}
+catch {
+    Write-Result -Result ([pscustomobject]@{
+        schemaVersion=1; action=$action; preview=$isPreview; status='blocked'; proposalHash=$null
+        codexHome=$codexHomePath; transactionLockIdentity=$transactionLockIdentity
+        backupDestination=$null; changes=$null; messages=@(); blockers=@($_.Exception.Message)
+    })
+    Exit-InstallerTransactionMutex -Mutex $transactionMutex
+    exit 2
 }
 
 if ($action -eq "mark-active") {
@@ -1404,7 +1292,7 @@ if ($action -eq "mark-active") {
     }
 
     if ($null -ne $activationEvidence) {
-        if ((Get-ObjectProperty -Object $activationEvidence -Name "schemaVersion") -ne 1 -or
+        if ((Get-ObjectProperty -Object $activationEvidence -Name "schemaVersion") -ne 2 -or
             [string](Get-ObjectProperty -Object $activationEvidence -Name "runtimeVersion") -ne $manifestRuntimeVersion -or
             [string](Get-ObjectProperty -Object $activationEvidence -Name "runtimeHash") -ne $manifestRuntimeHash -or
             [string](Get-ObjectProperty -Object $activationEvidence -Name "runtimeMarkerHash") -ne $currentRuntimeMarkerHash -or
@@ -1421,29 +1309,18 @@ if ($action -eq "mark-active") {
                 $blockers.Add("Activation evidence check '$requiredCheck' is missing or not true.")
             }
         }
-        try {
-            $runtimeObservationAt = ConvertTo-DateTimeOffsetValue -Value (Get-ObjectProperty -Object $activationEvidence -Name "runtimeObservationAtUtc")
-            $evidenceCreatedAt = ConvertTo-DateTimeOffsetValue -Value (Get-ObjectProperty -Object $activationEvidence -Name "evidenceCreatedAtUtc")
-            $evidenceExpiresAt = ConvertTo-DateTimeOffsetValue -Value (Get-ObjectProperty -Object $activationEvidence -Name "expiresAtUtc")
-            $evidenceValidationNow = [DateTimeOffset]::UtcNow
-            $futureTolerance = $evidenceValidationNow.AddMinutes(1)
-            if ($runtimeObservationAt -gt $evidenceCreatedAt -or
-                $evidenceCreatedAt -gt $evidenceExpiresAt -or
-                $runtimeObservationAt -gt $futureTolerance -or
-                $evidenceCreatedAt -gt $futureTolerance -or
-                ($evidenceExpiresAt - $runtimeObservationAt).TotalMinutes -gt 15.1 -or
-                $evidenceValidationNow -gt $evidenceExpiresAt) {
-                $blockers.Add("Activation evidence timestamps are inconsistent or expired.")
-            }
+        if (-not (Test-AgentOperationsActivationFreshness -Evidence $activationEvidence -InstalledAt (Get-ObjectProperty $manifest 'installedAt'))) {
+            $blockers.Add("Activation evidence requires two fresh bound observations and valid controlled child identity.")
         }
-        catch {
-            $blockers.Add("Activation evidence timestamps are missing or invalid.")
-        }
+        try { $evidenceExpiresAt = ConvertTo-AgentOperationsDate $activationEvidence.expiresAtUtc }
+        catch { $blockers.Add("Activation evidence expiry is missing or invalid.") }
+
     }
 
     $activationProposalMaterial = [ordered]@{
         schemaVersion = 1
         action = "mark-active"
+        contractsHash = $contractsHash
         runtimeVersion = $manifestRuntimeVersion
         codexHome = $codexHomePath
         inputs = [ordered]@{
@@ -1556,7 +1433,8 @@ if ($action -eq "mark-active") {
     if ($SimulateActivationDelayMilliseconds -gt 0) {
         Start-Sleep -Milliseconds $SimulateActivationDelayMilliseconds
     }
-    if ($null -eq $evidenceExpiresAt -or [DateTimeOffset]::UtcNow -gt $evidenceExpiresAt) {
+    if ($null -eq $evidenceExpiresAt -or [DateTimeOffset]::UtcNow -gt $evidenceExpiresAt -or
+        -not (Test-AgentOperationsActivationFreshness -Evidence $activationEvidence -InstalledAt (Get-ObjectProperty $manifest 'installedAt'))) {
         $activationResult.status = "approval-required"
         $activationResult.messages = @($activationResult.messages) + "Activation evidence expired before commit; generate fresh evidence and preview again."
         Write-Result -Result ([pscustomobject]$activationResult)
@@ -1584,7 +1462,8 @@ if ($action -eq "mark-active") {
     if ((ConvertTo-StableJson -Value $finalActivationInputs) -ne (ConvertTo-StableJson -Value $activationProposalMaterial.inputs) -or
         (Get-CanonicalDirectoryIdentity -Path $codexHomePath) -ne $transactionLockIdentity -or
         -not (Test-ManagedPathSetSafe -CodexHomePath $codexHomePath -Paths $managedPaths) -or
-        [DateTimeOffset]::UtcNow -gt $evidenceExpiresAt) {
+        [DateTimeOffset]::UtcNow -gt $evidenceExpiresAt -or
+        -not (Test-AgentOperationsActivationFreshness -Evidence $activationEvidence -InstalledAt (Get-ObjectProperty $manifest 'installedAt'))) {
         $activationResult.status = "approval-required"
         $activationResult.messages = @($activationResult.messages) + "Activation-bound inputs or managed path safety changed immediately before commit."
         Write-Result -Result ([pscustomobject]$activationResult)
@@ -1611,13 +1490,11 @@ if ($action -eq "install") {
     if ($null -eq (Get-Command pwsh -ErrorAction SilentlyContinue)) {
         $blockers.Add("pwsh is unavailable in the effective runtime.")
     }
-    if ($currentConfig -match '(?m)^\s*\[{1,2}hooks(?:[.\]])') {
+    if ($configContract.HasHooks) {
         $blockers.Add("Inline hooks are already present in config.toml; representation migration is intentionally manual.")
     }
-    if (Test-UnsupportedAgentConfiguration -Content $currentConfig) {
-        $blockers.Add("The agents configuration uses an unsupported or ambiguous TOML representation; migrate it manually before install.")
-    }
-    if ($currentConfig -match '(?im)^\s*(?:hooks_enabled|enable_hooks)\s*=\s*false\b|^\s*(?:managed_hooks_only|hooks_managed_only)\s*=\s*true\b') {
+
+    if ($configContract.HooksDisabled) {
         $blockers.Add("The effective config disables non-managed hooks or requires managed-only hooks.")
     }
 }
@@ -1627,8 +1504,12 @@ $runtimeSourceHash = Get-Sha256Bytes -Bytes $runtimeSourceBytes
 $reviewerTemplate = Read-TextFile -Path $reviewerTemplatePath
 $reviewerTemplateHash = Get-Sha256Text -Text $reviewerTemplate
 $priorReviewerHash = [string](Get-ManifestProperty -Manifest $manifest -Name "installerOwnedReviewerFingerprint" -LegacyNames @("reviewerHash"))
+if ($null -eq $manifest -and $null -eq $currentReviewer) { $reviewerProvenance.initialFingerprint = $reviewerTemplateHash }
+if ($action -eq 'install' -and $reviewerProvenance.origin -eq 'preexisting' -and (Get-Sha256File $reviewerPath) -ne $reviewerTemplateHash) {
+    $blockers.Add('A preexisting reviewer cannot be replaced during install or upgrade.')
+}
 if ($action -eq "install" -and $null -ne $currentReviewer) {
-    $currentReviewerHash = Get-Sha256Text -Text $currentReviewer
+    $currentReviewerHash = Get-Sha256File -Path $reviewerPath
     if ($currentReviewerHash -ne $reviewerTemplateHash -and $currentReviewerHash -ne $priorReviewerHash) {
         $blockers.Add("The personal reviewer file is foreign or drifted and will not be overwritten.")
     }
@@ -1752,12 +1633,11 @@ elseif ($action -eq "uninstall") {
         catch {
             $blockers.Add($_.Exception.Message)
         }
-        if ($null -ne $currentReviewer -and (Get-Sha256Text -Text $currentReviewer) -ne $priorReviewerHash) {
-            $blockers.Add("Reviewer fingerprint drifted; uninstall will not delete it.")
-        }
-        else {
-            $proposedReviewer = $null
-        }
+        if ($reviewerProvenance.origin -eq 'created') {
+            if ($null -ne $currentReviewer -and (Get-Sha256File $reviewerPath) -ne $priorReviewerHash) {
+                $blockers.Add("Reviewer fingerprint drifted; uninstall will not delete it.")
+            } else { $proposedReviewer = $null }
+        } else { $messages.Add('Preexisting or unknown-origin reviewer is preserved, including user edits.') }
         $manifestRuntimeChecksums = Get-ManifestProperty -Manifest $manifest -Name "runtimeChecksums"
         $manifestRuntimeHash = [string](Get-ObjectProperty -Object $manifestRuntimeChecksums -Name "hook")
         if ([string]::IsNullOrWhiteSpace($manifestRuntimeHash)) {
@@ -1783,6 +1663,8 @@ $previewContract = [ordered]@{
 $proposalMaterial = [ordered]@{
     schemaVersion = 1
     action = $action
+    contractsHash = $contractsHash
+    reviewerProvenance = $reviewerProvenance
     runtimeVersion = $script:RuntimeVersion
     codexHome = $codexHomePath
     proposalDateUtc = [DateTime]::UtcNow.ToString("yyyyMMdd")
@@ -1790,7 +1672,7 @@ $proposalMaterial = [ordered]@{
         managedPathSafety = $true
         config = Get-Sha256Text -Text $currentConfig
         hooks = Get-Sha256Text -Text $currentHooks
-        reviewer = Get-Sha256Text -Text $currentReviewer
+        reviewer = Get-Sha256File -Path $reviewerPath
         manifest = Get-Sha256Text -Text $currentManifestText
         runtime = Get-Sha256File -Path $runtimePath
         runtimeMarker = Get-Sha256File -Path $runtimeMarkerPath
@@ -1930,9 +1812,9 @@ if (-not (Test-ManagedPathSetSafe -CodexHomePath $codexHomePath -Paths $managedP
 
 $liveInputs = [ordered]@{
     managedPathSafety = $true
-    config = Get-Sha256Text -Text (Read-TextFile -Path $configPath)
+    config = Get-Sha256Text -Text (Read-ConfigTextFile -Path $configPath)
     hooks = Get-Sha256Text -Text (Read-TextFile -Path $hooksPath)
-    reviewer = Get-Sha256Text -Text (Read-TextFile -Path $reviewerPath)
+    reviewer = Get-Sha256File -Path $reviewerPath
     manifest = Get-Sha256Text -Text (Read-TextFile -Path $manifestPath)
     runtime = Get-Sha256File -Path $runtimePath
     runtimeMarker = Get-Sha256File -Path $runtimeMarkerPath
@@ -1974,9 +1856,9 @@ if ((Get-CanonicalDirectoryIdentity -Path $codexHomePath) -ne $transactionLockId
 }
 $finalLiveInputs = [ordered]@{
     managedPathSafety = $true
-    config = Get-Sha256Text -Text (Read-TextFile -Path $configPath)
+    config = Get-Sha256Text -Text (Read-ConfigTextFile -Path $configPath)
     hooks = Get-Sha256Text -Text (Read-TextFile -Path $hooksPath)
-    reviewer = Get-Sha256Text -Text (Read-TextFile -Path $reviewerPath)
+    reviewer = Get-Sha256File -Path $reviewerPath
     manifest = Get-Sha256Text -Text (Read-TextFile -Path $manifestPath)
     runtime = Get-Sha256File -Path $runtimePath
     runtimeMarker = Get-Sha256File -Path $runtimeMarkerPath
@@ -2039,9 +1921,9 @@ $snapshotTextHash = {
 }
 $snapshotBoundInputs = [ordered]@{
     managedPathSafety = $true
-    config = & $snapshotTextHash $snapshotByPath[$configPath]
+    config = if ($snapshotByPath[$configPath].Exists) { Get-Sha256Bytes -Bytes $snapshotByPath[$configPath].Bytes } else { $null }
     hooks = & $snapshotTextHash $snapshotByPath[$hooksPath]
-    reviewer = & $snapshotTextHash $snapshotByPath[$reviewerPath]
+    reviewer = if ($snapshotByPath[$reviewerPath].Exists) { Get-Sha256Bytes -Bytes $snapshotByPath[$reviewerPath].Bytes } else { $null }
     manifest = & $snapshotTextHash $snapshotByPath[$manifestPath]
     runtime = if ($snapshotByPath[$runtimePath].Exists) { Get-Sha256Bytes -Bytes $snapshotByPath[$runtimePath].Bytes } else { $null }
     runtimeMarker = if ($snapshotByPath[$runtimeMarkerPath].Exists) { Get-Sha256Bytes -Bytes $snapshotByPath[$runtimeMarkerPath].Bytes } else { $null }
@@ -2084,7 +1966,7 @@ try {
     if ($null -eq $proposedReviewer) {
         if (Test-Path -LiteralPath $reviewerPath -PathType Leaf) { Remove-Item -LiteralPath $reviewerPath -Force }
     }
-    else {
+    elseif ($proposedReviewer -cne $currentReviewer) {
         Write-TextAtomic -Path $reviewerPath -Content $proposedReviewer
     }
 
@@ -2119,6 +2001,7 @@ try {
             installerOwnedReviewerFingerprint = $reviewerTemplateHash
             previousAgentSettings = $previousAgents
             createdFiles = $createdFiles
+            reviewerProvenance = $reviewerProvenance
             backupPath = $backupDestination
             runtimeChecksums = [ordered]@{
                 hook = $runtimeSourceHash

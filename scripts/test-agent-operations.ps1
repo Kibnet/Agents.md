@@ -6,6 +6,7 @@ param(
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
+Import-Module (Join-Path $PSScriptRoot "lib/AgentOperations.Contracts.psm1") -Force
 
 $repositoryRoot = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot ".."))
 $hookScript = Join-Path $repositoryRoot "scripts/hooks/agent-operations-hook.ps1"
@@ -137,12 +138,7 @@ function Invoke-HookFixture {
         [object]$Payload,
         [string]$TelemetryRoot,
         [string]$InstallManifestPath,
-        [switch]$NoTelemetry,
-        [switch]$SimulateRotationFailureAfterArchiveReplace,
-        [switch]$SimulateRotationRollbackFailure,
-        [switch]$SimulateRecoveryMarkerDriftBeforeQuarantine,
-        [switch]$SimulateRecoveryQuarantineVerificationFailure,
-        [switch]$SimulateRecoveryCleanupFailureAfterFirstDelete
+        [switch]$NoTelemetry
     )
 
     $inputPath = Join-Path $testRoot ("hook-input-" + [guid]::NewGuid().ToString("N") + ".json")
@@ -157,7 +153,7 @@ function Invoke-HookFixture {
                 $hookManifest = [ordered]@{
                     schemaVersion = 1
                     owner = "agent-operations"
-                    runtimeVersion = "3.1.0"
+                    runtimeVersion = "3.2.0"
                     runtimeChecksums = [ordered]@{ hook = $hookHash }
                     telemetrySalt = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
                     activationChallenge = "0123456789abcdef0123456789abcdef"
@@ -168,11 +164,6 @@ function Invoke-HookFixture {
         $arguments.InstallManifestPath = $InstallManifestPath
     }
     if ($NoTelemetry) { $arguments.NoTelemetry = $true }
-    if ($SimulateRotationFailureAfterArchiveReplace) { $arguments.SimulateRotationFailureAfterArchiveReplace = $true }
-    if ($SimulateRotationRollbackFailure) { $arguments.SimulateRotationRollbackFailure = $true }
-    if ($SimulateRecoveryMarkerDriftBeforeQuarantine) { $arguments.SimulateRecoveryMarkerDriftBeforeQuarantine = $true }
-    if ($SimulateRecoveryQuarantineVerificationFailure) { $arguments.SimulateRecoveryQuarantineVerificationFailure = $true }
-    if ($SimulateRecoveryCleanupFailureAfterFirstDelete) { $arguments.SimulateRecoveryCleanupFailureAfterFirstDelete = $true }
     $stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
     $raw = @(& $hookScript @arguments) -join "`n"
     $stopwatch.Stop()
@@ -328,158 +319,16 @@ function Test-Hooks {
     Assert-True -Condition (-not (Test-Path -LiteralPath (Join-Path $unsaltedRoot "agent-operations.jsonl"))) -Message "telemetry must stay disabled when a private salt is unavailable"
 
     $foreignManifestPath = Join-Path $testRoot "foreign-hook-manifest.json"
-    Write-TestText -Path $foreignManifestPath -Content "{`"schemaVersion`":1,`"owner`":`"foreign`",`"runtimeVersion`":`"3.1.0`",`"telemetrySalt`":`"0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef`"}`n"
+    Write-TestText -Path $foreignManifestPath -Content "{`"schemaVersion`":1,`"owner`":`"foreign`",`"runtimeVersion`":`"3.2.0`",`"telemetrySalt`":`"0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef`"}`n"
     $foreignManifestTelemetry = Join-Path $testRoot "foreign-manifest-telemetry"
     [void](Invoke-HookFixture -Payload ([pscustomobject]@{
         hook_event_name = "PreToolUse"; tool_name = "Bash"; tool_input = [pscustomobject]@{ command = "git status" }
     }) -TelemetryRoot $foreignManifestTelemetry -InstallManifestPath $foreignManifestPath)
     Assert-True -Condition (-not (Test-Path -LiteralPath (Join-Path $foreignManifestTelemetry "agent-operations.jsonl"))) -Message "telemetry must reject a foreign or checksum-unbound manifest even when its salt is syntactically valid"
 
-    $rotationRoot = Join-Path $testRoot "rotation"
-    [void](New-Item -ItemType Directory -Path $rotationRoot -Force)
-    $largeLog = Join-Path $rotationRoot "agent-operations.jsonl"
-    Write-TestText -Path (Join-Path $rotationRoot "agent-operations.1.jsonl") -Content "previous-one`n"
-    Write-TestText -Path (Join-Path $rotationRoot "agent-operations.2.jsonl") -Content "previous-two`n"
-    $foreignLog = Join-Path $rotationRoot "agent-operations-foreign.jsonl"
-    Write-TestText -Path $foreignLog -Content "foreign`n"
-    [System.IO.File]::SetLastWriteTimeUtc($foreignLog, [DateTime]::UtcNow.AddDays(-100))
-    $stream = [System.IO.File]::Open($largeLog, [System.IO.FileMode]::Create, [System.IO.FileAccess]::Write, [System.IO.FileShare]::None)
-    try { $stream.SetLength(10MB) } finally { $stream.Dispose() }
-    [System.IO.File]::SetLastWriteTimeUtc($largeLog, [DateTime]::UtcNow)
-    [void](Invoke-HookFixture -Payload ([pscustomobject]@{
-        hook_event_name = "PreToolUse"; tool_name = "Bash"; tool_input = [pscustomobject]@{ command = "rg TODO . -g '*.md'" }
-    }) -TelemetryRoot $rotationRoot)
-    Assert-True -Condition (Test-Path -LiteralPath (Join-Path $rotationRoot "agent-operations.1.jsonl")) -Message "10 MB log should rotate"
-    Assert-True -Condition (@(Get-ChildItem -LiteralPath $rotationRoot -File | Where-Object { $_.Name -match '^agent-operations(?:\.[12])?\.jsonl$' }).Count -le 3) -Message "log retention should keep at most three owned JSONL files"
-    Assert-Equal -Actual ([System.IO.File]::ReadAllText((Join-Path $rotationRoot "agent-operations.2.jsonl"))) -Expected "previous-one`n" -Message "rotation should promote the previous .1 log without deleting its data"
-    Assert-True -Condition (Test-Path -LiteralPath $foreignLog -PathType Leaf) -Message "retention must preserve foreign files sharing the log prefix"
-
-    $lockedRotationRoot = Join-Path $testRoot "locked-rotation"
-    [void](New-Item -ItemType Directory -Path $lockedRotationRoot -Force)
-    $lockedActive = Join-Path $lockedRotationRoot "agent-operations.jsonl"
-    $lockedOne = Join-Path $lockedRotationRoot "agent-operations.1.jsonl"
-    $lockedTwo = Join-Path $lockedRotationRoot "agent-operations.2.jsonl"
-    $stream = [System.IO.File]::Open($lockedActive, [System.IO.FileMode]::Create, [System.IO.FileAccess]::Write, [System.IO.FileShare]::None)
-    try { $stream.SetLength(10MB) } finally { $stream.Dispose() }
-    Write-TestText -Path $lockedOne -Content "locked-one`n"
-    Write-TestText -Path $lockedTwo -Content "locked-two`n"
-    $lockedDestination = [System.IO.File]::Open($lockedTwo, [System.IO.FileMode]::Open, [System.IO.FileAccess]::Read, [System.IO.FileShare]::None)
-    try {
-        [void](Invoke-HookFixture -Payload ([pscustomobject]@{
-            hook_event_name = "PreToolUse"; tool_name = "Bash"; tool_input = [pscustomobject]@{ command = "git status" }
-        }) -TelemetryRoot $lockedRotationRoot)
-    }
-    finally {
-        $lockedDestination.Dispose()
-    }
-    Assert-Equal -Actual ([System.IO.File]::ReadAllText($lockedTwo)) -Expected "locked-two`n" -Message "failed rotation must preserve the previous destination"
-    Assert-Equal -Actual ([System.IO.File]::ReadAllText($lockedOne)) -Expected "locked-one`n" -Message "failed rotation must preserve the previous source"
-    Assert-Equal -Actual (Get-Item -LiteralPath $lockedActive).Length -Expected 10MB -Message "failed rotation must not truncate the active log"
-
-    $recoveryRotationRoot = Join-Path $testRoot "recovery-rotation"
-    [void](New-Item -ItemType Directory -Path $recoveryRotationRoot -Force)
-    $recoveryActive = Join-Path $recoveryRotationRoot "agent-operations.jsonl"
-    $stream = [System.IO.File]::Open($recoveryActive, [System.IO.FileMode]::Create, [System.IO.FileAccess]::Write, [System.IO.FileShare]::None)
-    try { $stream.SetLength(10MB) } finally { $stream.Dispose() }
-    Write-TestText -Path (Join-Path $recoveryRotationRoot "agent-operations.1.jsonl") -Content "recovery-one`n"
-    Write-TestText -Path (Join-Path $recoveryRotationRoot "agent-operations.2.jsonl") -Content "recovery-two`n"
-    [void](Invoke-HookFixture -Payload ([pscustomobject]@{
-        hook_event_name = "PreToolUse"; tool_name = "Bash"; tool_input = [pscustomobject]@{ command = "git status" }
-    }) -TelemetryRoot $recoveryRotationRoot -SimulateRotationFailureAfterArchiveReplace -SimulateRotationRollbackFailure)
-    $recoveryCopies = @(Get-ChildItem -LiteralPath $recoveryRotationRoot -File -Filter ".agent-operations.rollback-*.tmp")
-    $recoveryContents = @($recoveryCopies | ForEach-Object { [System.IO.File]::ReadAllText($_.FullName) })
-    Assert-True -Condition (@($recoveryCopies | Where-Object Name -match 'rollback-active').Count -eq 1) -Message "incomplete rotation rollback must retain a recovery copy of the active log"
-    Assert-True -Condition ($recoveryContents -contains "recovery-one`n") -Message "incomplete rotation rollback must retain a recovery copy of the previous .1 archive"
-    Assert-True -Condition ($recoveryContents -contains "recovery-two`n") -Message "incomplete rotation rollback must retain a recovery copy of the previous .2 archive"
-    $recoveryMarkers = @(Get-ChildItem -LiteralPath $recoveryRotationRoot -File -Filter "agent-operations-recovery-*.json")
-    Assert-Equal -Actual $recoveryMarkers.Count -Expected 1 -Message "incomplete rotation rollback should publish one discoverable recovery marker"
-    $staleRecoveryMarker = [System.IO.File]::ReadAllText($recoveryMarkers[0].FullName) | ConvertFrom-Json -Depth 10
-    $staleRecoveryMarker.createdAtUtc = [DateTime]::UtcNow.AddDays(-8).ToString("o")
-    Write-TestText -Path $recoveryMarkers[0].FullName -Content (($staleRecoveryMarker | ConvertTo-Json -Depth 10) + [Environment]::NewLine)
-    [void](Invoke-HookFixture -Payload ([pscustomobject]@{
-        hook_event_name = "PreToolUse"; tool_name = "Bash"; tool_input = [pscustomobject]@{ command = "git status" }
-    }) -TelemetryRoot $recoveryRotationRoot)
-    Assert-Equal -Actual @(Get-ChildItem -LiteralPath $recoveryRotationRoot -File -Filter ".agent-operations.rollback-*.tmp").Count -Expected 0 -Message "verified recovery copies should be removed after the recovery retention window"
-    Assert-Equal -Actual @(Get-ChildItem -LiteralPath $recoveryRotationRoot -File -Filter "agent-operations-recovery-*.json").Count -Expected 0 -Message "verified stale recovery marker should be removed with its copies"
-
-    $duplicateRecoveryRoot = Join-Path $testRoot "duplicate-recovery"
-    [void](New-Item -ItemType Directory -Path $duplicateRecoveryRoot -Force)
-    $duplicateRecoveryName = ".agent-operations.rollback-active.$([guid]::NewGuid().ToString('N')).tmp"
-    $duplicateRecoveryPath = Join-Path $duplicateRecoveryRoot $duplicateRecoveryName
-    Write-TestText -Path $duplicateRecoveryPath -Content "preserve-duplicate`n"
-    $duplicateRecoveryHash = (Get-FileHash -LiteralPath $duplicateRecoveryPath -Algorithm SHA256).Hash.ToLowerInvariant()
-    $duplicateRecoveryMarker = [ordered]@{
-        schemaVersion = 1
-        owner = "agent-operations"
-        createdAtUtc = [DateTime]::UtcNow.AddDays(-8).ToString("o")
-        files = @(
-            [ordered]@{ name = $duplicateRecoveryName; sha256 = $duplicateRecoveryHash },
-            [ordered]@{ name = $duplicateRecoveryName; sha256 = $duplicateRecoveryHash }
-        )
-    }
-    $duplicateRecoveryMarkerPath = Join-Path $duplicateRecoveryRoot ("agent-operations-recovery-{0}.json" -f [guid]::NewGuid().ToString("N"))
-    Write-TestText -Path $duplicateRecoveryMarkerPath -Content (($duplicateRecoveryMarker | ConvertTo-Json -Depth 10) + [Environment]::NewLine)
-    [void](Invoke-HookFixture -Payload ([pscustomobject]@{
-        hook_event_name = "PreToolUse"; tool_name = "Bash"; tool_input = [pscustomobject]@{ command = "git status" }
-    }) -TelemetryRoot $duplicateRecoveryRoot)
-    Assert-True -Condition (Test-Path -LiteralPath $duplicateRecoveryPath -PathType Leaf) -Message "duplicate recovery roles must be preserved for manual inspection"
-    Assert-True -Condition (Test-Path -LiteralPath $duplicateRecoveryMarkerPath -PathType Leaf) -Message "invalid duplicate recovery marker must not be consumed"
-
-    $markerDriftRoot = Join-Path $testRoot "recovery-marker-drift"
-    [void](New-Item -ItemType Directory -Path $markerDriftRoot -Force)
-    $markerDriftName = ".agent-operations.rollback-active.$([guid]::NewGuid().ToString('N')).tmp"
-    $markerDriftPath = Join-Path $markerDriftRoot $markerDriftName
-    Write-TestText -Path $markerDriftPath -Content "marker-drift`n"
-    $markerDriftDocument = [ordered]@{
-        schemaVersion = 1; owner = "agent-operations"; createdAtUtc = [DateTime]::UtcNow.AddDays(-8).ToString("o")
-        files = @([ordered]@{ name = $markerDriftName; sha256 = (Get-FileHash -LiteralPath $markerDriftPath -Algorithm SHA256).Hash.ToLowerInvariant() })
-    }
-    $markerDriftMarkerPath = Join-Path $markerDriftRoot ("agent-operations-recovery-{0}.json" -f [guid]::NewGuid().ToString("N"))
-    Write-TestText -Path $markerDriftMarkerPath -Content (($markerDriftDocument | ConvertTo-Json -Depth 10) + [Environment]::NewLine)
-    [void](Invoke-HookFixture -Payload ([pscustomobject]@{
-        hook_event_name = "PreToolUse"; tool_name = "Bash"; tool_input = [pscustomobject]@{ command = "git status" }
-    }) -TelemetryRoot $markerDriftRoot -SimulateRecoveryMarkerDriftBeforeQuarantine)
-    Assert-True -Condition (Test-Path -LiteralPath $markerDriftPath -PathType Leaf) -Message "marker drift before quarantine must preserve recovery bytes"
-    Assert-True -Condition (Test-Path -LiteralPath $markerDriftMarkerPath -PathType Leaf) -Message "marker drift before quarantine must preserve the marker for inspection"
-
-    $verificationFailureRoot = Join-Path $testRoot "recovery-verification-failure"
-    [void](New-Item -ItemType Directory -Path $verificationFailureRoot -Force)
-    $verificationFailureName = ".agent-operations.rollback-active.$([guid]::NewGuid().ToString('N')).tmp"
-    $verificationFailurePath = Join-Path $verificationFailureRoot $verificationFailureName
-    Write-TestText -Path $verificationFailurePath -Content "verification-failure`n"
-    $verificationFailureDocument = [ordered]@{
-        schemaVersion = 1; owner = "agent-operations"; createdAtUtc = [DateTime]::UtcNow.AddDays(-8).ToString("o")
-        files = @([ordered]@{ name = $verificationFailureName; sha256 = (Get-FileHash -LiteralPath $verificationFailurePath -Algorithm SHA256).Hash.ToLowerInvariant() })
-    }
-    $verificationFailureMarkerPath = Join-Path $verificationFailureRoot ("agent-operations-recovery-{0}.json" -f [guid]::NewGuid().ToString("N"))
-    Write-TestText -Path $verificationFailureMarkerPath -Content (($verificationFailureDocument | ConvertTo-Json -Depth 10) + [Environment]::NewLine)
-    [void](Invoke-HookFixture -Payload ([pscustomobject]@{
-        hook_event_name = "PreToolUse"; tool_name = "Bash"; tool_input = [pscustomobject]@{ command = "git status" }
-    }) -TelemetryRoot $verificationFailureRoot -SimulateRecoveryQuarantineVerificationFailure)
-    Assert-True -Condition (Test-Path -LiteralPath $verificationFailurePath -PathType Leaf) -Message "pre-commit quarantine verification failure must restore the moved copy"
-    Assert-True -Condition (Test-Path -LiteralPath $verificationFailureMarkerPath -PathType Leaf) -Message "pre-commit quarantine verification failure must preserve the canonical marker"
-    Assert-Equal -Actual @(Get-ChildItem -LiteralPath $verificationFailureRoot -File -Filter ".agent-operations.recovery-delete.*.tmp").Count -Expected 0 -Message "pre-commit quarantine verification failure must not leave an untracked moved copy"
-
-    $cleanupFailureRoot = Join-Path $testRoot "recovery-cleanup-failure"
-    [void](New-Item -ItemType Directory -Path $cleanupFailureRoot -Force)
-    $cleanupFailureEntries = [System.Collections.Generic.List[object]]::new()
-    foreach ($role in @("active", "one", "two")) {
-        $name = ".agent-operations.rollback-$role.$([guid]::NewGuid().ToString('N')).tmp"
-        $path = Join-Path $cleanupFailureRoot $name
-        Write-TestText -Path $path -Content ("cleanup-$role`n")
-        $cleanupFailureEntries.Add([ordered]@{ name = $name; sha256 = (Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash.ToLowerInvariant() })
-    }
-    $cleanupFailureDocument = [ordered]@{
-        schemaVersion = 1; owner = "agent-operations"; createdAtUtc = [DateTime]::UtcNow.AddDays(-8).ToString("o"); files = @($cleanupFailureEntries)
-    }
-    $cleanupFailureMarkerPath = Join-Path $cleanupFailureRoot ("agent-operations-recovery-{0}.json" -f [guid]::NewGuid().ToString("N"))
-    Write-TestText -Path $cleanupFailureMarkerPath -Content (($cleanupFailureDocument | ConvertTo-Json -Depth 10) + [Environment]::NewLine)
-    [void](Invoke-HookFixture -Payload ([pscustomobject]@{
-        hook_event_name = "PreToolUse"; tool_name = "Bash"; tool_input = [pscustomobject]@{ command = "git status" }
-    }) -TelemetryRoot $cleanupFailureRoot -SimulateRecoveryCleanupFailureAfterFirstDelete)
-    Assert-True -Condition (-not (Test-Path -LiteralPath $cleanupFailureMarkerPath)) -Message "cleanup commit failure must not restore a marker that references an already deleted copy"
-    Assert-Equal -Actual @(Get-ChildItem -LiteralPath $cleanupFailureRoot -File -Filter ".agent-operations.recovery-marker-delete.*.tmp").Count -Expected 1 -Message "cleanup commit failure should retain one quarantined marker"
-    Assert-Equal -Actual @(Get-ChildItem -LiteralPath $cleanupFailureRoot -File -Filter ".agent-operations.recovery-delete.*.tmp").Count -Expected 2 -Message "cleanup commit failure should retain only the not-yet-deleted quarantined copies"
+    # The native store has exclusive-create ownership and handle-based maintenance.
+    & pwsh -NoProfile -File (Join-Path $PSScriptRoot 'test-agent-operations-telemetry-remediation.ps1') -EvidenceDirectory (Join-Path $testRoot 'telemetry-remediation')
+    Assert-Equal $LASTEXITCODE 0 'Native telemetry remediation behavioral suite'
 
     $concurrentRoot = Join-Path $testRoot "concurrent-telemetry"
     $concurrentManifest = Join-Path $testRoot "hook-install-manifest.json"
@@ -497,20 +346,31 @@ function Test-Hooks {
         Write-TestText -Path $concurrentInput -Content (($concurrentPayload | ConvertTo-Json -Depth 10) + [Environment]::NewLine)
         $jobs.Add((Start-Job -ScriptBlock {
             param($HookScript, $InputPath, $TelemetryRoot, $ManifestPath)
-            & pwsh -NoProfile -File $HookScript -InputPath $InputPath -TelemetryRoot $TelemetryRoot -InstallManifestPath $ManifestPath
+            $raw = @(& pwsh -NoProfile -File $HookScript -InputPath $InputPath -TelemetryRoot $TelemetryRoot -InstallManifestPath $ManifestPath) -join "`n"
+            [pscustomobject]@{ ExitCode=$LASTEXITCODE; Raw=$raw }
         } -ArgumentList $hookScript, $concurrentInput, $concurrentRoot, $concurrentManifest))
     }
     try {
         $null = @($jobs | Wait-Job -Timeout 30)
         $jobFailures = @($jobs | Where-Object { $_.State -ne "Completed" })
         Assert-Equal -Actual $jobFailures.Count -Expected 0 -Message "concurrent hook processes should complete"
-        $null = @($jobs | Receive-Job -ErrorAction SilentlyContinue)
+        $concurrentResults = @($jobs | Receive-Job -ErrorAction SilentlyContinue)
+        foreach ($result in $concurrentResults) {
+            $json = $null
+            try { $json = $result.Raw | ConvertFrom-Json } catch { }
+            Assert-True -Condition ($result.ExitCode -eq 0 -and $null -ne $json) -Message 'Contended hooks remain fail-open and emit valid JSON'
+        }
     }
     finally {
         $jobs | Remove-Job -Force -ErrorAction SilentlyContinue
     }
-    $concurrentLines = @(Get-Content -LiteralPath (Join-Path $concurrentRoot "agent-operations.jsonl"))
-    Assert-Equal -Actual $concurrentLines.Count -Expected 12 -Message "concurrent telemetry appends should not lose records"
+    $concurrentLog = Join-Path $concurrentRoot "agent-operations.jsonl"
+    $concurrentLines = if (Test-Path -LiteralPath $concurrentLog) { @(Get-Content -LiteralPath $concurrentLog) } else { @() }
+    Assert-True -Condition ($concurrentLines.Count -le 12) -Message 'Contention may skip telemetry within the cooperative budget'
+    [void](Invoke-HookFixture -Payload ([pscustomobject]@{
+        hook_event_name='PostToolUse'; tool_name='Bash'; tool_input=[pscustomobject]@{command='git status'}; tool_response=[pscustomobject]@{exit_code=0}
+    }) -TelemetryRoot $concurrentRoot -InstallManifestPath $concurrentManifest)
+    Assert-Equal @(Get-Content -LiteralPath $concurrentLog).Count ($concurrentLines.Count + 1) 'Serial telemetry recovers after contention'
     foreach ($line in $concurrentLines) {
         $parsedConcurrentRecord = $null
         try { $parsedConcurrentRecord = $line | ConvertFrom-Json } catch { }
@@ -522,29 +382,13 @@ function Test-Hooks {
     $aliasTelemetryRoot = Join-Path $aliasTelemetryParent "logs"
     [void](New-Item -ItemType Directory -Path $aliasTelemetryRoot -Force)
     [void](New-Item -ItemType Junction -Path $aliasTelemetryLink -Target $aliasTelemetryParent)
-    $aliasTelemetryJobs = [System.Collections.Generic.List[object]]::new()
-    for ($index = 0; $index -lt 16; $index++) {
-        $aliasInput = Join-Path $testRoot ("alias-telemetry-{0:D2}.json" -f $index)
-        $aliasPayload = [ordered]@{
-            hook_event_name = "PostToolUse"; session_id = "alias-$index"; cwd = $repositoryRoot; tool_name = "Bash"
-            tool_input = [ordered]@{ command = "git status" }; tool_response = [ordered]@{ exit_code = 0 }
-        }
-        Write-TestText -Path $aliasInput -Content (($aliasPayload | ConvertTo-Json -Depth 10) + [Environment]::NewLine)
-        $lexicalTelemetryRoot = if ($index % 2 -eq 0) { $aliasTelemetryRoot } else { Join-Path $aliasTelemetryLink "logs" }
-        $aliasTelemetryJobs.Add((Start-Job -ScriptBlock {
-            param($HookScript, $InputPath, $TelemetryRoot, $ManifestPath)
-            & pwsh -NoProfile -File $HookScript -InputPath $InputPath -TelemetryRoot $TelemetryRoot -InstallManifestPath $ManifestPath
-        } -ArgumentList $hookScript, $aliasInput, $lexicalTelemetryRoot, $concurrentManifest))
-    }
-    try {
-        $null = @($aliasTelemetryJobs | Wait-Job -Timeout 30)
-        $null = @($aliasTelemetryJobs | Receive-Job -ErrorAction SilentlyContinue)
-    }
-    finally {
-        $aliasTelemetryJobs | Remove-Job -Force -ErrorAction SilentlyContinue
-    }
-    $aliasTelemetryLines = @(Get-Content -LiteralPath (Join-Path $aliasTelemetryRoot "agent-operations.jsonl"))
-    Assert-Equal -Actual $aliasTelemetryLines.Count -Expected 16 -Message "telemetry locking should serialize mixed lexical aliases of one physical logs directory"
+    $aliasBefore = Get-FileTreeFingerprint $aliasTelemetryParent
+    $aliasResult = Invoke-HookFixture -Payload ([pscustomobject]@{
+        hook_event_name='PostToolUse'; tool_name='Bash'; tool_input=[pscustomobject]@{command='git status'}; tool_response=[pscustomobject]@{exit_code=0}
+    }) -TelemetryRoot (Join-Path $aliasTelemetryLink 'logs') -InstallManifestPath $concurrentManifest
+    Assert-True -Condition ($null -ne $aliasResult.Json) -Message 'Unsupported junction telemetry keeps hook fail-open'
+    Assert-Equal (Get-FileTreeFingerprint $aliasTelemetryParent) $aliasBefore 'Junction telemetry does not mutate target files'
+
 }
 
 function Initialize-InstallerFixture {
@@ -594,12 +438,12 @@ function Test-Installer {
     Assert-Equal -Actual @($hooks.hooks.Notification).Count -Expected 1 -Message "foreign hook event should survive"
     Assert-Equal -Actual @($hooks.hooks.PreToolUse).Count -Expected 1 -Message "exactly one PreToolUse group should be installed"
     Assert-Equal -Actual @($hooks.hooks.PostToolUse).Count -Expected 1 -Message "exactly one PostToolUse group should be installed"
-    Assert-True -Condition ([string]$hooks.hooks.PreToolUse[0].hooks[0].commandWindows -match 'versions\\3\.1\.0\\agent-operations-hook\.ps1') -Message "hook should reference immutable versioned runtime"
+    Assert-True -Condition ([string]$hooks.hooks.PreToolUse[0].hooks[0].commandWindows -match 'versions\\3\.2\.0\\agent-operations-hook\.ps1') -Message "hook should reference immutable versioned runtime"
     Assert-True -Condition ([string]$hooks.hooks.PreToolUse[0].hooks[0].commandWindows -match 'InstallManifestPath') -Message "hook should receive the manifest path for salted telemetry"
     $manifestPath = Join-Path $codexHome "agent-operations/install-manifest.json"
     $manifest = (Get-Content -LiteralPath $manifestPath -Raw) | ConvertFrom-Json -Depth 20
     Assert-Equal -Actual $manifest.state -Expected "awaiting-trust" -Message "manifest trust state"
-    Assert-Equal -Actual (Get-FileHash -LiteralPath (Join-Path $codexHome "agent-operations/versions/3.1.0/agent-operations-hook.ps1") -Algorithm SHA256).Hash.ToLowerInvariant() -Expected $manifest.runtimeChecksums.hook -Message "installed runtime bytes should match the approved immutable manifest hash"
+    Assert-Equal -Actual (Get-FileHash -LiteralPath (Join-Path $codexHome "agent-operations/versions/3.2.0/agent-operations-hook.ps1") -Algorithm SHA256).Hash.ToLowerInvariant() -Expected $manifest.runtimeChecksums.hook -Message "installed runtime bytes should match the approved immutable manifest hash"
     foreach ($requiredManifestField in @("installedAt", "approvedProposalHash", "installerOwnedHookFingerprints", "installerOwnedReviewerFingerprint", "previousAgentSettings", "runtimeChecksums", "telemetrySalt", "activationChallenge")) {
         Assert-True -Condition ($null -ne $manifest.PSObject.Properties[$requiredManifestField]) -Message "manifest should implement approved field '$requiredManifestField'"
     }
@@ -610,14 +454,20 @@ function Test-Installer {
     $activationEvidencePath = Join-Path $codexHome "activation-evidence.json"
     $reviewerEvidencePath = Join-Path $codexHome "reviewer-write-denial.json"
     $reviewerEvidence = [ordered]@{
-        schemaVersion = 1
+        schemaVersion = 2
+        activationBindingHash = Get-TextSha256 -Text ("$($manifest.telemetrySalt)|activation|$($manifest.activationChallenge)")
+        configHash = (Get-FileHash -LiteralPath (Join-Path $codexHome "config.toml")).Hash.ToLowerInvariant()
+        observedAtUtc = [DateTime]::UtcNow.ToString("o")
+        hostIdentity = [Environment]::MachineName
+        runtimeFingerprint = ('a' * 64)
+        childSessionId = 'controlled-reviewer-session'
         reviewerFingerprint = $manifest.installerOwnedReviewerFingerprint
         effectiveSandbox = "read-only"
         readSucceeded = $true
         writeDenied = $true
     }
     Write-TestText -Path $reviewerEvidencePath -Content (($reviewerEvidence | ConvertTo-Json -Depth 10) + [Environment]::NewLine)
-    $installedRuntimePath = Join-Path $codexHome "agent-operations/versions/3.1.0/agent-operations-hook.ps1"
+    $installedRuntimePath = Join-Path $codexHome "agent-operations/versions/3.2.0/agent-operations-hook.ps1"
     $activationTelemetryRoot = Join-Path $codexHome "logs"
     $trustedProbePayload = [ordered]@{
         hook_event_name = "PreToolUse"
@@ -635,6 +485,8 @@ function Test-Installer {
     $probeWithoutManualTrust = Invoke-JsonProcess -ScriptPath $activationProbeScript -Arguments @(
         "-CodexHome", $codexHome,
         "-ReviewerEvidencePath", $reviewerEvidencePath,
+        "-ExpectedReviewerRuntimeFingerprint", ("a" * 64),
+        "-ExpectedReviewerSessionId", "controlled-reviewer-session",
         "-OutputFormat", "Json"
     )
     Assert-Equal -Actual $probeWithoutManualTrust.ExitCode -Expected 2 -Message "observed runtime telemetry must not replace the user's manual hook trust confirmation"
@@ -642,6 +494,8 @@ function Test-Installer {
     $probeWithoutHostTask = Invoke-JsonProcess -ScriptPath $activationProbeScript -Arguments @(
         "-CodexHome", $codexHome,
         "-ReviewerEvidencePath", $reviewerEvidencePath,
+        "-ExpectedReviewerRuntimeFingerprint", ("a" * 64),
+        "-ExpectedReviewerSessionId", "controlled-reviewer-session",
         "-ManualHookTrustConfirmed",
         "-OutputFormat", "Json"
     )
@@ -650,6 +504,8 @@ function Test-Installer {
     $activationProbe = Invoke-JsonProcess -ScriptPath $activationProbeScript -Arguments @(
         "-CodexHome", $codexHome,
         "-ReviewerEvidencePath", $reviewerEvidencePath,
+        "-ExpectedReviewerRuntimeFingerprint", ("a" * 64),
+        "-ExpectedReviewerSessionId", "controlled-reviewer-session",
         "-ManualHookTrustConfirmed",
         "-ControlledHostTaskConfirmed",
         "-OutputPath", $activationEvidencePath,
@@ -670,6 +526,8 @@ function Test-Installer {
     $replacementProbe = Invoke-JsonProcess -ScriptPath $activationProbeScript -Arguments @(
         "-CodexHome", $codexHome,
         "-ReviewerEvidencePath", $reviewerEvidencePath,
+        "-ExpectedReviewerRuntimeFingerprint", ("a" * 64),
+        "-ExpectedReviewerSessionId", "controlled-reviewer-session",
         "-ManualHookTrustConfirmed",
         "-ControlledHostTaskConfirmed",
         "-SimulateRuntimeReplacementAfterCapturePath", $replacementRuntimePath,
@@ -691,7 +549,13 @@ function Test-Installer {
     $copiedManifest = ([System.IO.File]::ReadAllText((Join-Path $copiedTelemetryHome "agent-operations/install-manifest.json"))) | ConvertFrom-Json -Depth 20
     $copiedReviewerEvidencePath = Join-Path $copiedTelemetryHome "reviewer-evidence.json"
     $copiedReviewerEvidence = [ordered]@{
-        schemaVersion = 1
+        schemaVersion = 2
+        activationBindingHash = Get-TextSha256 -Text ("$($copiedManifest.telemetrySalt)|activation|$($copiedManifest.activationChallenge)")
+        configHash = (Get-FileHash -LiteralPath (Join-Path $copiedTelemetryHome "config.toml")).Hash.ToLowerInvariant()
+        observedAtUtc = [DateTime]::UtcNow.ToString("o")
+        hostIdentity = [Environment]::MachineName
+        runtimeFingerprint = ('a' * 64)
+        childSessionId = 'controlled-reviewer-session'
         reviewerFingerprint = $copiedManifest.installerOwnedReviewerFingerprint
         effectiveSandbox = "read-only"
         readSucceeded = $true
@@ -701,6 +565,8 @@ function Test-Installer {
     $copiedTelemetryProbe = Invoke-JsonProcess -ScriptPath $activationProbeScript -Arguments @(
         "-CodexHome", $copiedTelemetryHome,
         "-ReviewerEvidencePath", $copiedReviewerEvidencePath,
+        "-ExpectedReviewerRuntimeFingerprint", ("a" * 64),
+        "-ExpectedReviewerSessionId", "controlled-reviewer-session",
         "-ManualHookTrustConfirmed",
         "-ControlledHostTaskConfirmed",
         "-OutputFormat", "Json"
@@ -729,7 +595,7 @@ function Test-Installer {
 
     $reparseProbeHome = Join-Path $testRoot "probe-runtime-reparse"
     $reparseProbeExternal = Join-Path $testRoot "probe-runtime-reparse-external"
-    $reparseProbeRuntimeDirectory = Join-Path $reparseProbeExternal "3.1.0"
+    $reparseProbeRuntimeDirectory = Join-Path $reparseProbeExternal "3.2.0"
     $reparseExecutionMarker = Join-Path $reparseProbeHome "reparse-executed.txt"
     $escapedReparseMarker = $reparseExecutionMarker.Replace("'", "''")
     $reparseProbeRuntimePath = Join-Path $reparseProbeRuntimeDirectory "agent-operations-hook.ps1"
@@ -738,7 +604,7 @@ function Test-Installer {
     $reparseProbeMarkerPath = Join-Path $reparseProbeRuntimeDirectory ".agent-operations-owned.json"
     Write-TestText -Path $reparseProbeMarkerPath -Content "{}`n"
     $reparseProbeManifest = [ordered]@{
-        schemaVersion = 1; owner = "agent-operations"; state = "awaiting-trust"; runtimeVersion = "3.1.0"
+        schemaVersion = 1; owner = "agent-operations"; state = "awaiting-trust"; runtimeVersion = "3.2.0"
         runtimeChecksums = [ordered]@{ hook = $reparseProbeRuntimeHash; marker = (Get-FileHash -LiteralPath $reparseProbeMarkerPath -Algorithm SHA256).Hash.ToLowerInvariant() }
         telemetrySalt = "c" * 64; activationChallenge = "d" * 64; installedAt = [DateTime]::UtcNow.AddMinutes(-1).ToString("o")
     }
@@ -755,6 +621,8 @@ function Test-Installer {
     $rejectedProbe = Invoke-JsonProcess -ScriptPath $activationProbeScript -Arguments @(
         "-CodexHome", $codexHome,
         "-ReviewerEvidencePath", $badReviewerEvidencePath,
+        "-ExpectedReviewerRuntimeFingerprint", ("a" * 64),
+        "-ExpectedReviewerSessionId", "controlled-reviewer-session",
         "-OutputFormat", "Json"
     )
     Assert-Equal -Actual $rejectedProbe.ExitCode -Expected 2 -Message "activation probe must reject writable reviewer evidence"
@@ -799,12 +667,22 @@ function Test-Installer {
 
     $commitExpiryEvidencePath = Join-Path $codexHome "commit-expiry-activation-evidence.json"
     $commitExpiryEvidence = ([System.IO.File]::ReadAllText($activationEvidencePath)) | ConvertFrom-Json -Depth 20
-    $commitExpiryEvidence.expiresAtUtc = [DateTime]::UtcNow.AddSeconds(5).ToString("o")
+    $commitExpiryNow = [DateTimeOffset]::UtcNow
+    $commitExpiryEvidence.reviewerEvidence.observedAtUtc = $commitExpiryNow.AddMinutes(-15).AddSeconds(12).UtcDateTime.ToString("o")
+    $commitExpiryEvidence.reviewerObservationAtUtc = $commitExpiryEvidence.reviewerEvidence.observedAtUtc
+    $commitExpiryEvidence.reviewerEvidenceHash = Get-AgentOperationsEvidenceHash $commitExpiryEvidence.reviewerEvidence
+    $commitExpiryEvidence.evidenceCreatedAtUtc = $commitExpiryNow.UtcDateTime.ToString("o")
+    $commitExpiryEvidence.expiresAtUtc = $commitExpiryNow.AddSeconds(12).UtcDateTime.ToString("o")
+    $commitExpiryManifest = $awaitingManifestText | ConvertFrom-Json -Depth 20
+    $commitExpiryManifest.installedAt = $commitExpiryNow.AddMinutes(-30).UtcDateTime.ToString("o")
+    Write-TestText -Path $manifestPath -Content ($commitExpiryManifest | ConvertTo-Json -Depth 20)
     Write-TestText -Path $commitExpiryEvidencePath -Content (($commitExpiryEvidence | ConvertTo-Json -Depth 20) + [Environment]::NewLine)
     $commitExpiryPreview = Invoke-JsonProcess -ScriptPath $installerScript -Arguments @("-CodexHome", $codexHome, "-MarkActive", "-ActivationEvidencePath", $commitExpiryEvidencePath, "-WhatIf", "-OutputFormat", "Json")
-    $commitExpiryApply = Invoke-JsonProcess -ScriptPath $installerScript -Arguments @("-CodexHome", $codexHome, "-MarkActive", "-ActivationEvidencePath", $commitExpiryEvidencePath, "-ApprovedProposalHash", $commitExpiryPreview.Json.proposalHash, "-SimulateActivationDelayMilliseconds", "6000", "-OutputFormat", "Json")
+    $commitExpiryApply = Invoke-JsonProcess -ScriptPath $installerScript -Arguments @("-CodexHome", $codexHome, "-MarkActive", "-ActivationEvidencePath", $commitExpiryEvidencePath, "-ApprovedProposalHash", $commitExpiryPreview.Json.proposalHash, "-SimulateActivationDelayMilliseconds", "13000", "-OutputFormat", "Json")
     Assert-Equal -Actual $commitExpiryApply.ExitCode -Expected 3 -Message "mark-active must recheck evidence expiry immediately before commit"
     Assert-Equal -Actual (([System.IO.File]::ReadAllText($manifestPath) | ConvertFrom-Json -Depth 20).state) -Expected "awaiting-trust" -Message "commit-time expiry must leave manifest awaiting trust"
+
+    Write-TestText -Path $manifestPath -Content $awaitingManifestText
 
     $activePreview = Invoke-JsonProcess -ScriptPath $installerScript -Arguments @("-CodexHome", $codexHome, "-MarkActive", "-ActivationEvidencePath", $activationEvidencePath, "-WhatIf", "-OutputFormat", "Json")
     Assert-Equal -Actual $activePreview.ExitCode -Expected 0 -Message "mark-active preview should validate complete pilot evidence"
@@ -859,7 +737,7 @@ function Test-Installer {
     Assert-Equal -Actual $crossEventUninstall.ExitCode -Expected 2 -Message "managed runtime reference from an unsupported hook event must block uninstall"
     Write-TestText -Path $emptyHooksPath -Content $ownedHooksText
 
-    $foreignRuntimeFile = Join-Path $emptyHome "agent-operations/versions/3.1.0/foreign.txt"
+    $foreignRuntimeFile = Join-Path $emptyHome "agent-operations/versions/3.2.0/foreign.txt"
     Write-TestText -Path $foreignRuntimeFile -Content "foreign"
     $foreignRuntimeUninstall = Invoke-JsonProcess -ScriptPath $installerScript -Arguments @("-CodexHome", $emptyHome, "-Uninstall", "-WhatIf", "-OutputFormat", "Json")
     Assert-Equal -Actual $foreignRuntimeUninstall.ExitCode -Expected 2 -Message "unexpected runtime content must block recursive uninstall"
@@ -932,7 +810,7 @@ function Test-Installer {
 
     $foreignManifestHome = Join-Path $testRoot "installer-foreign-manifest"
     Initialize-InstallerFixture -CodexHome $foreignManifestHome
-    Write-TestText -Path (Join-Path $foreignManifestHome "agent-operations/install-manifest.json") -Content "{`"owner`":`"foreign`",`"runtimeVersion`":`"3.1.0`"}"
+    Write-TestText -Path (Join-Path $foreignManifestHome "agent-operations/install-manifest.json") -Content "{`"owner`":`"foreign`",`"runtimeVersion`":`"3.2.0`"}"
     $foreignManifestBefore = Get-FileTreeFingerprint -Root $foreignManifestHome
     $foreignManifestPlan = Invoke-JsonProcess -ScriptPath $installerScript -Arguments @("-CodexHome", $foreignManifestHome, "-WhatIf", "-OutputFormat", "Json")
     Assert-Equal -Actual $foreignManifestPlan.ExitCode -Expected 2 -Message "foreign manifest must block ownership-sensitive install"
@@ -955,7 +833,7 @@ function Test-Installer {
     $foreignFingerprint = Get-TextSha256 -Text ($foreignGroup | ConvertTo-Json -Depth 20 -Compress)
     $foreignHooks = [ordered]@{ hooks = [ordered]@{ PreToolUse = @($foreignGroup) } }
     Write-TestText -Path (Join-Path $foreignFingerprintHome "hooks.json") -Content (($foreignHooks | ConvertTo-Json -Depth 20) + [Environment]::NewLine)
-    $forgedManifest = [ordered]@{ owner = "agent-operations"; runtimeVersion = "3.1.0"; hookFingerprints = [ordered]@{ PreToolUse = $foreignFingerprint } }
+    $forgedManifest = [ordered]@{ owner = "agent-operations"; runtimeVersion = "3.2.0"; hookFingerprints = [ordered]@{ PreToolUse = $foreignFingerprint } }
     Write-TestText -Path (Join-Path $foreignFingerprintHome "agent-operations/install-manifest.json") -Content (($forgedManifest | ConvertTo-Json -Depth 10) + [Environment]::NewLine)
     $foreignFingerprintBefore = Get-FileTreeFingerprint -Root $foreignFingerprintHome
     $foreignFingerprintPlan = Invoke-JsonProcess -ScriptPath $installerScript -Arguments @("-CodexHome", $foreignFingerprintHome, "-Uninstall", "-WhatIf", "-OutputFormat", "Json")
@@ -964,7 +842,7 @@ function Test-Installer {
 
     $foreignRuntimeHome = Join-Path $testRoot "installer-foreign-runtime"
     Initialize-InstallerFixture -CodexHome $foreignRuntimeHome
-    Write-TestText -Path (Join-Path $foreignRuntimeHome "agent-operations/versions/3.1.0/foreign.txt") -Content "foreign"
+    Write-TestText -Path (Join-Path $foreignRuntimeHome "agent-operations/versions/3.2.0/foreign.txt") -Content "foreign"
     $foreignRuntimeBefore = Get-FileTreeFingerprint -Root $foreignRuntimeHome
     $foreignRuntimePlan = Invoke-JsonProcess -ScriptPath $installerScript -Arguments @("-CodexHome", $foreignRuntimeHome, "-WhatIf", "-OutputFormat", "Json")
     Assert-Equal -Actual $foreignRuntimePlan.ExitCode -Expected 2 -Message "foreign target runtime directory must block install"
@@ -1183,7 +1061,7 @@ function Test-Installer {
     Write-TestText -Path (Join-Path $tamperedBackup "backup-manifest.json") -Content "{`"owner`":`"agent-operations`",`"successful`":true,`"files`":[{`"backup`":`"00-config.toml`",`"sha256`":`"0000000000000000000000000000000000000000000000000000000000000000`"}]}"
     [System.IO.Directory]::SetLastWriteTimeUtc($tamperedBackup, [DateTime]::UtcNow.AddDays(-100))
     $versionsRoot = Join-Path $pruneHome "agent-operations/versions"
-    foreach ($version in @("2.9.0", "3.0.0", "3.1.0")) {
+    foreach ($version in @("2.9.0", "3.0.0", "3.2.0")) {
         $versionDirectory = Join-Path $versionsRoot $version
         $runtimeFile = Join-Path $versionDirectory "agent-operations-hook.ps1"
         Write-TestText -Path $runtimeFile -Content "# $version"
@@ -1198,7 +1076,7 @@ function Test-Installer {
     $manifestProtectedBackup = Join-Path $backupRoot "backup-01"
     $pruneManifest = [ordered]@{
         owner = "agent-operations"
-        runtimeVersion = "3.1.0"
+        runtimeVersion = "3.2.0"
         lastKnownGoodVersion = "3.0.0"
         backupPath = $manifestProtectedBackup
     }
@@ -1209,7 +1087,7 @@ function Test-Installer {
     $prune = Invoke-JsonProcess -ScriptPath $installerScript -Arguments @("-CodexHome", $pruneHome, "-Prune", "-ApprovedProposalHash", $prunePreview.Json.proposalHash, "-OutputFormat", "Json")
     Assert-Equal -Actual $prune.Json.status -Expected "pruned" -Message "approved prune should pass"
     Assert-True -Condition (@(Get-ChildItem -LiteralPath $backupRoot -Directory).Count -le 9) -Message "prune should leave room below backup hard cap"
-    Assert-True -Condition (Test-Path -LiteralPath (Join-Path $versionsRoot "3.1.0")) -Message "prune should protect active runtime"
+    Assert-True -Condition (Test-Path -LiteralPath (Join-Path $versionsRoot "3.2.0")) -Message "prune should protect active runtime"
     Assert-True -Condition (Test-Path -LiteralPath (Join-Path $versionsRoot "3.0.0")) -Message "prune should protect last-known-good runtime"
     Assert-True -Condition (-not (Test-Path -LiteralPath (Join-Path $versionsRoot "2.9.0"))) -Message "prune should remove only verified unprotected runtime"
     Assert-True -Condition (Test-Path -LiteralPath $tamperedBackup) -Message "prune must preserve a backup whose declared content hash drifted"
@@ -1396,12 +1274,12 @@ function Test-Analyzer {
     Write-TestText -Path (Join-Path $hierarchyRoot "child-$hierarchyChildId.jsonl") -Content ((@(
         [ordered]@{ timestamp = "2026-01-01T02:01:00Z"; type = "session_meta"; payload = [ordered]@{ id = $hierarchyChildId; parent_thread_id = $hierarchyParentId; thread_source = "subagent" } },
         [ordered]@{ timestamp = "2026-01-01T02:01:01Z"; type = "response_item"; payload = [ordered]@{ type = "function_call"; call_id = "child-timeout"; name = "shell_command"; arguments = '{"command":"dotnet test"}' } },
-        [ordered]@{ timestamp = "2026-01-01T02:01:02Z"; type = "response_item"; payload = [ordered]@{ type = "function_call_output"; call_id = "child-timeout"; output = "Operation timed out`nExit code: 124" } }
+        [ordered]@{ timestamp = "2026-01-01T02:01:02Z"; type = "response_item"; payload = [ordered]@{ type = "function_call_output"; call_id = "child-timeout"; output = [ordered]@{ exit_code = 124; timed_out = $true; stderr = "Operation timed out" } } }
     ) | ForEach-Object { $_ | ConvertTo-Json -Depth 10 -Compress }) -join "`n")
     Write-TestText -Path (Join-Path $hierarchyRoot "grandchild-$hierarchyGrandchildId.jsonl") -Content ((@(
         [ordered]@{ timestamp = "2026-01-01T02:02:00Z"; type = "session_meta"; payload = [ordered]@{ id = $hierarchyGrandchildId; parent_thread_id = $hierarchyChildId; thread_source = "subagent" } },
         [ordered]@{ timestamp = "2026-01-01T02:02:01Z"; type = "response_item"; payload = [ordered]@{ type = "function_call"; call_id = "grandchild-path"; name = "shell_command"; arguments = '{"command":"Get-Content missing\\*.md"}' } },
-        [ordered]@{ timestamp = "2026-01-01T02:02:02Z"; type = "response_item"; payload = [ordered]@{ type = "function_call_output"; call_id = "grandchild-path"; output = "Cannot find path 'missing\\*.md' because it does not exist`nExit code: 1" } }
+        [ordered]@{ timestamp = "2026-01-01T02:02:02Z"; type = "response_item"; payload = [ordered]@{ type = "function_call_output"; call_id = "grandchild-path"; output = [ordered]@{ exit_code = 1; stderr = "Cannot find path 'missing\\*.md' because it does not exist" } } }
     ) | ForEach-Object { $_ | ConvertTo-Json -Depth 10 -Compress }) -join "`n")
     $hierarchyOutput = Join-Path $testRoot "analyzer-hierarchy-output"
     $hierarchyRun = Invoke-JsonProcess -ScriptPath $analyzerScript -Arguments @("-Since", "2026-01-01T00:00:00Z", "-Until", "2026-01-02T00:00:00Z", "-SessionsRoot", $hierarchyRoot, "-OutputDirectory", $hierarchyOutput, "-Quiet")
@@ -1418,7 +1296,7 @@ function Test-Analyzer {
     $duplicateContent = ((@(
         [ordered]@{ timestamp = "2026-01-01T03:00:00Z"; type = "session_meta"; payload = [ordered]@{ id = $duplicateTraceId; thread_source = "user" } },
         [ordered]@{ timestamp = "2026-01-01T03:00:01Z"; type = "response_item"; payload = [ordered]@{ type = "function_call"; call_id = "duplicate-timeout"; name = "shell_command"; arguments = '{"command":"dotnet test"}' } },
-        [ordered]@{ timestamp = "2026-01-01T03:00:02Z"; type = "response_item"; payload = [ordered]@{ type = "function_call_output"; call_id = "duplicate-timeout"; output = "Operation timed out`nExit code: 124" } }
+        [ordered]@{ timestamp = "2026-01-01T03:00:02Z"; type = "response_item"; payload = [ordered]@{ type = "function_call_output"; call_id = "duplicate-timeout"; output = [ordered]@{ exit_code = 124; timed_out = $true; stderr = "Operation timed out" } } }
     ) | ForEach-Object { $_ | ConvertTo-Json -Depth 10 -Compress }) -join "`n")
     Write-TestText -Path (Join-Path $duplicateRoot "active/$duplicateName") -Content $duplicateContent
     Write-TestText -Path (Join-Path $duplicateRoot "archive/$duplicateName") -Content $duplicateContent
@@ -1442,16 +1320,16 @@ function Test-Analyzer {
         [ordered]@{ timestamp = "2026-01-01T00:00:04Z"; type = "response_item"; payload = [ordered]@{ type = "function_call"; call_id = "matched"; name = "shell_command"; arguments = '{"command":"git status"}' } },
         [ordered]@{ timestamp = "2026-01-01T00:00:05Z"; type = "response_item"; payload = [ordered]@{ type = "function_call_output"; call_id = "matched"; output = "Exit code: 0" } },
         [ordered]@{ timestamp = "2026-01-01T00:00:06Z"; type = "response_item"; payload = [ordered]@{ type = "function_call"; call_id = "sequential-duplicate"; name = "shell_command"; arguments = '{"command":"Get-Content missing\\*.md"}' } },
-        [ordered]@{ timestamp = "2026-01-01T00:00:07Z"; type = "response_item"; payload = [ordered]@{ type = "function_call_output"; call_id = "sequential-duplicate"; output = "Cannot find path 'missing\\*.md' because it does not exist`nExit code: 1" } },
+        [ordered]@{ timestamp = "2026-01-01T00:00:07Z"; type = "response_item"; payload = [ordered]@{ type = "function_call_output"; call_id = "sequential-duplicate"; output = [ordered]@{ exit_code = 1; stderr = "Cannot find path 'missing\\*.md' because it does not exist" } } },
         [ordered]@{ timestamp = "2026-01-01T00:00:08Z"; type = "response_item"; payload = [ordered]@{ type = "function_call"; call_id = "sequential-duplicate"; name = "shell_command"; arguments = '{"command":"Get-Content missing\\*.md"}' } },
-        [ordered]@{ timestamp = "2026-01-01T00:00:09Z"; type = "response_item"; payload = [ordered]@{ type = "function_call_output"; call_id = "sequential-duplicate"; output = "Cannot find path 'missing\\*.md' because it does not exist`nExit code: 1" } },
+        [ordered]@{ timestamp = "2026-01-01T00:00:09Z"; type = "response_item"; payload = [ordered]@{ type = "function_call_output"; call_id = "sequential-duplicate"; output = [ordered]@{ exit_code = 1; stderr = "Cannot find path 'missing\\*.md' because it does not exist" } } },
         [ordered]@{ timestamp = "2026-01-01T00:00:10Z"; type = "response_item"; payload = [ordered]@{ type = "function_call"; call_id = "overlapping-duplicate"; name = "shell_command"; arguments = '{"command":"Get-Content missing\\*.md"}' } },
         [ordered]@{ timestamp = "2026-01-01T00:00:11Z"; type = "response_item"; payload = [ordered]@{ type = "function_call"; call_id = "overlapping-duplicate"; name = "shell_command"; arguments = '{"command":"Get-Content missing\\*.md"}' } },
-        [ordered]@{ timestamp = "2026-01-01T00:00:12Z"; type = "response_item"; payload = [ordered]@{ type = "function_call_output"; call_id = "overlapping-duplicate"; output = "Cannot find path 'missing\\*.md' because it does not exist`nExit code: 1" } },
-        [ordered]@{ timestamp = "2026-01-01T00:00:13Z"; type = "response_item"; payload = [ordered]@{ type = "function_call_output"; call_id = "overlapping-duplicate"; output = "Cannot find path 'missing\\*.md' because it does not exist`nExit code: 1" } },
+        [ordered]@{ timestamp = "2026-01-01T00:00:12Z"; type = "response_item"; payload = [ordered]@{ type = "function_call_output"; call_id = "overlapping-duplicate"; output = [ordered]@{ exit_code = 1; stderr = "Cannot find path 'missing\\*.md' because it does not exist" } } },
+        [ordered]@{ timestamp = "2026-01-01T00:00:13Z"; type = "response_item"; payload = [ordered]@{ type = "function_call_output"; call_id = "overlapping-duplicate"; output = [ordered]@{ exit_code = 1; stderr = "Cannot find path 'missing\\*.md' because it does not exist" } } },
         [ordered]@{ timestamp = "2026-01-01T23:59:59Z"; type = "response_item"; payload = [ordered]@{ type = "function_call"; call_id = "trailing-boundary"; name = "shell_command"; arguments = '{"command":"git status"}' } },
         [ordered]@{ timestamp = "2026-01-02T00:00:00Z"; type = "response_item"; payload = [ordered]@{ type = "function_call"; call_id = "matched"; name = "shell_command"; arguments = '{"command":"Get-Content missing\\*.md"}' } },
-        [ordered]@{ timestamp = "2026-01-02T00:00:01Z"; type = "response_item"; payload = [ordered]@{ type = "function_call_output"; call_id = "matched"; output = "Cannot find path 'missing\\*.md' because it does not exist`nExit code: 1" } },
+        [ordered]@{ timestamp = "2026-01-02T00:00:01Z"; type = "response_item"; payload = [ordered]@{ type = "function_call_output"; call_id = "matched"; output = [ordered]@{ exit_code = 1; stderr = "Cannot find path 'missing\\*.md' because it does not exist" } } },
         [ordered]@{ timestamp = "2026-01-02T00:00:02Z"; type = "response_item"; payload = [ordered]@{ type = "function_call_output"; call_id = "trailing-boundary"; output = "Exit code: 0" } }
     ) | ForEach-Object { $_ | ConvertTo-Json -Depth 10 -Compress }) -join "`n")
     $pairingOutput = Join-Path $testRoot "analyzer-pairing-output"
@@ -1532,10 +1410,20 @@ function Remove-TestRoot {
         throw "Refusing to remove test root outside the system temp directory."
     }
     if (Test-Path -LiteralPath $resolved -PathType Container) {
-        foreach ($child in @(Get-ChildItem -LiteralPath $resolved -Force)) {
-            if (($child.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) {
-                if ($child.PSIsContainer) { [System.IO.Directory]::Delete($child.FullName, $false) }
-                else { [System.IO.File]::Delete($child.FullName) }
+        # Remove links at every depth before any ordinary directory/target is deleted.
+        # Enumerate one directory at a time; reparse directories never enter the queue.
+        $pendingDirectories = [System.Collections.Generic.Queue[string]]::new()
+        $pendingDirectories.Enqueue($resolved)
+        while ($pendingDirectories.Count -gt 0) {
+            $directory = $pendingDirectories.Dequeue()
+            foreach ($child in @(Get-ChildItem -LiteralPath $directory -Force)) {
+                if (($child.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) {
+                    if (($child.Attributes -band [System.IO.FileAttributes]::Directory) -ne 0) { [System.IO.Directory]::Delete($child.FullName, $false) }
+                    else { [System.IO.File]::Delete($child.FullName) }
+                }
+                elseif ($child.PSIsContainer) {
+                    $pendingDirectories.Enqueue($child.FullName)
+                }
             }
         }
         [System.IO.Directory]::Delete($resolved, $true)
@@ -1544,7 +1432,11 @@ function Remove-TestRoot {
 
 try {
     if ($Area -in @("All", "Hooks")) { Test-Hooks }
-    if ($Area -in @("All", "Installer")) { Test-Installer }
+    if ($Area -in @("All", "Installer")) {
+        Test-Installer
+        & pwsh -NoProfile -File (Join-Path $PSScriptRoot 'test-agent-operations-installer-remediation.ps1') -EvidenceRoot (Join-Path $testRoot 'installer-remediation')
+        Assert-Equal $LASTEXITCODE 0 'Installer remediation behavioral suite'
+    }
     if ($Area -in @("All", "Analyzer")) { Test-Analyzer }
     if ($Area -in @("All", "Privacy")) { Test-Privacy }
 }

@@ -1,0 +1,8 @@
+[
+  {"name":"plain no-match","response":{"exit_code":1,"stderr":""},"expectedNoMatch":true},
+  {"name":"isError true overrides exit one","response":{"exit_code":1,"stderr":"","isError":true},"expectedNoMatch":false},
+  {"name":"success false overrides exit one","response":{"exit_code":1,"stderr":"","success":false},"expectedNoMatch":false},
+  {"name":"contradictory wrapper flags remain failure","response":{"exit_code":1,"stderr":"","isError":true,"success":true},"expectedNoMatch":false},
+  {"name":"negative isError permits no-match","response":{"exit_code":1,"stderr":"","isError":false},"expectedNoMatch":true},
+  {"name":"typed timeout overrides exit one","response":{"exit_code":1,"stderr":"","timed_out":true},"expectedNoMatch":false}
+]

@@ -3,22 +3,39 @@ param(
     [string]$InputPath,
     [string]$TelemetryRoot,
     [string]$InstallManifestPath,
-    [switch]$NoTelemetry,
-    [switch]$SimulateRotationFailureAfterArchiveReplace,
-    [switch]$SimulateRotationRollbackFailure,
-    [switch]$SimulateRecoveryMarkerDriftBeforeQuarantine,
-    [switch]$SimulateRecoveryQuarantineVerificationFailure,
-    [switch]$SimulateRecoveryCleanupFailureAfterFirstDelete
+    [switch]$NoTelemetry
 )
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
-$script:ClassifierVersion = "3.1.0"
+$script:ClassifierVersion = "3.2.0"
 $script:MaxLogBytes = 10MB
 $script:MaxLogFiles = 3
 $script:MaxLogAgeDays = 45
 $script:RecoveryAgeDays = 7
+$script:TelemetryClock = $null
+
+function Get-SingleDirectCommand {
+    param([string]$Command)
+    if ([string]::IsNullOrWhiteSpace($Command)) { return $null }
+    $tokens=$null; $errors=$null
+    $ast=[System.Management.Automation.Language.Parser]::ParseInput($Command,[ref]$tokens,[ref]$errors)
+    if ($errors.Count -or $ast.ParamBlock -or $ast.BeginBlock -or $ast.ProcessBlock -or $ast.CleanBlock -or ($null -ne $ast.EndBlock.Traps -and $ast.EndBlock.Traps.Count -gt 0)) { return $null }
+    $statements=@($ast.EndBlock.Statements)
+    if ($statements.Count -ne 1 -or $statements[0] -isnot [System.Management.Automation.Language.PipelineAst]) { return $null }
+    $parts=@($statements[0].PipelineElements)
+    if ($parts.Count -ne 1 -or $parts[0] -isnot [System.Management.Automation.Language.CommandAst]) { return $null }
+    $call=$parts[0]
+    if ($call.InvocationOperator -ne [System.Management.Automation.Language.TokenKind]::Unknown -or $call.Redirections.Count) { return $null }
+    foreach ($element in $call.CommandElements) {
+        if ($element -isnot [System.Management.Automation.Language.StringConstantExpressionAst] -and $element -isnot [System.Management.Automation.Language.CommandParameterAst]) { return $null }
+        if ($element -is [System.Management.Automation.Language.CommandParameterAst] -and $null -ne $element.Argument -and $element.Argument -isnot [System.Management.Automation.Language.StringConstantExpressionAst]) { return $null }
+    }
+    $name=$call.CommandElements[0].Value
+    if ([System.IO.Path]::GetFileName($name) -notmatch '^(?i:rg(?:\.exe)?)$') { return $null }
+    return $name
+}
 
 function Get-PropertyValue {
     param(
@@ -128,473 +145,177 @@ function Get-TelemetryContext {
     }
 }
 
-function Enter-TelemetryMutex {
-    param([string]$Root)
-
-    try {
-        if (Test-IsReparsePoint -Path $Root) { return $null }
-        $lockPath = Join-Path $Root ".agent-operations.lock"
-        if (Test-IsReparsePoint -Path $lockPath) { return $null }
-        $deadline = [DateTime]::UtcNow.AddMilliseconds(1500)
-        do {
-            try {
-                return [System.IO.File]::Open(
-                    $lockPath,
-                    [System.IO.FileMode]::OpenOrCreate,
-                    [System.IO.FileAccess]::ReadWrite,
-                    [System.IO.FileShare]::None
-                )
-            }
-            catch [System.IO.IOException] {
-                Start-Sleep -Milliseconds 25
-            }
-        } while ([DateTime]::UtcNow -lt $deadline)
-    }
-    catch {
-        # Lock acquisition is best-effort; callers skip telemetry when it fails.
-    }
-    return $null
+function Initialize-TelemetryNative {
+    if ('AgentOperations.SafeStore' -as [type]) { return }
+    if (-not $IsWindows) { throw 'telemetry-platform-unsupported' }
+    Add-Type -TypeDefinition @'
+using System;
+using System.IO;
+using System.Text;
+using System.Linq;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
+using System.Security.Cryptography;
+using System.Text.Json;
+using Microsoft.Win32.SafeHandles;
+namespace AgentOperations {
+// Windows local NTFS only. Every leaf operation is relative to a held root handle.
+// No pathname is reopened after validation. Deadline is cooperative, not a kernel I/O timeout.
+public sealed class SafeStore : IDisposable {
+ [StructLayout(LayoutKind.Sequential)] struct UNICODE_STRING { public ushort Length, MaximumLength; public IntPtr Buffer; }
+ [StructLayout(LayoutKind.Sequential)] struct OBJECT_ATTRIBUTES { public int Length; public IntPtr RootDirectory, ObjectName; public uint Attributes; public IntPtr SecurityDescriptor, SecurityQualityOfService; }
+ [StructLayout(LayoutKind.Sequential)] struct IO_STATUS_BLOCK { public IntPtr Status, Information; }
+ [StructLayout(LayoutKind.Sequential)] struct FILE_INFO { public uint Attributes; public System.Runtime.InteropServices.ComTypes.FILETIME Creation, Access, Write; public uint Volume, SizeHigh, SizeLow, Links, IndexHigh, IndexLow; }
+ [DllImport("ntdll.dll")] static extern int NtCreateFile(out SafeFileHandle handle,uint access,ref OBJECT_ATTRIBUTES attributes,out IO_STATUS_BLOCK status,IntPtr allocation,uint fileAttributes,uint share,uint disposition,uint options,IntPtr ea,uint eaLength);
+ [DllImport("kernel32.dll",SetLastError=true)] static extern bool GetFileInformationByHandle(SafeFileHandle handle,out FILE_INFO info);
+ [DllImport("kernel32.dll",CharSet=CharSet.Unicode,SetLastError=true)] static extern bool GetVolumeInformationByHandleW(SafeFileHandle handle,StringBuilder volume,uint volumeSize,out uint serial,out uint maxLength,out uint flags,StringBuilder fs,uint fsSize);
+ [DllImport("kernel32.dll",SetLastError=true)] static extern bool SetFileInformationByHandle(SafeFileHandle handle,int type,ref int info,uint size);
+ [DllImport("kernel32.dll",CharSet=CharSet.Unicode)] static extern uint GetDriveTypeW(string root);
+ const uint Synchronize=0x100000, DeleteAccess=0x10000, Read=0x80000000, Write=0x40000000;
+ const long MaxBytes=10*1024*1024, MaxScan=30*1024*1024;
+ readonly Stopwatch clock; readonly long budget; readonly byte[] key;
+ readonly List<SafeFileHandle> directories=new List<SafeFileHandle>();
+ SafeFileHandle root, mutex; FileStream metadata; string metadataIdentity; string rootIdentity;
+ Ledger ledger; byte[] originalMetadata; long scanBytes;
+ readonly Dictionary<string,FileStream> files=new Dictionary<string,FileStream>();
+ public string Diagnostic {get;private set;} = "";
+ public sealed class Segment { public string Name {get;set;} public string Identity {get;set;} public string Generation {get;set;} public DateTimeOffset MinTime {get;set;} public DateTimeOffset Created {get;set;} }
+ public sealed class Warning { public string Key {get;set;} public DateTimeOffset Timestamp {get;set;} }
+ public sealed class Ledger { public int SchemaVersion {get;set;}=1; public string Generation {get;set;} public string RootIdentity {get;set;} public string MetadataIdentity {get;set;} public List<Segment> Segments {get;set;}=new List<Segment>(); public List<Warning> Warnings {get;set;}=new List<Warning>(); }
+ public sealed class Envelope { public string Payload {get;set;} public string Binding {get;set;} }
+ void Check() { if(clock.ElapsedMilliseconds>=budget) throw new IOException("telemetry-budget-exhausted"); }
+ static void Leaf(string name) { if(String.IsNullOrEmpty(name)||name=="."||name==".."||name.IndexOfAny(new[]{'\\','/',':','\0'})>=0||name.EndsWith(".")||name.EndsWith(" ")) throw new IOException("unsafe-leaf"); }
+ static FILE_INFO Info(SafeFileHandle h,bool directory) { FILE_INFO i; if(!GetFileInformationByHandle(h,out i)||(i.Attributes&0x400)!=0||((i.Attributes&0x10)!=0)!=directory||(!directory&&i.Links!=1)) throw new IOException("unsafe-file-type-or-links"); return i; }
+ static string Identity(SafeFileHandle h,bool dir=false) { var i=Info(h,dir); return i.Volume.ToString("x8")+":"+i.IndexHigh.ToString("x8")+i.IndexLow.ToString("x8"); }
+ SafeFileHandle Open(SafeFileHandle parent,string name,bool directory,uint disposition,out bool created,bool anchor=false) {
+   Check(); if(!anchor) Leaf(name);
+   IntPtr buffer=Marshal.StringToHGlobalUni(name), unicode=IntPtr.Zero;
+   try { var us=new UNICODE_STRING {Length=checked((ushort)(name.Length*2)),MaximumLength=checked((ushort)(name.Length*2+2)),Buffer=buffer}; unicode=Marshal.AllocHGlobal(Marshal.SizeOf<UNICODE_STRING>()); Marshal.StructureToPtr(us,unicode,false);
+    var oa=new OBJECT_ATTRIBUTES {Length=Marshal.SizeOf<OBJECT_ATTRIBUTES>(),RootDirectory=parent==null?IntPtr.Zero:parent.DangerousGetHandle(),ObjectName=unicode,Attributes=0x40|0x1000};
+    IO_STATUS_BLOCK ios; SafeFileHandle h;
+    // Directory handles exclude DELETE sharing, pinning every component against replacement.
+    int status=NtCreateFile(out h,directory?(Synchronize|0x81u):(Read|Write|Synchronize|DeleteAccess),ref oa,out ios,IntPtr.Zero,0,directory?3u:0u,disposition,0x200000u|0x20u|(directory?1u:0x40u),IntPtr.Zero,0);
+    created=ios.Information.ToInt64()==2;
+    if(status<0) { if(h!=null)h.Dispose(); throw new IOException("native-open:"+status.ToString("x8")); }
+    try { var info=Info(h,directory); if(root!=null&&info.Volume!=Info(root,true).Volume) throw new IOException("volume-mismatch"); return h; } catch {h.Dispose();throw;}
+   } finally { if(unicode!=IntPtr.Zero)Marshal.FreeHGlobal(unicode); Marshal.FreeHGlobal(buffer); }
+ }
+ FileStream Stream(string name,uint disposition,out bool created) { var h=Open(root,name,false,disposition,out created); try{return new FileStream(h,FileAccess.ReadWrite,65536,false);}catch{h.Dispose();throw;} }
+ byte[] ReadBounded(FileStream f,long limit) { Check(); if(f.Length>limit)throw new IOException("telemetry-oversized-input"); var bytes=new byte[checked((int)f.Length)]; f.Position=0; int pos=0; while(pos<bytes.Length) {Check();int n=f.Read(bytes,pos,Math.Min(65536,bytes.Length-pos));if(n==0)throw new IOException("short-read");pos+=n;scanBytes+=n;if(scanBytes>MaxScan+65536)throw new IOException("scan-limit");} return bytes; }
+ static void WriteAll(FileStream f,byte[] bytes) { f.Position=0; for(int p=0;p<bytes.Length;p+=65536)f.Write(bytes,p,Math.Min(65536,bytes.Length-p));f.SetLength(bytes.Length);f.Flush(true); }
+ string Mac(string payload) { using(var h=new HMACSHA256(key))return Convert.ToHexString(h.ComputeHash(Encoding.UTF8.GetBytes(payload))); }
+ void Save() { var payload=JsonSerializer.Serialize(ledger); var bytes=Encoding.UTF8.GetBytes(JsonSerializer.Serialize(new Envelope{Payload=payload,Binding=Mac(payload)})); if(bytes.Length>65536)throw new IOException("metadata-limit"); var before=originalMetadata;try {WriteAll(metadata,bytes);originalMetadata=bytes;}catch{try{WriteAll(metadata,before);}catch{}throw;} }
+ static void MarkDelete(FileStream f) {Info(f.SafeFileHandle,false);int delete=1;if(!SetFileInformationByHandle(f.SafeFileHandle,4,ref delete,4))throw new IOException("handle-delete:"+Marshal.GetLastWin32Error());}
+ public SafeStore(string path,string salt,Stopwatch timer,long deadline=1500) {
+  clock=timer;budget=deadline;key=Convert.FromHexString(salt);
+  try {
+   Check(); if(!OperatingSystem.IsWindows()||!System.Text.RegularExpressions.Regex.IsMatch(path,@"^[A-Za-z]:[\\/]"))throw new IOException("unsupported-root");
+   var components=path.Substring(3).Split(new[]{'\\','/'},StringSplitOptions.RemoveEmptyEntries); foreach(var c in components)Leaf(c);
+   string drive=path.Substring(0,3).Replace('/','\\'); if(GetDriveTypeW(drive)!=3)throw new IOException("nonlocal-volume");
+   bool made;root=Open(null,@"\??\"+drive,true,1,out made,true);directories.Add(root);
+   var fs=new StringBuilder(32);uint serial,max,flags;if(!GetVolumeInformationByHandleW(root,null,0,out serial,out max,out flags,fs,32)||fs.ToString()!="NTFS")throw new IOException("non-NTFS");
+   foreach(var component in components) {root=Open(root,component,true,3,out made);directories.Add(root);}
+   rootIdentity=Identity(root,true);
+   // The lock is never truncated/deleted. OPEN_IF permits existing lock bytes but no mutation.
+   mutex=Open(root,".agent-operations.lock",false,3,out made);
+   bool created=false;
+   try { metadata=Stream(".agent-operations-store.json",2,out created); }
+   catch(IOException e) when(e.Message=="native-open:c0000035") { metadata=Stream(".agent-operations-store.json",1,out created); }
+   metadataIdentity=Identity(metadata.SafeFileHandle);
+   if(created) {
+    originalMetadata=Array.Empty<byte>();ledger=new Ledger{Generation=Guid.NewGuid().ToString("N"),RootIdentity=rootIdentity,MetadataIdentity=metadataIdentity};
+    try{Check();Save();}catch{MarkDelete(metadata);throw;}
+   } else {
+    originalMetadata=ReadBounded(metadata,65536);var envelope=JsonSerializer.Deserialize<Envelope>(originalMetadata);
+    if(envelope==null||envelope.Payload==null||envelope.Binding!=Mac(envelope.Payload))throw new IOException("metadata-unowned");
+    ledger=JsonSerializer.Deserialize<Ledger>(envelope.Payload);
+    if(ledger==null||ledger.SchemaVersion!=1||ledger.RootIdentity!=rootIdentity||ledger.MetadataIdentity!=metadataIdentity||!Guid.TryParseExact(ledger.Generation,"N",out _)||ledger.Segments==null||ledger.Segments.Count>3||ledger.Warnings==null||ledger.Warnings.Count>128)throw new IOException("metadata-binding-mismatch");
+   }
+   foreach(var seg in ledger.Segments) {
+    if(!new[]{"agent-operations.jsonl","agent-operations.1.jsonl","agent-operations.2.jsonl"}.Contains(seg.Name)||files.ContainsKey(seg.Name)||!Guid.TryParseExact(seg.Generation,"N",out _))throw new IOException("segment-contract");
+    var file=Stream(seg.Name,1,out made);files.Add(seg.Name,file);if(Identity(file.SafeFileHandle)!=seg.Identity)throw new IOException("segment-binding-mismatch");
+   }
+  } catch {Dispose();throw;}
+ }
+ // Validation scans only identity-bound segments: filename/JSON shape never creates ownership.
+ public void Maintain(DateTimeOffset now) {
+  foreach(var seg in ledger.Segments.ToArray()) {
+   Check();var file=files[seg.Name];byte[] bytes=ReadBounded(file,MaxBytes);bool malformed=false;DateTimeOffset? min=null;
+   int start=0;for(int i=0;i<bytes.Length;i++){if(i-start>=65536)throw new IOException("oversized-line");if(bytes[i]!=10)continue;Check();try{using(var doc=JsonDocument.Parse(bytes.AsMemory(start,i-start))){var time=doc.RootElement.GetProperty("timestamp").GetDateTimeOffset();if(min==null||time<min)min=time;}}catch{malformed=true;}start=i+1;}
+   if(start!=bytes.Length)malformed=true;
+   if(min!=null&&min<seg.MinTime)seg.MinTime=min.Value;
+   if(malformed||seg.MinTime<now.AddDays(-45)) Remove(seg);
+  }
+ }
+ void Remove(Segment seg) {
+  Check();var file=files[seg.Name];if(Identity(file.SafeFileHandle)!=seg.Identity)throw new IOException("segment-binding-mismatch");
+  int index=ledger.Segments.IndexOf(seg);ledger.Segments.RemoveAt(index);
+  try{Save();try{MarkDelete(file);}catch{ledger.Segments.Insert(index,seg);Save();throw;}}catch{if(!ledger.Segments.Contains(seg))ledger.Segments.Insert(index,seg);throw;}
+  file.Dispose();files.Remove(seg.Name);
+ }
+ public void Append(string json,DateTimeOffset now) {
+  Check();byte[] bytes=Encoding.UTF8.GetBytes(json+"\n");if(bytes.Length>65536)throw new IOException("oversized-event");
+  var seg=ledger.Segments.LastOrDefault();if(seg!=null&&files[seg.Name].Length+bytes.Length>MaxBytes)seg=null;
+  if(seg==null){
+   if(ledger.Segments.Count==3)Remove(ledger.Segments[0]);Check();
+   string name=new[]{"agent-operations.jsonl","agent-operations.1.jsonl","agent-operations.2.jsonl"}.First(n=>!files.ContainsKey(n));
+   bool made;var f=Stream(name,2,out made); // CREATE, never adopt an existing legacy/foreign file.
+   seg=new Segment{Name=name,Identity=Identity(f.SafeFileHandle),Generation=Guid.NewGuid().ToString("N"),MinTime=now,Created=now};
+   files.Add(name,f);ledger.Segments.Add(seg);
+   try{Save();}catch{ledger.Segments.Remove(seg);MarkDelete(f);f.Dispose();files.Remove(name);throw;}
+  }
+  Check();var target=files[seg.Name];if(Identity(target.SafeFileHandle)!=seg.Identity)throw new IOException("segment-binding-mismatch");long length=target.Length;var previous=seg.MinTime;
+  try{target.Position=length;target.Write(bytes);target.Flush(true);if(now<seg.MinTime)seg.MinTime=now;Save();}catch{target.SetLength(length);target.Flush(true);seg.MinTime=previous;throw;}
+ }
+ public bool RecordWarning(string warningKey,DateTimeOffset now) {
+  Check();ledger.Warnings.RemoveAll(w=>w.Timestamp<now.AddDays(-1));bool duplicate=ledger.Warnings.Any(w=>w.Key==warningKey);
+  if(!duplicate)ledger.Warnings.Add(new Warning{Key=warningKey,Timestamp=now});while(ledger.Warnings.Count>128)ledger.Warnings.RemoveAt(0);Save();return duplicate;
+ }
+ public void Dispose(){foreach(var f in files.Values)f.Dispose();files.Clear();if(metadata!=null){metadata.Dispose();metadata=null;}if(mutex!=null){mutex.Dispose();mutex=null;}for(int i=directories.Count-1;i>=0;i--)directories[i].Dispose();directories.Clear();}
+}
+}
+'@
 }
 
-function Exit-TelemetryMutex {
-    param([object]$Mutex)
-
-    if ($null -eq $Mutex) { return }
-    try { $Mutex.Dispose() } catch { }
-}
-
-function Write-TextAtomic {
-    param(
-        [string]$Path,
-        [string]$Content
-    )
-
-    $directory = Split-Path -Parent $Path
-    $temporary = Join-Path $directory (".{0}.{1}.tmp" -f ([System.IO.Path]::GetFileName($Path)), [guid]::NewGuid().ToString("N"))
-    try {
-        [System.IO.File]::WriteAllText($temporary, $Content, [System.Text.UTF8Encoding]::new($false))
-        Move-Item -LiteralPath $temporary -Destination $Path -Force
-    }
-    finally {
-        if (Test-Path -LiteralPath $temporary) {
-            Remove-Item -LiteralPath $temporary -Force
-        }
-    }
-}
-
-function Test-PathWithinRoot {
-    param(
-        [string]$Path,
-        [string]$Root
-    )
-
-    $fullPath = [System.IO.Path]::GetFullPath($Path)
-    $fullRoot = [System.IO.Path]::GetFullPath($Root).TrimEnd(
-        [System.IO.Path]::DirectorySeparatorChar,
-        [System.IO.Path]::AltDirectorySeparatorChar
-    ) + [System.IO.Path]::DirectorySeparatorChar
-
-    return $fullPath.StartsWith($fullRoot, [System.StringComparison]::OrdinalIgnoreCase)
-}
-
-function Test-IsReparsePoint {
-    param([string]$Path)
-
-    if (-not (Test-Path -LiteralPath $Path)) { return $false }
-    return ((Get-Item -LiteralPath $Path -Force).Attributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0
-}
-
-function Write-RotationRecoveryMarker {
-    param(
-        [string]$Root,
-        [string[]]$RecoveryPaths
-    )
-
-    $files = [System.Collections.Generic.List[object]]::new()
-    foreach ($recoveryPath in $RecoveryPaths) {
-        if ((Test-Path -LiteralPath $recoveryPath -PathType Leaf) -and
-            (Test-PathWithinRoot -Path $recoveryPath -Root $Root) -and
-            -not (Test-IsReparsePoint -Path $recoveryPath)) {
-            $files.Add([ordered]@{
-                name = [System.IO.Path]::GetFileName($recoveryPath)
-                sha256 = Get-Sha256File -Path $recoveryPath
-            })
-        }
-    }
-    if ($files.Count -eq 0) { return }
-
-    $markerPath = Join-Path $Root ("agent-operations-recovery-{0}.json" -f [guid]::NewGuid().ToString("N"))
-    $marker = [ordered]@{
-        schemaVersion = 1
-        owner = "agent-operations"
-        createdAtUtc = [DateTime]::UtcNow.ToString("o")
-        files = @($files)
-    }
-    Write-TextAtomic -Path $markerPath -Content (($marker | ConvertTo-Json -Depth 10) + [Environment]::NewLine)
-}
-
-function Invoke-RecoveryMaintenance {
-    param([string]$Root)
-
-    $cutoff = [DateTimeOffset]::UtcNow.AddDays(-$script:RecoveryAgeDays)
-    foreach ($markerFile in @(Get-ChildItem -LiteralPath $Root -File -ErrorAction SilentlyContinue | Where-Object {
-        $_.Name -match '^agent-operations-recovery-[0-9a-f]{32}\.json$'
-    })) {
-        $quarantinedFiles = [System.Collections.Generic.List[object]]::new()
-        $quarantinedMarker = $null
-        $cleanupCommitted = $false
-        try {
-            if ((Test-IsReparsePoint -Path $markerFile.FullName) -or
-                -not (Test-PathWithinRoot -Path $markerFile.FullName -Root $Root)) {
-                continue
-            }
-            $markerHash = Get-Sha256File -Path $markerFile.FullName
-            $markerText = [System.IO.File]::ReadAllText($markerFile.FullName)
-            if ((Get-Sha256File -Path $markerFile.FullName) -ne $markerHash) { continue }
-            $marker = $markerText | ConvertFrom-Json -Depth 10
-            $createdAt = [DateTimeOffset]::Parse(
-                [string](Get-PropertyValue -Object $marker -Names @("createdAtUtc")),
-                [System.Globalization.CultureInfo]::InvariantCulture,
-                [System.Globalization.DateTimeStyles]::AssumeUniversal
-            ).ToUniversalTime()
-            $fileEntries = @(Get-PropertyValue -Object $marker -Names @("files"))
-            if ((Get-PropertyValue -Object $marker -Names @("schemaVersion")) -ne 1 -or
-                [string](Get-PropertyValue -Object $marker -Names @("owner")) -ne "agent-operations" -or
-                $createdAt -ge $cutoff -or $fileEntries.Count -lt 1 -or $fileEntries.Count -gt 3) {
-                continue
-            }
-
-            $verifiedPaths = [System.Collections.Generic.List[object]]::new()
-            $roles = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::OrdinalIgnoreCase)
-            $verified = $true
-            foreach ($entry in $fileEntries) {
-                $name = [string](Get-PropertyValue -Object $entry -Names @("name"))
-                $expectedHash = [string](Get-PropertyValue -Object $entry -Names @("sha256"))
-                $nameMatch = [regex]::Match($name, '^\.agent-operations\.rollback-(active|one|two)\.[0-9a-f]{32}\.tmp$')
-                if (-not $nameMatch.Success -or
-                    $expectedHash -notmatch '^[0-9a-f]{64}$') {
-                    $verified = $false
-                    break
-                }
-                if (-not $roles.Add($nameMatch.Groups[1].Value)) {
-                    $verified = $false
-                    break
-                }
-                $candidatePath = Join-Path $Root $name
-                if (-not (Test-Path -LiteralPath $candidatePath -PathType Leaf) -or
-                    -not (Test-PathWithinRoot -Path $candidatePath -Root $Root) -or
-                    (Test-IsReparsePoint -Path $candidatePath) -or
-                    (Get-Sha256File -Path $candidatePath) -ne $expectedHash) {
-                    $verified = $false
-                    break
-                }
-                $verifiedPaths.Add([pscustomobject]@{ Path = $candidatePath; Hash = $expectedHash })
-            }
-            if (-not $verified -or -not $roles.Contains("active")) { continue }
-            if ($SimulateRecoveryMarkerDriftBeforeQuarantine) {
-                [System.IO.File]::AppendAllText($markerFile.FullName, " ", [System.Text.UTF8Encoding]::new($false))
-            }
-            if ((Test-IsReparsePoint -Path $markerFile.FullName) -or (Get-Sha256File -Path $markerFile.FullName) -ne $markerHash) {
-                continue
-            }
-
-            foreach ($verifiedPath in $verifiedPaths) {
-                if (-not (Test-Path -LiteralPath $verifiedPath.Path -PathType Leaf) -or
-                    (Test-IsReparsePoint -Path $verifiedPath.Path) -or
-                    (Get-Sha256File -Path $verifiedPath.Path) -ne $verifiedPath.Hash) {
-                    throw "Recovery copy changed before quarantine."
-                }
-                $quarantinePath = Join-Path $Root (".agent-operations.recovery-delete.{0}.tmp" -f [guid]::NewGuid().ToString("N"))
-                [System.IO.File]::Move($verifiedPath.Path, $quarantinePath, $false)
-                $quarantinedFiles.Add([pscustomobject]@{ Original = $verifiedPath.Path; Quarantine = $quarantinePath })
-                if ($SimulateRecoveryQuarantineVerificationFailure -and $quarantinedFiles.Count -eq 1) {
-                    throw "Simulated recovery quarantine verification failure."
-                }
-                if ((Test-IsReparsePoint -Path $quarantinePath) -or (Get-Sha256File -Path $quarantinePath) -ne $verifiedPath.Hash) {
-                    throw "Recovery copy changed during quarantine."
-                }
-            }
-            $markerQuarantinePath = Join-Path $Root (".agent-operations.recovery-marker-delete.{0}.tmp" -f [guid]::NewGuid().ToString("N"))
-            [System.IO.File]::Move($markerFile.FullName, $markerQuarantinePath, $false)
-            $quarantinedMarker = [pscustomobject]@{ Original = $markerFile.FullName; Quarantine = $markerQuarantinePath }
-            if ((Test-IsReparsePoint -Path $markerQuarantinePath) -or (Get-Sha256File -Path $markerQuarantinePath) -ne $markerHash) {
-                throw "Recovery marker changed during quarantine."
-            }
-            $cleanupCommitted = $true
-
-            $deletedCount = 0
-            foreach ($quarantinedFile in $quarantinedFiles) {
-                Remove-Item -LiteralPath $quarantinedFile.Quarantine -Force
-                $deletedCount++
-                if ($SimulateRecoveryCleanupFailureAfterFirstDelete -and $deletedCount -eq 1) {
-                    throw "Simulated recovery cleanup failure after first delete."
-                }
-            }
-            Remove-Item -LiteralPath $quarantinedMarker.Quarantine -Force
-        }
-        catch {
-            if (-not $cleanupCommitted) {
-                if ($null -ne $quarantinedMarker -and
-                    (Test-Path -LiteralPath $quarantinedMarker.Quarantine -PathType Leaf) -and
-                    -not (Test-Path -LiteralPath $quarantinedMarker.Original)) {
-                    [System.IO.File]::Move($quarantinedMarker.Quarantine, $quarantinedMarker.Original, $false)
-                }
-                foreach ($quarantinedFile in @($quarantinedFiles)) {
-                    if ((Test-Path -LiteralPath $quarantinedFile.Quarantine -PathType Leaf) -and
-                        -not (Test-Path -LiteralPath $quarantinedFile.Original)) {
-                        [System.IO.File]::Move($quarantinedFile.Quarantine, $quarantinedFile.Original, $false)
-                    }
-                }
-            }
-            # Before commit, state is restored. After commit, remaining quarantine files stay discoverable.
-        }
-    }
-}
-
-function Invoke-LogMaintenance {
-    param([string]$Root)
-
-    if (-not (Test-Path -LiteralPath $Root)) {
-        [void](New-Item -ItemType Directory -Path $Root -Force)
-    }
-    if (Test-IsReparsePoint -Path $Root) {
-        throw "Refusing telemetry maintenance through a reparse-point root."
-    }
-
-    Invoke-RecoveryMaintenance -Root $Root
-
-    $cutoff = [DateTime]::UtcNow.AddDays(-$script:MaxLogAgeDays)
-    Get-ChildItem -LiteralPath $Root -File -ErrorAction SilentlyContinue |
-        Where-Object { $_.Name -match '^agent-operations(?:\.[12])?\.jsonl$' } |
-        Where-Object { $_.LastWriteTimeUtc -lt $cutoff } |
-        ForEach-Object {
-            if ((Test-PathWithinRoot -Path $_.FullName -Root $Root) -and -not (Test-IsReparsePoint -Path $_.FullName)) {
-                Remove-Item -LiteralPath $_.FullName -Force
-            }
-        }
-
-    $activePath = Join-Path $Root "agent-operations.jsonl"
-    if ((Test-Path -LiteralPath $activePath) -and (Get-Item -LiteralPath $activePath).Length -ge $script:MaxLogBytes) {
-        $onePath = Join-Path $Root "agent-operations.1.jsonl"
-        $twoPath = Join-Path $Root "agent-operations.2.jsonl"
-        foreach ($ownedPath in @($activePath, $onePath, $twoPath)) {
-            if (Test-IsReparsePoint -Path $ownedPath) {
-                throw "Refusing telemetry rotation through a reparse point."
-            }
-        }
-        $oneExisted = Test-Path -LiteralPath $onePath -PathType Leaf
-        $twoExisted = Test-Path -LiteralPath $twoPath -PathType Leaf
-        $stagingPaths = [System.Collections.Generic.List[string]]::new()
-        $recoveryPaths = [System.Collections.Generic.List[string]]::new()
-        $preserveRecovery = $false
-        $newOne = Join-Path $Root (".agent-operations.new-one.{0}.tmp" -f [guid]::NewGuid().ToString("N"))
-        $rollbackActive = Join-Path $Root (".agent-operations.rollback-active.{0}.tmp" -f [guid]::NewGuid().ToString("N"))
-        $stagingPaths.Add($newOne)
-        $recoveryPaths.Add($rollbackActive)
-        $newTwo = $null
-        $rollbackOne = $null
-        $rollbackTwo = $null
-        try {
-            [System.IO.File]::Copy($activePath, $newOne, $false)
-            [System.IO.File]::Copy($activePath, $rollbackActive, $false)
-            if ($oneExisted) {
-                $newTwo = Join-Path $Root (".agent-operations.new-two.{0}.tmp" -f [guid]::NewGuid().ToString("N"))
-                $rollbackOne = Join-Path $Root (".agent-operations.rollback-one.{0}.tmp" -f [guid]::NewGuid().ToString("N"))
-                $stagingPaths.Add($newTwo)
-                $recoveryPaths.Add($rollbackOne)
-                [System.IO.File]::Copy($onePath, $newTwo, $false)
-                [System.IO.File]::Copy($onePath, $rollbackOne, $false)
-            }
-            if ($twoExisted) {
-                $rollbackTwo = Join-Path $Root (".agent-operations.rollback-two.{0}.tmp" -f [guid]::NewGuid().ToString("N"))
-                $recoveryPaths.Add($rollbackTwo)
-                [System.IO.File]::Copy($twoPath, $rollbackTwo, $false)
-            }
-
-            if ($oneExisted) {
-                [System.IO.File]::Move($newTwo, $twoPath, $true)
-            }
-            [System.IO.File]::Move($newOne, $onePath, $true)
-            if ($SimulateRotationFailureAfterArchiveReplace) {
-                throw "Simulated rotation failure after archive replacement."
-            }
-            if (-not $oneExisted -and $twoExisted) {
-                [System.IO.File]::Delete($twoPath)
-            }
-            [System.IO.File]::WriteAllText($activePath, "", [System.Text.UTF8Encoding]::new($false))
-        }
-        catch {
-            try {
-                if ($SimulateRotationRollbackFailure) {
-                    throw "Simulated rotation rollback failure."
-                }
-                [System.IO.File]::Copy($rollbackActive, $activePath, $true)
-                if ($oneExisted) {
-                    [System.IO.File]::Copy($rollbackOne, $onePath, $true)
-                }
-                elseif (Test-Path -LiteralPath $onePath) {
-                    [System.IO.File]::Delete($onePath)
-                }
-                if ($twoExisted) {
-                    [System.IO.File]::Copy($rollbackTwo, $twoPath, $true)
-                }
-                elseif (Test-Path -LiteralPath $twoPath) {
-                    [System.IO.File]::Delete($twoPath)
-                }
-            }
-            catch {
-                $preserveRecovery = $true
-                try {
-                    Write-RotationRecoveryMarker -Root $Root -RecoveryPaths @($recoveryPaths)
-                }
-                catch {
-                    # Raw recovery copies remain available even if marker publication fails.
-                }
-            }
-            throw
-        }
-        finally {
-            foreach ($temporaryPath in $stagingPaths) {
-                if (Test-Path -LiteralPath $temporaryPath) {
-                    Remove-Item -LiteralPath $temporaryPath -Force -ErrorAction SilentlyContinue
-                }
-            }
-            if (-not $preserveRecovery) {
-                foreach ($recoveryPath in $recoveryPaths) {
-                    if (Test-Path -LiteralPath $recoveryPath) {
-                        Remove-Item -LiteralPath $recoveryPath -Force -ErrorAction SilentlyContinue
-                    }
-                }
-            }
-        }
-    }
+function Open-TelemetryStore {
+    param([string]$Root,[object]$Context)
+    if ($NoTelemetry -or [string]::IsNullOrWhiteSpace($Root) -or $null -eq $Context) { return $null }
+    if ($null -eq $script:TelemetryClock) { $script:TelemetryClock=[Diagnostics.Stopwatch]::StartNew() }
+    if ($script:TelemetryClock.ElapsedMilliseconds -ge 1500) { return $null }
+    Initialize-TelemetryNative
+    return [AgentOperations.SafeStore]::new($Root,$Context.Salt,$script:TelemetryClock,1500)
 }
 
 function Write-TelemetryEvent {
-    param(
-        [string]$Root,
-        [object]$Context,
-        [string]$EventName,
-        [string]$Category,
-        [string]$Severity,
-        [string]$Action,
-        [string]$ExitClass
-    )
-
-    if ($NoTelemetry -or [string]::IsNullOrWhiteSpace($Root) -or $null -eq $Context) {
-        return
-    }
-
-    $mutex = $null
+    param([string]$Root,[object]$Context,[string]$EventName,[string]$Category,[string]$Severity,[string]$Action,[string]$ExitClass)
+    $store=$null
     try {
-        if (-not (Test-Path -LiteralPath $Root)) {
-            [void](New-Item -ItemType Directory -Path $Root -Force)
-        }
-        $mutex = Enter-TelemetryMutex -Root $Root
-        if ($null -eq $mutex) { return }
-        Invoke-LogMaintenance -Root $Root
-        $record = [ordered]@{
-            schemaVersion = 1
-            timestamp = [DateTime]::UtcNow.ToString("o")
-            runtimeVersion = $script:ClassifierVersion
-            eventName = $EventName
-            category = $Category
-            severity = $Severity
-            action = $Action
-            exitClass = $ExitClass
-            repoHash = $Context.RepoHash
-        }
-        if (-not [string]::IsNullOrWhiteSpace([string]$Context.SessionHash)) {
-            $record.sessionHash = $Context.SessionHash
-        }
-        $recordJson = $record | ConvertTo-Json -Compress
-        [System.IO.File]::AppendAllText(
-            (Join-Path $Root "agent-operations.jsonl"),
-            $recordJson + [Environment]::NewLine,
-            [System.Text.UTF8Encoding]::new($false)
-        )
-    }
-    catch {
-        # Telemetry is best-effort and must never affect the tool call.
-    }
-    finally {
-        Exit-TelemetryMutex -Mutex $mutex
-    }
+        $store=Open-TelemetryStore $Root $Context
+        if ($null -eq $store) { return }
+        $now=[DateTimeOffset]::UtcNow
+        $store.Maintain($now)
+        $record=[ordered]@{schemaVersion=1;timestamp=$now.ToString('o');runtimeVersion=$script:ClassifierVersion;eventName=$EventName;category=$Category;severity=$Severity;action=$Action;exitClass=$ExitClass;repoHash=$Context.RepoHash}
+        if (-not [string]::IsNullOrWhiteSpace([string]$Context.SessionHash)) { $record.sessionHash=$Context.SessionHash }
+        $store.Append(($record|ConvertTo-Json -Compress),$now)
+    } catch { [Console]::Error.WriteLine('Agent operations telemetry skipped: '+$_.Exception.GetBaseException().Message) }
+    finally { if($null -ne $store){$store.Dispose()} }
 }
 
 function Test-AndRecordDuplicateWarning {
-    param(
-        [string]$Root,
-        [object]$Context,
-        [object]$Payload,
-        [string]$EventName,
-        [string]$Category
-    )
-
-    if ($NoTelemetry -or [string]::IsNullOrWhiteSpace($Root) -or $null -eq $Context) {
-        return $false
-    }
-    $turnId = [string](Get-PropertyValue -Object $Payload -Names @("turn_id", "turnId"))
-    if ([string]::IsNullOrWhiteSpace($turnId)) {
-        return $false
-    }
-
-    $mutex = $null
+    param([string]$Root,[object]$Context,[object]$Payload,[string]$EventName,[string]$Category)
+    $store=$null
     try {
-        if (-not (Test-Path -LiteralPath $Root)) {
-            [void](New-Item -ItemType Directory -Path $Root -Force)
-        }
-        $mutex = Enter-TelemetryMutex -Root $Root
-        if ($null -eq $mutex) { return $false }
-        $statePath = Join-Path $Root ".agent-operations-warning-state.json"
-        $entries = [System.Collections.Generic.List[object]]::new()
-        if (Test-Path -LiteralPath $statePath -PathType Leaf) {
-            try {
-                $state = (Get-Content -LiteralPath $statePath -Raw) | ConvertFrom-Json -Depth 5
-                foreach ($entry in @($state.entries)) {
-                    $timestampValue = $entry.timestampUtc
-                    [DateTimeOffset]$timestamp = [DateTimeOffset]::MinValue
-                    $hasTimestamp = if ($timestampValue -is [DateTime]) {
-                        $timestamp = [DateTimeOffset]::new($timestampValue.ToUniversalTime())
-                        $true
-                    }
-                    elseif ($timestampValue -is [DateTimeOffset]) {
-                        $timestamp = $timestampValue
-                        $true
-                    }
-                    else {
-                        [DateTimeOffset]::TryParse([string]$timestampValue, [ref]$timestamp)
-                    }
-                    if ($hasTimestamp -and $timestamp -ge [DateTimeOffset]::UtcNow.AddDays(-1)) {
-                        $entries.Add($entry)
-                    }
-                }
-            }
-            catch {
-                $entries.Clear()
-            }
-        }
-
-        $key = Get-Sha256 -Text ("$($Context.Salt)|warning|$turnId|$EventName|$Category")
-        $duplicate = @($entries | Where-Object { $_.key -eq $key }).Count -gt 0
-        if (-not $duplicate) {
-            $entries.Add([pscustomobject]@{ key = $key; timestampUtc = [DateTimeOffset]::UtcNow.ToString("o") })
-        }
-        while ($entries.Count -gt 128) {
-            $entries.RemoveAt(0)
-        }
-
-        $stateJson = [ordered]@{ schemaVersion = 1; entries = @($entries) } | ConvertTo-Json -Depth 5
-        Write-TextAtomic -Path $statePath -Content ($stateJson + [Environment]::NewLine)
-        return $duplicate
-    }
-    catch {
-        return $false
-    }
-    finally {
-        Exit-TelemetryMutex -Mutex $mutex
-    }
+        $turn=[string](Get-PropertyValue $Payload @('turn_id','turnId'))
+        if ([string]::IsNullOrWhiteSpace($turn)) { return $false }
+        $store=Open-TelemetryStore $Root $Context
+        if($null -eq $store){return $false}
+        $key=Get-Sha256 "$($Context.Salt)|warning|$turn|$EventName|$Category"
+        return $store.RecordWarning($key,[DateTimeOffset]::UtcNow)
+    } catch { [Console]::Error.WriteLine('Agent operations telemetry skipped: '+$_.Exception.GetBaseException().Message); return $false }
+    finally { if($null -ne $store){$store.Dispose()} }
 }
+
 
 function Get-ExitClass {
     param(
@@ -801,46 +522,25 @@ function Test-TUnitFilter {
 
 function Get-ResponseShape {
     param([object]$Payload)
-
-    $response = Get-PropertyValue -Object $Payload -Names @("tool_response", "toolResponse")
-    if ($null -eq $response -or $response -is [string]) {
-        return $null
-    }
-
-    $exitCodeValue = Get-PropertyValue -Object $response -Names @("exit_code", "exitCode")
-    $timedOutValue = Get-PropertyValue -Object $response -Names @("timed_out", "timedOut")
-    if ($null -eq $exitCodeValue -and $null -eq $timedOutValue) {
-        return $null
-    }
-
-    $exitCode = $null
-    if ($null -ne $exitCodeValue) {
-        $parsedExitCode = 0
-        if (-not [int]::TryParse([string]$exitCodeValue, [ref]$parsedExitCode)) {
-            return $null
-        }
-        $exitCode = $parsedExitCode
-    }
-
-    $timedOut = $false
-    if ($null -ne $timedOutValue) {
-        if ($timedOutValue -is [bool]) {
-            $timedOut = $timedOutValue
-        }
-        else {
-            $parsedTimedOut = $false
-            if (-not [bool]::TryParse([string]$timedOutValue, [ref]$parsedTimedOut)) {
-                return $null
-            }
-            $timedOut = $parsedTimedOut
-        }
-    }
-
+    $response=Get-PropertyValue $Payload @('tool_response','toolResponse')
+    if ($null -eq $response -or $response -is [string]) { return $null }
+    $exit=Get-PropertyValue $response @('exit_code','exitCode')
+    $timeout=Get-PropertyValue $response @('timed_out','timedOut')
+    $errorFlag=Get-PropertyValue $response @('isError')
+    $success=Get-PropertyValue $response @('success')
+    $integer=$exit -is [int] -or $exit -is [long]
+    $typedTimeout=$timeout -is [bool]
+    $typedError=$errorFlag -is [bool]
+    $typedSuccess=$success -is [bool]
+    if(-not $integer -and -not $typedTimeout -and -not $typedError -and -not $typedSuccess){return $null}
     return [pscustomobject]@{
-        ExitCode = $exitCode
-        TimedOut = $timedOut
-        StdErr = [string](Get-PropertyValue -Object $response -Names @("stderr", "error", "error_message", "errorMessage"))
-        Summary = [string](Get-PropertyValue -Object $response -Names @("summary", "message", "status"))
+        ExitCode=$(if($integer){$exit}else{$null})
+        TimedOut=($typedTimeout -and $timeout)
+        IsError=($typedError -and $errorFlag)
+        ExplicitFailure=(($typedError -and $errorFlag) -or ($typedSuccess -and -not $success))
+        HasEmptyStdErr=($null -ne $response.PSObject.Properties['stderr'] -and $response.stderr -is [string] -and $response.stderr.Length -eq 0)
+        StdErr=[string](Get-PropertyValue $response @('stderr','error','error_message','errorMessage'))
+        Summary=[string](Get-PropertyValue $response @('summary','message','status'))
     }
 }
 
@@ -865,7 +565,7 @@ function Get-PostClassification {
         }
     }
 
-    $confirmedFailure = $null -ne $shape.ExitCode -and $shape.ExitCode -ne 0
+    $confirmedFailure = $shape.ExplicitFailure -or ($null -ne $shape.ExitCode -and $shape.ExitCode -ne 0)
     if ($confirmedFailure -and $signal -match '(?i)(index\.lock|being used by another process|another git process|cannot access.+used by another process|permission denied|access.+denied|unauthori[sz]ed|authentication|\b401\b|\b403\b|NU1301|unable to load the service index|SSL|certificate)') {
         return [pscustomobject]@{
             Category = if ($signal -match '(?i)(index\.lock|being used by another process|another git process|cannot access.+used by another process)') { "lock" } else { "auth-restore-permission" }
@@ -874,18 +574,9 @@ function Get-PostClassification {
         }
     }
 
-    $commandName = $null
-    if (-not [string]::IsNullOrWhiteSpace($Command)) {
-        $commandAsts = @(Get-CommandAsts -Command $Command)
-        if ($commandAsts.Count -gt 0) {
-            $firstElements = @($commandAsts[0].CommandElements)
-            if ($firstElements.Count -gt 0) {
-                $commandName = [System.IO.Path]::GetFileNameWithoutExtension((Get-ElementText -Element $firstElements[0]))
-            }
-        }
-    }
+    $commandName = Get-SingleDirectCommand -Command $Command
 
-    if (($commandName -ieq "rg") -and $shape.ExitCode -eq 1 -and [string]::IsNullOrWhiteSpace($shape.StdErr)) {
+    if ((-not [string]::IsNullOrWhiteSpace($commandName)) -and $shape.ExitCode -eq 1 -and $shape.HasEmptyStdErr -and -not $shape.ExplicitFailure) {
         return [pscustomobject]@{
             Category = "rg-no-match"
             Outcome = "expected-no-match"
@@ -901,7 +592,7 @@ function Get-PostClassification {
         }
     }
 
-    if ($null -eq $shape.ExitCode) {
+    if ($null -eq $shape.ExitCode -and -not $shape.ExplicitFailure) {
         return [pscustomobject]@{ Category = "unclassified"; Outcome = "unknown-shape"; Context = $null }
     }
 

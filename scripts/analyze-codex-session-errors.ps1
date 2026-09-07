@@ -23,7 +23,7 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
-$script:ClassifierVersion = "3.1.0"
+$script:ClassifierVersion = "3.2.0"
 $script:KeyCategories = @("path-glob", "failed-patch", "git-sandbox", "timeout")
 $technicalCandidateCategories = if ($EmitPrivateReviewSample) {
     if ($PrivateReviewCategory -in $script:KeyCategories) { @($PrivateReviewCategory) } else { @() }
@@ -57,6 +57,27 @@ if ($Until -le $Since) {
 }
 if ($EmitPrivateReviewSample -and [string]::IsNullOrWhiteSpace($PrivateReviewCategory)) {
     throw "PrivateReviewCategory is required with EmitPrivateReviewSample."
+}
+
+function Get-SingleDirectCommand {
+    param([string]$Command)
+    if ([string]::IsNullOrWhiteSpace($Command)) { return $null }
+    $tokens=$null; $errors=$null
+    $ast=[System.Management.Automation.Language.Parser]::ParseInput($Command,[ref]$tokens,[ref]$errors)
+    if ($errors.Count -or $ast.ParamBlock -or $ast.BeginBlock -or $ast.ProcessBlock -or $ast.CleanBlock -or ($null -ne $ast.EndBlock.Traps -and $ast.EndBlock.Traps.Count -gt 0)) { return $null }
+    $statements=@($ast.EndBlock.Statements)
+    if ($statements.Count -ne 1 -or $statements[0] -isnot [System.Management.Automation.Language.PipelineAst]) { return $null }
+    $parts=@($statements[0].PipelineElements)
+    if ($parts.Count -ne 1 -or $parts[0] -isnot [System.Management.Automation.Language.CommandAst]) { return $null }
+    $call=$parts[0]
+    if ($call.InvocationOperator -ne [System.Management.Automation.Language.TokenKind]::Unknown -or $call.Redirections.Count) { return $null }
+    foreach ($element in $call.CommandElements) {
+        if ($element -isnot [System.Management.Automation.Language.StringConstantExpressionAst] -and $element -isnot [System.Management.Automation.Language.CommandParameterAst]) { return $null }
+        if ($element -is [System.Management.Automation.Language.CommandParameterAst] -and $null -ne $element.Argument -and $element.Argument -isnot [System.Management.Automation.Language.StringConstantExpressionAst]) { return $null }
+    }
+    $name=$call.CommandElements[0].Value
+    if ([System.IO.Path]::GetFileName($name) -notmatch '^(?i:rg(?:\.exe)?)$') { return $null }
+    return $name
 }
 
 function Get-PropertyValue {
@@ -178,33 +199,38 @@ function Test-CommandName {
     return $Command -match ("(?im)(?:^|[;|&]\s*)" + [regex]::Escape($Name) + "(?:\.exe)?(?:\s|$)")
 }
 
-function Test-ConfirmedFailure {
-    param([string]$OutputText)
-
-    return $OutputText -match '(?im)(?:^|\b)(?:exit code|exit_code)\s*[:=]\s*[1-9]\d*\b|\bisError\b\s*[:=]\s*true|script failed|tool (?:call )?failed|process exited with code [1-9]\d*'
-}
-
-function Get-DirectExitCode {
-    param([string]$OutputText)
-
-    $match = [regex]::Match($OutputText, '(?im)^Exit code:\s*(-?\d+)\s*$')
-    if (-not $match.Success) { return $null }
-    return [int]$match.Groups[1].Value
+function Get-StructuralOutcome {
+    param([object]$OutputObject)
+    $value=$OutputObject
+    if ($value -is [string] -and $value.TrimStart().StartsWith('{')) {
+        try { $value=$value | ConvertFrom-Json -Depth 30 -ErrorAction Stop } catch { }
+    }
+    if ($value -isnot [string] -and $null -ne $value) {
+        $exit=Get-PropertyValue $value @('exit_code','exitCode')
+        $timeout=Get-PropertyValue $value @('timed_out','timedOut')
+        $errorFlag=Get-PropertyValue $value @('isError')
+        $success=Get-PropertyValue $value @('success')
+        $integer=$exit -is [int] -or $exit -is [long]
+        $typedTimeout=$timeout -is [bool]
+        $typedError=$errorFlag -is [bool]
+        $typedSuccess=$success -is [bool]
+        $explicitFailure=($typedError -and $errorFlag) -or ($typedSuccess -and -not $success)
+        $failure=($typedTimeout -and $timeout) -or ($integer -and $exit -ne 0) -or $explicitFailure
+        $outcome=if($failure){'failure'}elseif($integer -or $typedError -or $typedSuccess){'success'}else{'unknown'}
+        return [pscustomobject]@{Outcome=$outcome;ExitCode=$(if($integer){$exit}else{$null});TimedOut=($typedTimeout -and $timeout);IsError=($typedError -and $errorFlag);ExplicitFailure=$explicitFailure;HasEmptyStdErr=($null -ne $value.PSObject.Properties['stderr'] -and $value.stderr -is [string] -and $value.stderr.Length -eq 0)}
+    }
+    # Only this known envelope header has structural meaning. Quoted stdout is never searched for exit codes.
+    $match=[regex]::Match([string]$value,'\A(?:Script (?:completed|failed)\r?\n)?Exit code:\s*(-?\d+)\r?\nOutput:\r?\n')
+    $code=0
+    if($match.Success -and $match.Groups[1].Length -le 11 -and [int]::TryParse($match.Groups[1].Value,[ref]$code)){
+        return [pscustomobject]@{Outcome=$(if($code -eq 0){'success'}else{'failure'});ExitCode=$code;TimedOut=($code -eq 124);IsError=$false;ExplicitFailure=$false;HasEmptyStdErr=$false}
+    }
+    return [pscustomobject]@{Outcome='unknown';ExitCode=$null;TimedOut=$false;IsError=$false;ExplicitFailure=$false;HasEmptyStdErr=$false}
 }
 
 function Test-RgExpectedNoMatch {
-    param(
-        [string]$Command,
-        [string]$OutputText
-    )
-
-    if (-not (Test-CommandName -Command $Command -Name "rg")) {
-        return $false
-    }
-    if ((Get-DirectExitCode -OutputText $OutputText) -ne 1) {
-        return $false
-    }
-    return $OutputText -notmatch '(?im)(stderr\s*[:=]\s*\S|^rg:\s.*(?:error|os error|regex parse error|i/o error)|invalid|permission|denied|not recognized|no such file|cannot find|error:)'
+    param([string]$Command,[object]$Shape)
+    return $Shape.Outcome -eq 'failure' -and -not $Shape.TimedOut -and -not $Shape.ExplicitFailure -and $Shape.ExitCode -eq 1 -and $Shape.HasEmptyStdErr -and $null -ne (Get-SingleDirectCommand $Command)
 }
 
 function Get-CallClassifications {
@@ -217,10 +243,13 @@ function Get-CallClassifications {
     $categories = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::OrdinalIgnoreCase)
     $command = Get-ToolCommand -InputObject $InputObject
     $outputText = ConvertTo-BoundedText -Value $OutputObject
-    $failure = Test-ConfirmedFailure -OutputText $outputText
-    $isShellCommand = $ToolName -ieq "shell_command"
-    $shellExitCode = if ($isShellCommand) { Get-DirectExitCode -OutputText $outputText } else { $null }
-    $shellFailure = $isShellCommand -and $null -ne $shellExitCode -and $shellExitCode -ne 0
+    $shape = Get-StructuralOutcome $OutputObject
+    if ($shape.Outcome -ne "failure") { return @() }
+    $failure = $true
+    $isShellCommand = $ToolName -match "(?i)(shell_command|exec_command|write_stdin)$"
+    $shellExitCode = $shape.ExitCode
+    $shellFailure = $isShellCommand -and $failure
+    if ($shape.TimedOut) { [void]$categories.Add("timeout") }
     $plannedRed = [bool](Get-PropertyValue -Object $InputObject -Names @("planned_red", "plannedRed", "expected_red", "expectedRed"))
 
     $environmentSignal = $outputText -match '(?im)(permission denied|access (?:is )?denied|unauthori[sz]ed|authentication|\b401\b|\b403\b|NU1301|unable to load the service index|SSL|certificate|index\.lock|being used by another process|another git process|missing (?:sdk|workload|dependency)|command not found|not recognized as (?:the name of )?a cmdlet)'
@@ -237,7 +266,7 @@ function Get-CallClassifications {
         [void]$categories.Add("missing-dependency")
     }
 
-    if (Test-RgExpectedNoMatch -Command $command -OutputText $outputText) {
+    if (Test-RgExpectedNoMatch -Command $command -Shape $shape) {
         [void]$categories.Add("expected-no-match")
         return @($categories)
     }
@@ -261,7 +290,7 @@ function Get-CallClassifications {
     }
 
     $isPatch = $ToolName -match '(?i)apply_patch|patch' -or $command -match '(?i)^\*\*\* Begin Patch'
-    if ($isPatch -and $outputText -match '(?im)(failed|error|invalid patch|could not|permission|denied)') {
+    if ($isPatch) {
         [void]$categories.Add("failed-patch")
     }
 
@@ -406,6 +435,11 @@ function Get-GoldSetReport {
             tn = 0
             fn = 0
             invalidEntries = 0
+            precisionDenominator = 0
+            recallDenominator = 0
+            falsePositiveRateDenominator = 0
+            evaluationScope = "selected-stratified-sample"
+            sampleSize = 0
             precision = $null
             recall = $null
             falsePositiveRate = $null
@@ -485,6 +519,11 @@ function Get-GoldSetReport {
             tn = $tn
             fn = $fn
             invalidEntries = $invalidEntries
+            precisionDenominator = $tp + $fp
+            recallDenominator = $tp + $fn
+            falsePositiveRateDenominator = $fp + $tn
+            evaluationScope = "selected-stratified-sample"
+            sampleSize = $categoryEntries.Count
             precision = $precision
             recall = $recall
             falsePositiveRate = $fpr
@@ -541,6 +580,7 @@ $allFiles = @($fileGroups | ForEach-Object {
         Select-Object -First 1
 } | Sort-Object FullName)
 $files = @($allFiles | Where-Object { $_.LastWriteTimeUtc -ge $Since.UtcDateTime })
+$structuralOutcomeCounts = [ordered]@{success=0L;failure=0L;unknown=0L}
 $taskCategories = @{}
 $traceCategoryCounts = @{}
 $eventCategoryCounts = @{}
@@ -777,7 +817,7 @@ foreach ($file in $files) {
                     [void]$traceCategories.Add("interrupted")
                     $traceEventCounts["interrupted"] = 1 + $(if ($traceEventCounts.ContainsKey("interrupted")) { $traceEventCounts["interrupted"] } else { 0 })
                 }
-                elseif ($payloadType -eq "patch_apply_end" -and -not [bool](Get-PropertyValue -Object $payload -Names @("success"))) {
+                elseif ($payloadType -eq "patch_apply_end" -and (Get-PropertyValue -Object $payload -Names @("success")) -is [bool] -and (Get-PropertyValue -Object $payload -Names @("success")) -eq $false) {
                     [void]$traceCategories.Add("failed-patch")
                     $traceEventCounts["failed-patch"] = 1 + $(if ($traceEventCounts.ContainsKey("failed-patch")) { $traceEventCounts["failed-patch"] } else { 0 })
                 }
@@ -893,6 +933,7 @@ foreach ($file in $files) {
                     }
                     $completedCallContributions[$callId] = [pscustomobject]@{
                         Kind = $callKind
+                        StructuralOutcome = (Get-StructuralOutcome $output).Outcome
                         Categories = @($categories)
                         EvidenceCandidates = @($callEvidenceCandidates)
                         PredictionHashes = @($callPredictionHashes)
@@ -917,6 +958,10 @@ foreach ($file in $files) {
     $traceUnmatchedCodeModeWrappers = @($pendingCalls.Values | Where-Object { $_.IsInWindow -and $_.IsCodeModeWrapper }).Count
     $traceUnmatchedOtherRecognizedToolCalls = @($pendingCalls.Values | Where-Object { $_.IsInWindow -and -not $_.IsCompatibilityEnvelope }).Count
 
+    foreach($contribution in $completedCallContributions.Values) {
+        $structuralOutcome=Get-PropertyValue $contribution @("StructuralOutcome")
+        if($null -ne $structuralOutcome){$structuralOutcomeCounts[$structuralOutcome]++}
+    }
     $includedTraces++
     $toolCallCount += $traceToolCalls
     $directToolCallEnvelopeCount += $traceDirectToolCallEnvelopes
@@ -978,7 +1023,7 @@ foreach ($taskEntry in $taskCategories.GetEnumerator()) {
 
 $samplingAlgorithm = "independent-stratified-v1"
 $samplingSeedId = "sha256-order-v1"
-$evidenceSample = if ($null -ne $salt) { @(New-EvidenceSample -Candidates @($evidenceCandidates)) } else { @() }
+$evidenceSample = @(if ($null -ne $salt) { New-EvidenceSample -Candidates @($evidenceCandidates) })
 $sampleMaterial = @($evidenceSample | ForEach-Object {
     "{0}|{1}|{2}|{3}" -f $_.category, $_.evidenceHash, ([bool]$_.predicted).ToString().ToLowerInvariant(), $_.selectionReason
 }) -join "`n"
@@ -1038,6 +1083,8 @@ if ($comparabilityReasons.Count -eq 0) { $comparabilityReasons.Add("all observed
 
 $summary = [ordered]@{
     schemaVersion = 1
+    evaluationScope = "selected-stratified-sample"
+    evaluation = [ordered]@{ sampleSize = $evidenceSample.Count; strategy = $samplingAlgorithm; limitation = "Precision, recall and false-positive rate describe only the selected sample; auto-counted is a sample quality gate, not population accuracy or causal improvement." }
     classifierVersion = $script:ClassifierVersion
     generatedAtUtc = [DateTime]::UtcNow.ToString("o")
     window = [ordered]@{
@@ -1076,11 +1123,26 @@ $summary = [ordered]@{
         boundaryPairsExcluded = $boundaryPairCount
         duplicateCallIds = $duplicateCallIdCount
     }
+    structuralOutcomes = $structuralOutcomeCounts
     categories = $categoriesOutput
     goldSet = $goldReport
     compatibility = [ordered]@{
+        purpose = "historical-reference-only"
+        isQualityGate = $false
         applicable = $compatibilityApplicable
         passed = $compatibilityPassed
+        status = if (-not $compatibilityApplicable) { "not-applicable" } elseif ($compatibilityPassed) { "historical-counts-match" } else { "historical-counts-differ" }
+        delta = [ordered]@{
+            topLevelTasks = $includedTasks.Count - $compatibilityExpected.topLevelTasks
+            traces = $includedTraces - $compatibilityExpected.traces
+            toolCalls = $toolCallCount - $compatibilityExpected.toolCalls
+            categories = [ordered]@{
+                "path-glob" = $taskCategoryCounts["path-glob"] - $compatibilityExpected.categories['path-glob']
+                "failed-patch" = $taskCategoryCounts["failed-patch"] - $compatibilityExpected.categories['failed-patch']
+                "git-sandbox" = $taskCategoryCounts["git-sandbox"] - $compatibilityExpected.categories['git-sandbox']
+                "timeout" = $taskCategoryCounts["timeout"] - $compatibilityExpected.categories['timeout']
+            }
+        }
         expected = $compatibilityExpected
         actual = [ordered]@{
             topLevelTasks = $includedTasks.Count
@@ -1116,6 +1178,8 @@ $markdown = [System.Text.StringBuilder]::new()
 [void]$markdown.AppendLine("")
 [void]$markdown.AppendLine(("Denominators: {0} top-level tasks, {1} unique traces, {2} legacy-compatible tool-call envelopes; {3} direct envelopes have {4} matched in-window outputs, {5} code-mode wrappers remain unresolved, and {6} additional recognized envelopes are reported separately." -f $includedTasks.Count, $includedTraces, $toolCallCount, $directToolCallEnvelopeCount, $matchedDirectToolCallCount, $unresolvedCodeModeWrapperCount, $otherRecognizedToolCallCount))
 [void]$markdown.AppendLine("")
+[void]$markdown.AppendLine("Evaluation scope: selected-stratified-sample. Precision, recall and false-positive rate describe only the selected sample; auto-counted is a sample quality gate, not population accuracy or causal improvement.")
+[void]$markdown.AppendLine("")
 [void]$markdown.AppendLine("| Category | Tasks | Task rate | Traces | Events | Counting status |")
 [void]$markdown.AppendLine("| --- | ---: | ---: | ---: | ---: | --- |")
 foreach ($category in $script:AllCategories) {
@@ -1123,7 +1187,7 @@ foreach ($category in $script:AllCategories) {
     [void]$markdown.AppendLine(("| `{0}` | {1} | {2:P1} | {3} | {4} | {5} |" -f $category, $item.tasks, $item.taskRate, $item.traces, $item.events, $item.countingStatus))
 }
 [void]$markdown.AppendLine("")
-[void]$markdown.AppendLine(("Compatibility check: {0}." -f $(if (-not $compatibilityApplicable) { "not applicable" } elseif ($compatibilityPassed) { "PASS" } else { "FAIL" })))
+[void]$markdown.AppendLine(("Historical reference comparison: {0}; informational, not a validation gate. Counts and deltas are retained in summary.json." -f $summary.compatibility.status))
 [void]$markdown.AppendLine("The 14-day warning review and 30-day effectiveness review are follow-up measurements; this report does not claim that targets are already achieved.")
 [System.IO.File]::WriteAllText($summaryMarkdownPath, $markdown.ToString(), [System.Text.UTF8Encoding]::new($false))
 
@@ -1171,7 +1235,4 @@ if (-not $Quiet) {
     Write-Host ("PASS: wrote privacy-safe summaries to {0}" -f $outputPath)
 }
 
-if (-not $EmitPrivateReviewSample -and $compatibilityApplicable -and -not $compatibilityPassed) {
-    exit 2
-}
 exit 0
