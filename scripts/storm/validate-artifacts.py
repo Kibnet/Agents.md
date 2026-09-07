@@ -10,26 +10,12 @@ No external dependencies.
 
 from __future__ import annotations
 
-import json
 import sys
-from collections import defaultdict, deque
+from collections import defaultdict
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Set, Tuple
 
-REQUIRED_TOP_LEVEL = [
-    "metadata",
-    "vision",
-    "product_goal",
-    "needs",
-    "constraints",
-    "stories",
-    "tests",
-    "code_units",
-    "conflicts",
-    "dependencies",
-    "ranking",
-    "process_audit",
-]
+from storm_model import ContractError, InputError, load_model, step_metrics
 
 ACTIVE_STATUSES = {"active", "implemented", "partial", "confirmed", "proposed", "inferred", "needs_review"}
 INACTIVE_STATUSES = {"deprecated", "superseded", "removed"}
@@ -52,17 +38,6 @@ VALID_COVERAGE_ROLES = {
 }
 
 
-def load_json(path: Path) -> Dict[str, Any]:
-    try:
-        return json.loads(path.read_text(encoding="utf-8"))
-    except FileNotFoundError:
-        print(f"ERROR: file not found: {path}")
-        sys.exit(2)
-    except json.JSONDecodeError as exc:
-        print(f"ERROR: invalid JSON: {exc}")
-        sys.exit(2)
-
-
 def collect_ids(items: Iterable[Dict[str, Any]]) -> Dict[str, Dict[str, Any]]:
     result: Dict[str, Dict[str, Any]] = {}
     for item in items:
@@ -74,38 +49,6 @@ def collect_ids(items: Iterable[Dict[str, Any]]) -> Dict[str, Dict[str, Any]]:
 
 def add_issue(issues: List[Tuple[str, str]], severity: str, message: str) -> None:
     issues.append((severity, message))
-
-
-def graph_cycles(nodes: Set[str], edges: List[Tuple[str, str]]) -> List[List[str]]:
-    graph: Dict[str, List[str]] = defaultdict(list)
-    for src, dst in edges:
-        graph[src].append(dst)
-
-    visited: Set[str] = set()
-    stack: Set[str] = set()
-    path: List[str] = []
-    cycles: List[List[str]] = []
-
-    def dfs(node: str) -> None:
-        visited.add(node)
-        stack.add(node)
-        path.append(node)
-        for nxt in graph.get(node, []):
-            if nxt not in visited:
-                dfs(nxt)
-            elif nxt in stack:
-                try:
-                    idx = path.index(nxt)
-                    cycles.append(path[idx:] + [nxt])
-                except ValueError:
-                    cycles.append([node, nxt])
-        stack.remove(node)
-        path.pop()
-
-    for node in nodes:
-        if node not in visited:
-            dfs(node)
-    return cycles
 
 
 def safe_len(value: Any) -> int:
@@ -122,12 +65,13 @@ def main() -> int:
         return 2
 
     path = Path(sys.argv[1])
-    data = load_json(path)
+    try:
+        model = load_model(path)
+    except (ContractError, InputError) as exc:
+        print(f"ERROR: {exc}")
+        return 2 if isinstance(exc, InputError) else 1
+    data = model.data
     issues: List[Tuple[str, str]] = []
-
-    for key in REQUIRED_TOP_LEVEL:
-        if key not in data:
-            add_issue(issues, "ERROR", f"Missing top-level key: {key}")
 
     stories = data.get("stories", []) if isinstance(data.get("stories", []), list) else []
     needs = data.get("needs", []) if isinstance(data.get("needs", []), list) else []
@@ -415,7 +359,7 @@ def main() -> int:
         if not supports:
             add_issue(issues, "WARNING", f"Code unit {cuid} has no supports links")
         for ref in supports:
-            if ref not in story_by_id and ref not in constraint_by_id and not ref.startswith("EN-"):
+            if ref not in story_by_id and ref not in constraint_by_id and ref not in model.groups["enablers"]:
                 add_issue(issues, "ERROR", f"Code unit {cuid} supports missing item {ref}")
 
     for conflict in conflicts:
@@ -438,26 +382,7 @@ def main() -> int:
         if conflict.get("status") == "resolved" and not conflict.get("injections"):
             add_issue(issues, "WARNING", f"Resolved conflict {cfid} has no injections")
 
-    dep_edges: List[Tuple[str, str]] = []
-    dep_nodes: Set[str] = set(story_by_id) | set(constraint_by_id)
-    for dep in dependencies:
-        did = dep.get("id", "<unknown>")
-        src = dep.get("from")
-        dst = dep.get("to")
-        if not src or not dst:
-            add_issue(issues, "ERROR", f"Dependency {did} missing from/to")
-            continue
-        if src not in dep_nodes and not src.startswith("EN-"):
-            add_issue(issues, "ERROR", f"Dependency {did} has missing from: {src}")
-        if dst not in dep_nodes and not dst.startswith("EN-"):
-            add_issue(issues, "ERROR", f"Dependency {did} has missing to: {dst}")
-        dep_edges.append((src, dst))
-        dep_nodes.add(src)
-        dep_nodes.add(dst)
-
-    cycles = graph_cycles(dep_nodes, dep_edges)
-    for cycle in cycles:
-        add_issue(issues, "ERROR", f"Dependency cycle: {' -> '.join(cycle)}")
+    cycles = []  # Shared model validated the complete ST/CN/EN graph before audit.
 
     total_ac = 0
     good_ac = 0
@@ -526,13 +451,7 @@ def main() -> int:
         if isinstance(cid, str)
     }
     constraints_with_scenarios = len(active_constraint_ids & scenario_constraint_ids)
-    step_refs = [
-        ref
-        for scenario in active_scenarios
-        for ref in as_list(scenario.get("step_definitions"))
-        if isinstance(ref, str)
-    ]
-    reused_step_refs = [ref for ref in step_refs if ref in step_by_id]
+    reuse = step_metrics(data)
     bdd_issue_count = sum(
         1
         for _, msg in issues
@@ -543,6 +462,7 @@ def main() -> int:
     print(f"File: {path}")
     print()
     print("Metrics:")
+    print("  metrics_version: 2")
     print(f"  stories_total: {len(stories)}")
     print(f"  active_stories: {len(active_stories)}")
     print(f"  implemented_stories: {len(implemented_stories)}")
@@ -564,7 +484,9 @@ def main() -> int:
     print(f"  executable_specification_ratio: {len(passing_scenarios)}/{len(active_scenarios)}" if active_scenarios else "  executable_specification_ratio: n/a")
     print(f"  orphan_scenarios: {orphan_scenarios}")
     print(f"  deprecated_drift: {deprecated_drift}")
-    print(f"  step_reuse_ratio: {len(reused_step_refs)}/{len(step_refs)}" if step_refs else "  step_reuse_ratio: n/a")
+    for name, counts in (("resolved_step_reference_ratio", "resolved_step_reference_counts"), ("step_reuse_ratio", "step_reuse_counts")):
+        numerator, denominator = reuse[counts]
+        print(f"  {name}: {numerator}/{denominator}" if denominator else f"  {name}: n/a")
     print(f"  bdd_lint_issues: {bdd_issue_count}")
     print()
 

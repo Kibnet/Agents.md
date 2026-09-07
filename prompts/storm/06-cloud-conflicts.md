@@ -18,7 +18,7 @@
    - injections;
    - decision.
 4. Предложи rewrite/split/add constraint/deprecate/supersede/accept risk.
-5. Обнови stories, acceptance criteria и constraints.
+5. Обнови stories, acceptance criteria и constraints; если вывод затрагивает behavior examples, синхронизируй Rule/Scenario и traceability, фиксируя rule_id/scenario_id и scenario_data_risk у конфликта.
 6. Обнови `docs/product/reports/conflicts.md`.
 
 Не удаляй код на этом шаге.

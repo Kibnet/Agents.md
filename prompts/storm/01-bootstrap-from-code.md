@@ -14,7 +14,8 @@
 - user stories;
 - acceptance criteria;
 - constraints;
-- technical enablers;
+- technical enablers (`enablers[]`, реальные EN IDs);
+- Gherkin features/rules/scenarios и существующие step definitions;
 - tests;
 - code units.
 
@@ -28,4 +29,6 @@
 - assumptions;
 - open questions.
 
-Не меняй функциональный код.
+Синхронизируй существующие Gherkin записи с `.feature` files, stable tags и `Story -> AC -> Rule -> Scenario -> Test / Step Definition -> Code`; неизвестные связи помечай как gaps. Для EN обязательны id/title/status/provenance/confidence; supports — описательная связь, prerequisite задаётся dependencies.
+
+Не меняй tests, code и test annotations в artifact-only bootstrap.

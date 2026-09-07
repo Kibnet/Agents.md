@@ -4,14 +4,16 @@
 
 Цель: повысить requirements coverage для active/implemented stories и constraints.
 
-Действия:
+Режим: при analysis-only только coverage report и предлагаемые проверки. Добавление/изменение tests или annotations требует `delivery-task` через QUEST до мутации.
+
+Действия после выбора режима:
 
 1. Найди acceptance criteria с `coverage_level = none|smoke|partial`.
-2. Для каждого AC предложи минимальный набор тестов.
-3. Если поведение уже существует, добавь regression/characterization tests.
-4. Если поведение отсутствует, не реализуй его без отдельной команды `/storm:implement`; пометь тест как planned/failing только если это принято в проекте.
-5. Обнови test annotations и `storm.json`.
-6. Запусти релевантные тесты.
+2. Для каждого AC сопоставь Rule/Scenario, coverage_role, наблюдаемый Then, linked tests и step definitions; предложи минимальные недостающие проверки.
+3. При разрешённом delivery EXEC для существующего поведения добавь regression/characterization tests; в analysis-only запиши рекомендации.
+4. Если поведение отсутствует, не реализуй его без отдельной команды `/storm:implement`; в analysis-only запиши planned verification в отчёте. Failing test допустим только в разрешённом delivery EXEC и принятом workflow проекта.
+5. Обнови `storm.json` и traceability report; test annotations меняй только в разрешённом delivery EXEC.
+6. При test changes запусти релевантные tests через обнаруженный runner; укажи проверенные scenarios и фактический результат.
 
 В конце дай список:
 

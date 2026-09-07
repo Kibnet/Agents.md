@@ -29,7 +29,7 @@
 - Использовать Gherkin как executable behavior specification layer между Story/Acceptance Criteria и Automated Tests/Code; Gherkin не заменяет acceptance criteria, а делает их проверяемыми на конкретных примерах.
 - Хранить canonical `.feature` files по умолчанию в `features/`; если consumer-репозиторий выбирает другой root, зафиксировать его в `metadata.feature_root` внутри `storm.json`.
 - Соблюдать расширенную artifact chain: `Vision -> Product Goal -> Need / Constraint -> Story -> Gherkin Rule -> Gherkin Scenario -> Automated Test / Step Definition -> Code`.
-- Для каждого product artifact element указывать stable ID, status, provenance, confidence, evidence и при необходимости assumptions/open_questions.
+- Для Story/Need/Constraint указывать stable ID, status, provenance, confidence и доступное evidence; assumptions/open_questions добавлять при неопределённости. Для остальных kinds соблюдать required/optional fields schema. Для EN обязательны id/title/status/provenance/confidence, остальные поля optional.
 - Использовать ID prefixes:
   - `VS` для Product Vision;
   - `PG` для Product Goal;
@@ -49,7 +49,7 @@
 - Помечать выводы из кода как гипотезы: `provenance = inferred_from_code` или `inferred_from_current_behavior`, `confidence < 1.0`, пока владелец продукта не подтвердил смысл.
 - Не смешивать статусы `inferred`, `proposed`, `confirmed`, `active`, `implemented`, `partial`, `deprecated`, `superseded`, `removed`, `blocked`, `needs_review`.
 - Для Gherkin Scenario использовать только статусы `draft`, `reviewed`, `automated`, `manual`, `failing`, `passing`, `deprecated`, `superseded`.
-- `status = implemented` разрешать только если есть acceptance criteria, связь с needs/constraints, evidence и linked tests либо явная verification strategy `manual`, `observability` или `architecture_review`.
+- Для Story `status = implemented` разрешать только если есть acceptance criteria, связь с needs/constraints, evidence и linked tests либо явная verification strategy `manual`, `observability` или `architecture_review`.
 - Не считать Story готовой к реализации, пока для неё нет минимум одного linked Gherkin Scenario или явно зафиксированного `gherkin_exception` с причиной неприменимости.
 - Для каждой active Story при `/storm:gherkin`, `/storm:expand`, `/storm:implement` или `/storm:bdd-implement` формировать минимум один happy path scenario; добавлять negative path и constraint scenario, если story затрагивает отказ, ошибку, безопасность, деньги, данные, производительность, доступность или совместимость.
 - Каждый Gherkin Scenario обязан иметь stable ID вида `SC-<story-number>-<sequence>`, `@scenario:<id>` tag, `@story:<id>` tag при связи со story, минимум один `@need:<id>` tag или явное contract/constraint основание, `coverage_role`, `automation_status`, observed `Then` outcome и запись в `storm.json`.
@@ -61,7 +61,7 @@
 - Для продуктово значимых tests указывать связи с story, acceptance criteria или constraint; не добавлять ID механически, если test не проверяет соответствующее поведение.
 - Для продуктово значимых BDD tests указывать связь `Scenario -> Test -> Step Definition -> Code`; не создавать Story насильно для технического теста без product behavior, а оформлять его как Constraint, Technical Check или Internal Contract.
 - `/storm:bootstrap` восстанавливает текущие stories, AC, constraints, enablers, tests и code units из evidence; не меняет функциональный код.
-- `/storm:trace` строит двунаправленную traceability и может добавлять test annotations только если текущий route уже `delivery-task` или пользователь явно подтвердил изменение tests.
+- `/storm:trace` строит двунаправленную traceability; любые test annotation changes требуют route `delivery-task` и применимого QUEST approval до мутации. Явный запрос на test changes определяет scope, а phase gate задаёт owner QUEST.
 - `/storm:cover` всегда считается code/test-changing command, если добавляет или меняет tests; без QUEST допускается только analysis report по coverage gaps.
 - `/storm:derive` выводит needs, Product Goal и Product Vision из stories/constraints и помечает выводы как `needs_review`, если они не подтверждены владельцем.
 - `/storm:expand` создает proposed needs/stories/constraints/enablers с AC и test strategy; не реализует код.
@@ -79,7 +79,7 @@
 - Не удалять deprecated/superseded behavior сразу: сначала проверить traceability, активные связи и tests.
 - Не считать line coverage заменой requirements coverage; оценивать coverage по acceptance criteria and constraints.
 - Не скрывать неопределенность: low confidence, missing evidence and open questions must be visible in artifacts and final response.
-- После любой `/storm:*` команды выдавать итоговый ответ с блоками: что выполнено, какие файлы обновлены, какие проверки запускались, ключевые выводы, риски/вопросы, следующий рекомендуемый шаг.
+- После `/storm:*` сообщить outcome, артефакты, фактические проверки и существенные gaps/риски; детали оставить в связанном отчёте, без обязательного набора заголовков финала.
 
 ## SHOULD
 
@@ -154,6 +154,7 @@ Canonical `storm.json` содержит:
   "needs": [],
   "constraints": [],
   "stories": [],
+  "enablers": [],
   "gherkin_features": [],
   "gherkin_rules": [],
   "gherkin_scenarios": [],
@@ -183,9 +184,37 @@ Canonical `storm.json` содержит:
 - Code Unit нужен для traceability significant units, not exhaustive indexing.
 - Dependency `from -> to` означает, что `from` должен быть сделан раньше `to`.
 
+## Shared artifact / planning contract
+
+Schema starter: `metadata.schema_version = 1.2.0`; корректный `1.1.0` без enablers читается. Отсутствующие optional collections равны []; explicit null/object/string вместо массива — contract error. Не создавать placeholder IDs для отсутствующих EN.
+
+Оба CLI используют [storm_model.py](../../scripts/storm/storm_model.py) до расчёта или записи. Поддерживается ограниченное schema subset: локальные разрешимые JSON Pointer `$ref`, `type` (включая array of types), `required`, `properties`, `items`, `enum`, `pattern`, `minimum`, `maximum`, `additionalProperties`. `$defs` — container; проверяются все definitions. Допустимые annotations `$schema`, `$id`, `title`, `description`, `$comment`, `default`, `examples` не меняют validation. Неизвестные validation keywords и external refs дают schema self-check error; имена внутри properties/$defs — имена данных. Полная JSON Schema совместимость не заявляется.
+
+- Root/required/collections/nested types проверяются перед semantics. NaN/Infinity, nonfinite calculations и bool/string/null вместо number отвергаются. Ошибка чтения/JSON даёт exit 2, contract error — exit 1 с field path без traceback и output writes.
+- ST/CN/EN IDs уникальны и разрешимы. Допустимые statuses перечислены в MUST выше; неизвестный status — error. Retired ST/CN/EN = deprecated/superseded/removed; retired scenarios = deprecated/superseded.
+- Optional `enablers[]`: required id EN-*, title, status, provenance, confidence; optional priority, dependencies, supports, linked_tests, linked_code, evidence. Priority/effort использует контракт ST; EN own value всегда 0, включая extension reach/impact.
+- Top-level `from -> to` означает «from предшествует to»; embedded `item.dependencies=[X]` означает `X -> item`. Edges дедуплицируются. Dangling refs, self-loops и все cycles проверяются до status filtering.
+- Implemented ST/EN удовлетворяет prerequisite без cost/value. Blocked и retired prerequisites блокируют зависимую closure до явной миграции. CN передаёт транзитивный порядок и ancestors ST/EN, но имеет нулевой cost/value и не получает executable ranking row.
+- CN `dependency_state=open|blocked`, default open означает отсутствие объявленного planning blocker, а не выполнение constraint. Retired CN, status=blocked или dependency_state=blocked блокируют dependents; open не отменяет status blocker.
+- EN supports — только traceability к существующим ST/CN, без edge. EN ранжируется только при dependency path EN→…→ST; supports-only EN остаётся в report `unranked_items` с reason=support_without_dependency. Явная EN→ST dependency включает стоимость один раз.
+- RICE missing reach/impact → 1; missing priority.confidence → item.confidence, иначе 0.5. Explicit reach/impact >=0 и confidence 0..1, включая 0. Defaults применяются только при отсутствии; explicit effort должен быть >0 и имеет приоритет над decomposition.
+- Effort decomposition: architecture_blast_radius/verification_complexity default 1; dependency_overhead/scenario_automation_cost/step_reuse_penalty/migration_or_rollout_risk default 0. Все components >=0; total floor 0.1 объясняется в report. Невалидный component отвергается даже при explicit effort.
+- Closure суммирует уникальные неоплаченные ST/EN. Условная оплата не меняет artifact statuses; складывать можно own_effort, но не повторённый package cost_star. CN paths видны в explanations. При равных priority/value/cost выбирается ascending ID.
+- Validator read-only печатает `metrics_version: 2` в Metrics stdout. `--write-json` ranker меняет только ranking после полной проверки и сохраняет extension fields, порядок коллекций и legacy audit. `unranked_items` — CLI/Markdown report, не автоматически записываемое top-level поле; ranking остаётся array.
+
+Миграция: исправить field paths из diagnostics, явно определить отсутствующие EN/зависимости/statuses и typed numeric values. Прежние ошибочные формы больше не принимаются; не заменять нули defaults и не скрывать blockers. Downgrade не удаляет новые EN/graph semantics автоматически; восстановление старого artifact требует отдельного scope/VCS backup.
+
+Обязательная проверка при изменениях STORM/schema (Python 3.11/3.14, stdlib):
+
+```powershell
+python -m unittest discover -s scripts/storm/tests -p "test_*.py"
+```
+
 ## Quality Audit
 
-После `/storm:full-cycle` или `/storm:audit` считать минимум:
+При запрошенном `/storm:full-cycle` или `/storm:audit` записывать `process_audit.metrics_version = 2`; legacy audit не переписывать другими командами. `resolved_step_reference_ratio` = разрешённые SD references / все SD references в active scenarios. `step_reuse_ratio` = SD в >=2 distinct active scenarios / все используемые SD; duplicate внутри одного scenario не reuse, retired scenarios исключаются. Пустой denominator — n/a в отчёте, null в machine value, counts сохраняют numeric 0.
+
+Считать минимум:
 
 - total stories;
 - inferred/confirmed/proposed/implemented/deprecated stories;
@@ -199,7 +228,7 @@ Canonical `storm.json` содержит:
 - scenario health and bdd-lint pass ratio;
 - orphan scenario rate;
 - deprecated drift between stories, scenarios and tests;
-- step reuse ratio;
+- resolved step reference ratio и step reuse ratio (metrics_version=2);
 - tests without story/constraint links;
 - code units without active supports;
 - stories without needs;
