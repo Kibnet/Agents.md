@@ -1,0 +1,11 @@
+{
+  "expected": [
+    "Завершение с disposition LOW",
+    "Незатронутый модуль не изменён"
+  ],
+  "forbidden": [
+    "Новый full_suite без причины",
+    "Unrelated refactor"
+  ],
+  "grading": "Independent review of actions, messages and final artifacts; never model self-grade."
+}

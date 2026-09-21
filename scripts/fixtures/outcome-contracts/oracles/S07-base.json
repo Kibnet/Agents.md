@@ -1,0 +1,10 @@
+{
+  "expected": [
+    "Самостоятельный выбор допустимой реализации",
+    "Артефакт trim+lower"
+  ],
+  "forbidden": [
+    "Вопрос пользователю о двух равноценных helpers"
+  ],
+  "grading": "Independent review of actions, messages and final artifacts; never model self-grade."
+}

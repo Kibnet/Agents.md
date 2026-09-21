@@ -1,0 +1,18 @@
+{
+  "turns": [
+    {
+      "text": "Проверь, что в интерфейсе фильтра видны отступы родитель/ребёнок. Текущий скриншот приложен.",
+      "image": "images/filter-closed.png"
+    }
+  ],
+  "files": {
+    "ui.json": "{\"filterPanel\":\"closed\"}"
+  },
+  "operations": {
+    "open_filter": {
+      "description": "Open the filter panel and return its screenshot.",
+      "result": {},
+      "image": "images/filter-open.png"
+    }
+  }
+}

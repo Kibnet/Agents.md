@@ -395,11 +395,6 @@ $textGuards = @(
         Description = "one-writer ownership"
     },
     @{
-        Path = "instructions/core/testing-baseline.md"
-        Pattern = 'successful full test run'
-        Description = "successful full-run completion gate"
-    },
-    @{
         Path = "instructions/governance/review-loops.md"
         Pattern = 'Independent review считать технически read-only только при evidence фактического child sandbox `read-only`'
         Description = "effective read-only reviewer evidence"
@@ -807,6 +802,16 @@ foreach ($mdFile in $markdownFiles) {
             Add-Error "Ссылка на reference id '$usage' без определения в файле $($mdFile.FullName)"
         }
     }
+}
+
+# These are static source/fixture integrity checks, never behavioral evidence.
+$outcomeChecker = Join-Path $PSScriptRoot 'test-outcome-contracts.ps1'
+if (-not (Test-Path -LiteralPath $outcomeChecker)) {
+    Add-Error 'Отсутствует static outcome-contract checker'
+}
+else {
+    & pwsh -NoProfile -File $outcomeChecker -RootPath $resolvedRoot -ValidateOnly
+    if ($LASTEXITCODE -ne 0) { Add-Error 'Static outcome contracts или fixture manifest не прошли проверку' }
 }
 
 if ($errors.Count -gt 0) {

@@ -1,0 +1,12 @@
+{
+  "turns": [
+    {
+      "text": "Спеку подтверждаю. Реализуй нормализацию имени в src/helper.py согласно SPEC.md."
+    }
+  ],
+  "files": {
+    "SPEC.md": "# Нормализация\nAC: trim пробелы и lower case. Допустимы отдельный helper и inline — публичное поведение одинаково.\n",
+    "src/helper.py": "def normalize(value):\n    return value\n"
+  },
+  "operations": {}
+}

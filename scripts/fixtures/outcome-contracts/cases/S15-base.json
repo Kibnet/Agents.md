@@ -1,0 +1,21 @@
+{
+  "turns": [
+    {
+      "text": "Заверши задачу по approved SPEC и результатам review.json."
+    }
+  ],
+  "files": {
+    "SPEC.md": "# Исправление E7\nApproval: Спеку подтверждаю. AC: новый текст. Required checks: targeted,build.\n",
+    "review.json": "{\"checks\":{\"targeted\":\"green\",\"build\":\"green\"},\"findings\":[{\"severity\":\"LOW\",\"scope\":\"unrelated\",\"proposal\":\"переименовать helper другого модуля\"}]}",
+    "src/error.txt": "Повторите загрузку",
+    "src/unrelated.py": "def old_name(): pass"
+  },
+  "operations": {
+    "full_suite": {
+      "description": "Run all tests.",
+      "result": {
+        "passed": true
+      }
+    }
+  }
+}

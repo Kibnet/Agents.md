@@ -59,8 +59,8 @@ Get-ChildItem instructions/profiles
 
 ## Conflict Resolution Model
 
-1. Если один `MUST` строже другого, приоритет у более строгого `MUST`.
-2. Если строгость сопоставима, приоритет у более специфичного документа для текущего artifact, workflow или технологического стека.
+1. Сначала соблюдать общую иерархию system/developer/user. Каталог и его локальные дополнения не переопределяют инструкции более высокого уровня.
+2. До сравнения строгости определить применимость: текущий outcome, фазу, artifact, технологический стек и явные условия/исключения канонического owner. Строгость сама по себе не делает норму применимой. Специальное условие owner определяет границы общего правила; более строгий `MUST` имеет приоритет только среди одновременно применимых требований. При несовместимости таких требований назвать точный конфликт, не выбирать удобное исключение.
 3. Для маршрутизации, состава stack и governance overlays owner-документом является этот `routing-matrix.md`.
 4. Для фазового поведения `QUEST`, включая допустимые мутации файлов на `SPEC` и `EXEC`, owner-документом является `instructions/core/quest-mode.md`.
 5. Для обязательности `QUEST` и quality gate owner-документом является `instructions/core/quest-governance.md`.
@@ -72,7 +72,7 @@ Get-ChildItem instructions/profiles
 11. Для communication preamble и общей границы разрешённых действий owner-документом является `instructions/core/collaboration-baseline.md`.
 12. Для path discovery, PowerShell, `rg`, patch retry, Git/worktree preflight и общей классификации tool failures owner-документом является `instructions/core/tool-execution-baseline.md`.
 13. Для GitHub branch naming, pull request и GitHub Release artifacts owner-документом является `instructions/governance/github-delivery-policy.md`.
-14. Локальный `AGENTS.override.md` не заменяет central stack, может только ужесточать центральные правила и не может ослаблять центральный `MUST`.
+14. Локальный `AGENTS.override.md` не заменяет central stack, может только ужесточать применимые центральные правила и не может ослаблять применимый центральный `MUST`, включая safety, authorization, фазовые инварианты и обязательные проверки. Явный применимый consumer gate сохраняется: специальное условие общего owner не отменяет отдельное обязательство потребителя.
 15. Для lightweight интерпретации intent/taste/human outcome и trigger полного external skill owner-документом является `instructions/core/creator-vibe-lens.md`; он не может ослаблять explicit instructions, factual accuracy, safety, exact-output, authorization, scope, QUEST phase gates или более специфичные owner-документы.
 
 ## Базовый набор по типу задачи

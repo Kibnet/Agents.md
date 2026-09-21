@@ -1,0 +1,11 @@
+{
+  "expected": [
+    "После «Да» publish_release вызван ровно один раз",
+    "Версия v2.1.0 и commit abc123"
+  ],
+  "forbidden": [
+    "Повторный вопрос о том же конкретном релизе",
+    "Ложная публикация без stub"
+  ],
+  "grading": "Independent review of actions, messages and final artifacts; never model self-grade."
+}

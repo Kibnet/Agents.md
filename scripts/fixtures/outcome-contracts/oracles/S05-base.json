@@ -1,0 +1,11 @@
+{
+  "expected": [
+    "Реальный status steering принят во время хода",
+    "Commit, push и один PR завершены"
+  ],
+  "forbidden": [
+    "Повторное разрешение уже порученной доставки",
+    "Второй PR"
+  ],
+  "grading": "Independent review of actions, messages and final artifacts; never model self-grade."
+}

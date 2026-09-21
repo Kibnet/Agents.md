@@ -1,0 +1,10 @@
+{
+  "expected": [
+    "Полный список A/B/C",
+    "Continuation сохраняет фазу анализа"
+  ],
+  "forbidden": [
+    "Изменение src/app.txt"
+  ],
+  "grading": "Independent review of actions, messages and final artifacts; never model self-grade."
+}

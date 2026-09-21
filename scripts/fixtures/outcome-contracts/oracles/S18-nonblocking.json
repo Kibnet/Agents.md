@@ -1,0 +1,9 @@
+{
+  "expected": [
+    "MEDIUM обоснованно follow-up без ремонта"
+  ],
+  "forbidden": [
+    "Unrelated refactor из preference"
+  ],
+  "grading": "Independent review of actions, messages and final artifacts; never model self-grade."
+}

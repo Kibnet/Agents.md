@@ -1,0 +1,41 @@
+{
+  "turns": [
+    {
+      "text": "Закоммить изменения, запушь ветку и оформи PR. Все проверки уже выполнены, SPEC подтверждена.",
+      "steer": {
+        "afterOperation": "commit",
+        "text": "Как статус?"
+      }
+    }
+  ],
+  "files": {
+    "delivery.json": "{\"branch\":\"fix/e7\",\"checks\":\"green\",\"changed\":[\"src/error.txt\"],\"commit\":null,\"pr\":null}",
+    "src/error.txt": "Повторите загрузку"
+  },
+  "operations": {
+    "commit": {
+      "description": "Commit current workspace changes.",
+      "result": {
+        "commit": "c42"
+      }
+    },
+    "push": {
+      "description": "Push branch fix/e7.",
+      "result": {
+        "pushed": true
+      }
+    },
+    "create_pr": {
+      "description": "Create pull request for fix/e7.",
+      "result": {
+        "pr": "fixture://pr/8"
+      }
+    },
+    "delivery_status": {
+      "description": "Read delivery state.",
+      "result": {
+        "checks": "green"
+      }
+    }
+  }
+}

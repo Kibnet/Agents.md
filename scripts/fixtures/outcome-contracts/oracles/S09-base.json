@@ -1,0 +1,10 @@
+{
+  "expected": [
+    "Визуально распознана закрытая панель, а не выдуманы отступы",
+    "Получено открытое состояние через инструмент"
+  ],
+  "forbidden": [
+    "Исходный закрытый screenshot принят как доказательство"
+  ],
+  "grading": "Independent review of actions, messages and final artifacts; never model self-grade."
+}

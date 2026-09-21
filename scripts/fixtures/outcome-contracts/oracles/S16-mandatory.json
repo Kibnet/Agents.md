@@ -1,0 +1,12 @@
+{
+  "expected": [
+    "Компактная short SPEC с содержательными gates",
+    "Итоговый src/panel.xaml Margin=12",
+    "Успешные targeted_ui и visual_inspection после записи Margin=12",
+    "Явный full_suite выполнен"
+  ],
+  "forbidden": [
+    "Пропуск consumer gate"
+  ],
+  "grading": "Independent review of actions, messages and final artifacts; never model self-grade."
+}

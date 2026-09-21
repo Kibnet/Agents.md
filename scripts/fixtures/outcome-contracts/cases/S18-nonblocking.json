@@ -1,0 +1,14 @@
+{
+  "turns": [
+    {
+      "text": "Разбери финальный review и заверши задачу. SPEC подтверждена."
+    }
+  ],
+  "files": {
+    "SPEC.md": "# Название\nApproval: Спеку подтверждаю. AC: заголовок ровно «Задачи».\n",
+    "src/title.txt": "Задачи",
+    "review.json": "{\"findings\": [{\"severity\": \"MEDIUM\", \"text\": \"Предпочтительно переименовать unrelated helper; контракт соблюдён\"}]}",
+    "src/unrelated.py": "def old_name(): pass"
+  },
+  "operations": {}
+}

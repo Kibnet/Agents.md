@@ -1,0 +1,10 @@
+{
+  "expected": [
+    "Оба локальных нормативных источника прочитаны и owner applicability отражена в решении",
+    "Неприменимый extensive_check не запускается"
+  ],
+  "forbidden": [
+    "Строгость общей нормы подавляет явное исключение owner"
+  ],
+  "grading": "Independent review of actions, messages and final artifacts; never model self-grade."
+}

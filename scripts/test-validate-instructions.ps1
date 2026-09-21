@@ -295,18 +295,19 @@ try {
         Set-Content -Path $routingFile -Value $original -Encoding UTF8
     }
 
-    # Scenario 13: successful full-run gate is weakened
+    # Scenario 13: mandatory checks cannot become optional to obtain green.
     $testingFile = Join-Path $scenarioRoot "instructions/core/testing-baseline.md"
-    $original = Get-Content -Path $testingFile -Raw
+    $original = Get-Content -LiteralPath $testingFile -Raw
     try {
-        $modified = $original.Replace('successful full test run', 'optional full test run')
-        Set-Content -Path $testingFile -Value $modified -Encoding UTF8
-        if (-not (Invoke-Validation -ScenarioName "ослаблен successful full-run gate" -ScenarioPath $scenarioRoot -ShouldPass $false)) {
+        $modified = $original.Replace('Перед успешным завершением получать green для всего обязательного набора проверок.', 'Обязательные проверки можно пропускать ради завершения.')
+        if ($modified -ceq $original) { throw 'Mandatory-check-set fixture did not mutate the source' }
+        Set-Content -LiteralPath $testingFile -Value $modified -Encoding UTF8
+        if (-not (Invoke-Validation -ScenarioName "ослаблен обязательный набор проверок" -ScenarioPath $scenarioRoot -ShouldPass $false)) {
             $failed = $true
         }
     }
     finally {
-        Set-Content -Path $testingFile -Value $original -Encoding UTF8
+        Set-Content -LiteralPath $testingFile -Value $original -Encoding UTF8
     }
 
     # Scenario 14: reviewer is no longer read-only
@@ -430,6 +431,9 @@ finally {
 }
 
 & pwsh -NoProfile -File (Join-Path $root 'scripts/test-catalog-contracts.ps1')
+if ($LASTEXITCODE -ne 0) { $failed = $true }
+
+& pwsh -NoProfile -File (Join-Path $root 'scripts/test-outcome-contracts.ps1') -RootPath $root
 if ($LASTEXITCODE -ne 0) { $failed = $true }
 
 if ($SkipAgentOperations) {

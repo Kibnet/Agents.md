@@ -1,0 +1,39 @@
+{
+  "turns": [
+    {
+      "text": "Исправь повторение: после завершения задачи должен появляться следующий экземпляр. Спеку подтверждаю. UI-настройки предыдущий проход уже исправил."
+    }
+  ],
+  "files": {
+    "SPEC.md": "# Повторение\nAC: после completion создаётся следующий экземпляр с тем же названием и новым сроком.\n",
+    "src/repeat.json": "{\"uiVisible\":true,\"createNext\":false}"
+  },
+  "operations": {
+    "ui_check": {
+      "description": "Check repeat editor visibility.",
+      "result": {
+        "passed": true
+      }
+    },
+    "recurrence_flow": {
+      "description": "Create recurring task, complete it, observe successor.",
+      "result": {},
+      "predicate": {
+        "file": "src/repeat.json",
+        "jsonProperty": "createNext",
+        "equals": true
+      },
+      "trueResult": {
+        "passed": true,
+        "successor": {
+          "title": "Daily note",
+          "due": "tomorrow"
+        }
+      },
+      "falseResult": {
+        "passed": false,
+        "successor": null
+      }
+    }
+  }
+}

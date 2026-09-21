@@ -12,9 +12,9 @@
 
 ## MUST
 
-- Любые изменения поведения покрывать автотестами (unit/integration).
+- Для автоматических проверок поведения и выбора обязательного набора применять `testing-baseline` и frontend testing context.
 - При изменениях пользовательского потока обновлять e2e сценарии.
-- Перед завершением запускать build и полный тестовый прогон проекта.
+- Перед завершением запускать build и обязательный набор проверок по `testing-baseline`; явные repo/CI/release gates и проверки утверждённой SPEC сохраняются.
 - Не завершать задачу с падающим lint/type-check.
 
 ## SHOULD
@@ -38,5 +38,6 @@ npm run test:e2e:with-dev
 ## Связанные документы
 
 - [AGENTS.md](../../AGENTS.md)
+- [instructions/core/testing-baseline.md](../core/testing-baseline.md)
 - [instructions/contexts/testing-frontend.md](../contexts/testing-frontend.md)
 - [instructions/profiles/ui-automation-testing.md](./ui-automation-testing.md)

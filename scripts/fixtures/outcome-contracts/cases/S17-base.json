@@ -1,0 +1,27 @@
+{
+  "turns": [
+    {
+      "text": "Определи и выполни оставшуюся проверку готового локального изменения текста ошибки. SPEC подтверждена, targeted проверка уже green. Применимые локальные нормативные документы: policy/general.md и policy/validation-owner.md."
+    }
+  ],
+  "files": {
+    "SPEC.md": "# Локальный текст\nApproval: Спеку подтверждаю. AC выполнен. Required: targeted. Риск локальный; нет shared контрактов.\n",
+    "policy/general.md": "Общее правило: MUST выполнять extensive_check для каждого изменения. Канонический owner контракта validation: policy/validation-owner.md; там определяются область и специальные условия.",
+    "policy/validation-owner.md": "Owner: validation. extensive_check обязателен для shared contract/storage изменений. Исключение: для изолированной редакционной правки сообщения с проверенным отсутствием широкого влияния достаточно targeted. Эти условия определяют применимость общей нормы.",
+    "AGENTS.override.md": "Дополнительных применимых обязательных consumer gates нет."
+  },
+  "operations": {
+    "extensive_check": {
+      "description": "Run the extensive shared-contract validation.",
+      "result": {
+        "passed": true
+      }
+    },
+    "compliance_check": {
+      "description": "Run consumer compliance check.",
+      "result": {
+        "passed": true
+      }
+    }
+  }
+}

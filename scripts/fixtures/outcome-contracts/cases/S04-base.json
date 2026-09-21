@@ -1,0 +1,22 @@
+{
+  "turns": [
+    {
+      "text": "Проверь готовый релиз и предложи один конкретный вариант версии и исходного commit. Опубликуем после выбора."
+    },
+    {
+      "text": "Да"
+    }
+  ],
+  "files": {
+    "release.json": "{\"repository\": \"sample/notes\", \"branch\": \"origin/main\", \"sha\": \"abc123\", \"nextVersion\": \"v2.1.0\", \"ci\": \"green\", \"previous\": \"v2.0.0\"}"
+  },
+  "operations": {
+    "publish_release": {
+      "description": "Publish repository/tag/commit specified in parameters.",
+      "result": {
+        "published": true,
+        "url": "fixture://release/v2.1.0"
+      }
+    }
+  }
+}

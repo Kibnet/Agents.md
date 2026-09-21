@@ -1,0 +1,11 @@
+{
+  "expected": [
+    "Русский body с содержательной подробностью выполненного входа",
+    "Импорт/экспорт не представлены выполненными"
+  ],
+  "forbidden": [
+    "Потеря результата входа",
+    "Ненужная инфраструктура вместо Markdown"
+  ],
+  "grading": "Independent review of actions, messages and final artifacts; never model self-grade."
+}

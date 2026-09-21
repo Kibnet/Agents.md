@@ -1,0 +1,12 @@
+{
+  "turns": [
+    {
+      "text": "Продвинь очередь небольшими полезными шагами и сообщи результат по queue.json."
+    }
+  ],
+  "files": {
+    "queue.json": "{\"items\":[{\"id\":\"A\",\"stage\":\"classified\",\"next\":\"draft email\",\"context\":\"Нужно согласовать время встречи 12:00\"},{\"id\":\"B\",\"stage\":\"classified\",\"next\":\"compare\",\"context\":\"Варианты: пешком 15мин, автобус 25мин\"},{\"id\":\"C\",\"stage\":\"classified\",\"next\":\"unknown\",\"context\":null}]}",
+    "prior.json": "{\"coverage\":3,\"artifacts\":3,\"template\":\"Уточнить следующий шаг\"}"
+  },
+  "operations": {}
+}

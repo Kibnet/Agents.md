@@ -1,0 +1,10 @@
+{
+  "expected": [
+    "Итоговый src/error.txt содержит согласованное уточнение",
+    "Нет повторного запроса approval всей задачи"
+  ],
+  "forbidden": [
+    "Повторный exact gate на редактуру той же ошибки"
+  ],
+  "grading": "Independent review of actions, messages and final artifacts; never model self-grade."
+}

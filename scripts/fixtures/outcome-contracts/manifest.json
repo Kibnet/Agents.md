@@ -1,0 +1,277 @@
+{
+  "schemaVersion": 1,
+  "scenarios": [
+    {
+      "id": "S01",
+      "contracts": [
+        "C2",
+        "C8"
+      ],
+      "variants": [
+        {
+          "id": "base",
+          "input": "cases/S01-base.json",
+          "oracle": "oracles/S01-base.json"
+        }
+      ]
+    },
+    {
+      "id": "S02",
+      "contracts": [
+        "C2",
+        "C3"
+      ],
+      "variants": [
+        {
+          "id": "base",
+          "input": "cases/S02-base.json",
+          "oracle": "oracles/S02-base.json"
+        }
+      ]
+    },
+    {
+      "id": "S03",
+      "contracts": [
+        "C2"
+      ],
+      "variants": [
+        {
+          "id": "base",
+          "input": "cases/S03-base.json",
+          "oracle": "oracles/S03-base.json"
+        }
+      ]
+    },
+    {
+      "id": "S04",
+      "contracts": [
+        "C2",
+        "C3"
+      ],
+      "variants": [
+        {
+          "id": "base",
+          "input": "cases/S04-base.json",
+          "oracle": "oracles/S04-base.json"
+        }
+      ]
+    },
+    {
+      "id": "S05",
+      "contracts": [
+        "C2"
+      ],
+      "variants": [
+        {
+          "id": "base",
+          "input": "cases/S05-base.json",
+          "oracle": "oracles/S05-base.json"
+        }
+      ]
+    },
+    {
+      "id": "S06",
+      "contracts": [
+        "C2"
+      ],
+      "variants": [
+        {
+          "id": "base",
+          "input": "cases/S06-base.json",
+          "oracle": "oracles/S06-base.json"
+        }
+      ]
+    },
+    {
+      "id": "S07",
+      "contracts": [
+        "C2",
+        "C3"
+      ],
+      "variants": [
+        {
+          "id": "base",
+          "input": "cases/S07-base.json",
+          "oracle": "oracles/S07-base.json"
+        }
+      ]
+    },
+    {
+      "id": "S08",
+      "contracts": [
+        "C2",
+        "C7"
+      ],
+      "variants": [
+        {
+          "id": "base",
+          "input": "cases/S08-base.json",
+          "oracle": "oracles/S08-base.json"
+        }
+      ]
+    },
+    {
+      "id": "S09",
+      "contracts": [
+        "C7"
+      ],
+      "variants": [
+        {
+          "id": "base",
+          "input": "cases/S09-base.json",
+          "oracle": "oracles/S09-base.json"
+        }
+      ]
+    },
+    {
+      "id": "S10",
+      "contracts": [
+        "C7"
+      ],
+      "variants": [
+        {
+          "id": "base",
+          "input": "cases/S10-base.json",
+          "oracle": "oracles/S10-base.json"
+        }
+      ]
+    },
+    {
+      "id": "S11",
+      "contracts": [
+        "C8"
+      ],
+      "variants": [
+        {
+          "id": "base",
+          "input": "cases/S11-base.json",
+          "oracle": "oracles/S11-base.json"
+        }
+      ]
+    },
+    {
+      "id": "S12",
+      "contracts": [
+        "C9"
+      ],
+      "variants": [
+        {
+          "id": "base",
+          "input": "cases/S12-base.json",
+          "oracle": "oracles/S12-base.json"
+        }
+      ]
+    },
+    {
+      "id": "S13",
+      "contracts": [
+        "C3"
+      ],
+      "variants": [
+        {
+          "id": "base",
+          "input": "cases/S13-base.json",
+          "oracle": "oracles/S13-base.json"
+        }
+      ]
+    },
+    {
+      "id": "S14",
+      "contracts": [
+        "C3",
+        "C8"
+      ],
+      "variants": [
+        {
+          "id": "base",
+          "input": "cases/S14-base.json",
+          "oracle": "oracles/S14-base.json"
+        }
+      ]
+    },
+    {
+      "id": "S15",
+      "contracts": [
+        "C4",
+        "C6"
+      ],
+      "variants": [
+        {
+          "id": "base",
+          "input": "cases/S15-base.json",
+          "oracle": "oracles/S15-base.json"
+        }
+      ]
+    },
+    {
+      "id": "S16",
+      "contracts": [
+        "C5",
+        "C6"
+      ],
+      "variants": [
+        {
+          "id": "base",
+          "input": "cases/S16-base.json",
+          "oracle": "oracles/S16-base.json"
+        },
+        {
+          "id": "mandatory",
+          "input": "cases/S16-mandatory.json",
+          "oracle": "oracles/S16-mandatory.json"
+        }
+      ]
+    },
+    {
+      "id": "S17",
+      "contracts": [
+        "C1",
+        "C6"
+      ],
+      "variants": [
+        {
+          "id": "base",
+          "input": "cases/S17-base.json",
+          "oracle": "oracles/S17-base.json"
+        },
+        {
+          "id": "mandatory",
+          "input": "cases/S17-mandatory.json",
+          "oracle": "oracles/S17-mandatory.json"
+        }
+      ]
+    },
+    {
+      "id": "S18",
+      "contracts": [
+        "C4"
+      ],
+      "variants": [
+        {
+          "id": "base",
+          "input": "cases/S18-base.json",
+          "oracle": "oracles/S18-base.json"
+        },
+        {
+          "id": "nonblocking",
+          "input": "cases/S18-nonblocking.json",
+          "oracle": "oracles/S18-nonblocking.json"
+        }
+      ]
+    }
+  ],
+  "heldOut": [
+    {
+      "id": "H06",
+      "input": "cases/H06.json",
+      "oracle": "oracles/H06.json",
+      "basedOn": "S06"
+    },
+    {
+      "id": "H11",
+      "input": "cases/H11.json",
+      "oracle": "oracles/H11.json",
+      "basedOn": "S11"
+    }
+  ]
+}

@@ -19,6 +19,9 @@
 - В PowerShell использовать here-string вместо Bash heredoc; перед `:` после переменной применять `${name}` или format operator.
 - Перед длинным build/test проверять runner/SDK/dependencies и заранее фиксировать команду, progress evidence и repo-specific timeout strategy.
 - Классифицировать permission/auth/network/lock/missing dependency отдельно от product defect; не менять код для маскировки environment blocker.
+- Выбирать первичный источник по проверяемому claim: активная конфигурация установленного приложения для текущего dataset, фактические production logs/status для инцидента. README, память и summary дают направление поиска, но не подтверждают текущее состояние.
+- Перед выводом «данных/доступа нет» проверить доступные обычные разрешённые пути и происхождение выбранного источника. Не требовать от пользователя ручной настройки по непроверенной гипотезе. Explicit tool/runtime denial не разрешает обход через иной инструмент, endpoint или credential.
+- Сообщать точный отказ инструмента и его указанную причину отдельно от своей гипотезы. При уже разрешённом действии runtime blocker не лечится повторным запросом того же разрешения; продолжать независимую разрешённую работу и точно обозначать, какая часть не выполнена.
 - После failed patch перечитать актуальный участок и ownership, затем уменьшить hunk. Идентичный retry по stale context запрещён.
 - После второго write conflict в одном файле остановить параллельных writers и вернуть ownership main agent; после третьего отказа без новой причины остановиться, а не продолжать retry loop.
 - До Git mutation проверить `git rev-parse --git-dir`, top-level, branch/upstream и worktree. Не предлагать broad `writable_roots` как исправление защиты Git metadata.

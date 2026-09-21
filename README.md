@@ -45,7 +45,9 @@
 
 Portable default: локальный `AGENTS.md` содержит только pointer на каталог. Для Codex также поддерживается global pointer в `~\.codex\AGENTS.md` на `~\.codex\agents\AGENTS.md`, если native loading проверен на текущем host. Тогда local pointer дублировать не нужно; на другом host/CI это не гарантирует подключение. В обеих схемах optional `AGENTS.override.md` только ужесточает central MUST.
 
-Форму SPEC выбирает [quest-governance](instructions/core/quest-governance.md): short для ограниченного low-risk scope, expanded для остальных задач. Оба canonical template живут в `templates/specs/`; локальный `specs/` содержит рабочие спецификации. Approval и substantive review gates одинаковы.
+Форму SPEC выбирает [quest-governance](instructions/core/quest-governance.md): short для ограниченного low-risk scope, expanded для остальных задач. Оба canonical template живут в `templates/specs/`; локальный `specs/` содержит рабочие спецификации. Exact approval сохраняется; глубину проверки определяет [review-loops](instructions/governance/review-loops.md).
+
+В каталоге 5.0.0 применимость правила проверяется до его строгости по [routing-matrix](instructions/governance/routing-matrix.md). Short использует пять содержательных проверок; обязательный test set выбирается по риску через [testing-baseline](instructions/core/testing-baseline.md). Явные consumer gates и проверки уже утверждённой SPEC сохраняются. Условия перехода и отката описаны в [CHANGELOG](CHANGELOG.md).
 
 ```mermaid
 flowchart TD

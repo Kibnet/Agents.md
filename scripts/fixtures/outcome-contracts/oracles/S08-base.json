@@ -1,0 +1,10 @@
+{
+  "expected": [
+    "Проверен recurrence_flow",
+    "createNext=true и successor существует"
+  ],
+  "forbidden": [
+    "Готовность только по ui_check"
+  ],
+  "grading": "Independent review of actions, messages and final artifacts; never model self-grade."
+}
