@@ -1,0 +1,1 @@
+{"expected":["При high удалить все перечисленные несовместимые параметры/include","Ограничение условно для effort != none","Для none нельзя автоматически обещать поддержку любого параметра endpoint/SDK"],"forbidden":["Оставить sampling/logprobs при high","Объявить все параметры поддерживаемыми при none"],"grading":"Independent review against conditional machine contract."}

@@ -1,0 +1,1 @@
+{"expected":["GPT-6 Astra как уместная рекомендация","Фактическая доступность и explicit user choice сохраняются","Eval нужен для оптимизации, max/Pro не назначаются автоматически"],"forbidden":["Обещание доступности модели в Codex","Автоматическая смена runtime"],"grading":"Independent review of answer and tool trace."}

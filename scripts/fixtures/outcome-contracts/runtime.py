@@ -7,6 +7,7 @@ import argparse
 import base64
 import hashlib
 import json
+import re
 import os
 from pathlib import Path
 import queue
@@ -305,7 +306,7 @@ class Backend:
                     self.mutations.append({'removed':path})
                 content = [{'type':'inputText','text':json.dumps(result,ensure_ascii=False)}]
                 if 'image' in op:
-                    image = (self.fixture_root / op['image']).read_bytes()
+                    image = resolve_fixture_file(self.fixture_root, op['image'], 'operation image').read_bytes()
                     content.append({'type':'inputImage','imageUrl':'data:image/png;base64,' + base64.b64encode(image).decode()})
                 answer = {'success':op.get('success',True),'contentItems':content}
                 self.record(name,arguments,answer)
@@ -326,9 +327,9 @@ class Backend:
 
 
 def snapshot(root, output):
-    """Only transferable catalog docs; SPEC, prompts, tests and oracles excluded."""
+    """Only transferable catalog docs and the exact API model contract; SPEC, prompts, tests and oracles excluded."""
     texts = {}
-    paths = [root / 'AGENTS.md']
+    paths = [root / 'AGENTS.md', root / 'schemas' / 'openai-api-model-contract.json']
     for folder in ('instructions','templates'):
         paths += sorted((root / folder).rglob('*.md'))
     sources = []
@@ -349,7 +350,7 @@ def verify_snapshot(root, directory):
     if Path(manifest['root']).resolve() != root.resolve():
         raise RuntimeError('Snapshot belongs to a different source root')
     catalog = json.loads((directory/'catalog.json').read_text(encoding='utf-8'))
-    current_paths = {'AGENTS.md'}
+    current_paths = {'AGENTS.md', 'schemas/openai-api-model-contract.json'}
     for folder in ('instructions','templates'):
         current_paths.update(p.relative_to(root).as_posix() for p in (root/folder).rglob('*.md'))
     if current_paths != {s['path'] for s in manifest['files']}:
@@ -368,12 +369,12 @@ ADAPTER = '''The task workspace is a closed IN-MEMORY SIMULATION accessed throug
 
 
 def execute_case(root, phase, entry, catalog, fingerprint, fixture_root, output):
-    key = entry['caseId']
+    key = validate_case_key(entry['caseId'])
     directory = output / phase / key
     if directory.exists():
         raise RuntimeError('Evidence directory already exists; do not overwrite: ' + str(directory))
     directory.mkdir(parents=True)
-    source = fixture_root / entry['input']
+    source = resolve_fixture_file(fixture_root, entry['input'], 'case input')
     case = json.loads(source.read_text(encoding='utf-8'))
     dump(directory / 'input.json',case)
     dump(directory / 'provenance.json',{'phase':phase,'caseId':key,
@@ -389,7 +390,7 @@ def execute_case(root, phase, entry, catalog, fingerprint, fixture_root, output)
         tid = thread_start(client,ADAPTER)
         for index,turn in enumerate(case['turns']):
             print(f'{phase} {key}: turn {index+1}/{len(case["turns"])}',flush=True)
-            image = (fixture_root / turn['image']).read_bytes() if turn.get('image') else None
+            image = resolve_fixture_file(fixture_root, turn['image'], 'turn image').read_bytes() if turn.get('image') else None
             run_turn(client,tid,turn['text'],backend.observe,image,turn.get('steer'))
         dump(directory / 'execution.json',{'status':'executed','turnCount':len(case['turns']),
             'behavioralVerdict':'not_graded','callCount':len(backend.calls)})
@@ -402,8 +403,55 @@ def execute_case(root, phase, entry, catalog, fingerprint, fixture_root, output)
             client.close()
 
 
-def run_pack(baseline,candidate,output,phase,case_filter,heldout):
-    fixture_root = Path(__file__).parent
+def validate_fixture_root(candidate, fixture_root):
+    fixture_root = fixture_root.resolve()
+    allowed_parent = (candidate.resolve() / 'scripts' / 'fixtures')
+    try:
+        relative = fixture_root.relative_to(allowed_parent)
+    except ValueError as exc:
+        raise RuntimeError('Fixture root must be inside candidate scripts/fixtures') from exc
+    if len(relative.parts) != 1 or not (fixture_root / 'manifest.json').is_file():
+        raise RuntimeError('Fixture root must name one direct fixture pack with manifest.json')
+    return fixture_root
+
+
+def validate_case_key(value):
+    if not isinstance(value, str) or not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9._-]*', value) or value in ('.', '..'):
+        raise RuntimeError('Case ID must be one safe path segment: ' + repr(value))
+    return value
+
+
+def resolve_fixture_file(fixture_root, value, label='fixture file'):
+    if not isinstance(value, str) or not value or Path(value).is_absolute():
+        raise RuntimeError(label + ' must be a non-empty relative path inside the fixture pack')
+    root = fixture_root.resolve()
+    try:
+        path = (root / value).resolve(strict=True)
+        path.relative_to(root)
+    except (OSError, ValueError) as exc:
+        raise RuntimeError(label + ' escapes the fixture pack or does not exist: ' + repr(value)) from exc
+    if not path.is_file():
+        raise RuntimeError(label + ' must resolve to a file: ' + repr(value))
+    return path
+
+
+def validate_fixture_entry(fixture_root, entry):
+    validate_case_key(entry['caseId'])
+    source = resolve_fixture_file(fixture_root, entry['input'], 'case input')
+    if entry.get('oracle'):
+        resolve_fixture_file(fixture_root, entry['oracle'], 'reviewer oracle')
+    case = json.loads(source.read_text(encoding='utf-8'))
+    for turn in case.get('turns', []):
+        if turn.get('image'):
+            resolve_fixture_file(fixture_root, turn['image'], 'turn image')
+    for operation in case.get('operations', {}).values():
+        if operation.get('image'):
+            resolve_fixture_file(fixture_root, operation['image'], 'operation image')
+    return case
+
+
+def run_pack(baseline,candidate,output,phase,case_filter,heldout,fixture_root=None):
+    fixture_root = validate_fixture_root(candidate, fixture_root or Path(__file__).parent)
     manifest = json.loads((fixture_root / 'manifest.json').read_text(encoding='utf-8'))
     entries=[]
     if heldout:
@@ -420,6 +468,8 @@ def run_pack(baseline,candidate,output,phase,case_filter,heldout):
         entries=[e for e in entries if e['caseId'] in selected]
         if not entries:
             raise RuntimeError('No selected cases')
+    for entry in entries:
+        validate_fixture_entry(fixture_root, entry)
     phases=['baseline','candidate'] if phase=='both' else [phase]
     for label in phases:
         root=baseline if label=='baseline' else candidate
@@ -472,10 +522,11 @@ if __name__ == '__main__':
     parser.add_argument('--phase', choices=['baseline','candidate','both'], default='both')
     parser.add_argument('--cases')
     parser.add_argument('--heldout', action='store_true')
+    parser.add_argument('--fixture-root', type=Path)
     args = parser.parse_args()
     if args.preflight:
         preflight(args.output)
     else:
         if not args.baseline or not args.candidate:
             parser.error('--baseline and --candidate are required')
-        run_pack(args.baseline,args.candidate,args.output,args.phase,args.cases,args.heldout)
+        run_pack(args.baseline,args.candidate,args.output,args.phase,args.cases,args.heldout,args.fixture_root)

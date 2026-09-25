@@ -2,6 +2,24 @@
 
 All notable changes to this instruction catalog are documented in this file.
 
+## [5.1.0] - 2026-09-25
+
+### Added
+
+- Machine-readable contracts and negative fixtures for GPT-6 Sol and Luna: efforts, Responses tool endpoint, the Chat Completions `none` exception, conditional sampling/logprobs restrictions, and EU Standard processing.
+- Eleven paired behavioral scenarios for model selection, legacy pins, surface boundaries, API compatibility, initiative, and the QUEST gate. The frozen catalog snapshot now includes the exact OpenAI API model JSON contract.
+
+### Changed
+
+- Astra remains the behavior baseline; workload guidance now distinguishes GPT-6 Astra, Sol, and Luna while preserving explicit GPT-5.6 pins and forbidding an invented GPT-6 Terra/alias.
+- Responses API guidance applies family-level effort and `configuration_update` rules with model-specific exceptions. Cost comparisons use successful-task outcomes rather than token price alone.
+- The existing behavioral runner and provenance audit accept a bounded fixture pack inside the candidate checkout without changing the original suite by default.
+
+### Compatibility / Rollback
+
+- Existing JSON fields, GPT-5.6 metadata, aliases, historical fixtures, and default smoke pack remain compatible. No user model, runtime config, hook, skill, memory, or account setting is changed.
+- Apply the verified allowlisted change set only after active-path drift checks. Roll back only files whose postimage still matches, preserving concurrent edits and previously recorded evidence.
+
 ## [5.0.0] - 2026-09-20
 
 ### Changed

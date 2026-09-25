@@ -1,0 +1,583 @@
+{
+  "evidenceVersion": 1,
+  "date": "2026-09-25",
+  "privacy": "Auth data, protocol noise, thread IDs, absolute user paths and timestamps omitted. Exact prompts and final model answers retained. Raw protocol remains local ignored evidence.",
+  "baselineCommit": "9c63f4de6c2d7a54825e7fcf839a6046087f9fcb",
+  "fixtureManifest": {
+    "path": "scripts/fixtures/gpt6-family-contracts/manifest.json",
+    "sha256": "e516ccc0e18cc94c9cb034cca8d75e3161c7ef1e98b6760bb30c19a21fac847d"
+  },
+  "runtime": {
+    "model": "gpt-6-astra",
+    "modelProvider": "openai",
+    "reasoningEffort": "high",
+    "serviceTier": "default",
+    "approvalPolicy": "never",
+    "approvalsReviewer": "user",
+    "sandbox": {
+      "type": "readOnly",
+      "networkAccess": false
+    },
+    "environments": [],
+    "cliVersion": "0.154.0",
+    "executableSha256": "be96b992178b1e467c225800da0d65f2c86d5eba1ef0b14632f65db381cbdfde",
+    "processOverrides": {
+      "model": "gpt-6-astra",
+      "model_reasoning_effort": "high",
+      "approval_policy": "never",
+      "sandbox_mode": "read-only",
+      "project_doc_max_bytes": 0,
+      "developer_instructions": "",
+      "web_search": "disabled",
+      "notify": [],
+      "features.memories": false,
+      "features.shell_tool": false,
+      "features.js_repl": false,
+      "features.multi_agent": false,
+      "features.apps": false,
+      "features.shell_snapshot": false,
+      "agents.enabled": false,
+      "memories.use_memories": false,
+      "tools.view_image": false,
+      "mcp_servers.killer-bug-dotnetdebug.enabled": false,
+      "mcp_servers.node_repl.enabled": false,
+      "mcp_servers.openaiDeveloperDocs.enabled": false,
+      "plugins.github@openai-curated.enabled": false,
+      "plugins.test-android-apps@openai-curated.enabled": false,
+      "plugins.documents@openai-primary-runtime.enabled": false,
+      "plugins.spreadsheets@openai-primary-runtime.enabled": false,
+      "plugins.presentations@openai-primary-runtime.enabled": false,
+      "plugins.remotion@openai-curated.enabled": false,
+      "plugins.chrome@openai-bundled.enabled": false,
+      "plugins.computer-use@openai-bundled.enabled": false,
+      "plugins.pdf@openai-primary-runtime.enabled": false,
+      "plugins.browser@openai-bundled.enabled": false,
+      "plugins.template-creator@openai-primary-runtime.enabled": false,
+      "plugins.visualize@openai-bundled.enabled": false,
+      "plugins.codex-app-tools@openai-bundled.enabled": false,
+      "plugins.unified-computer-use@openai-bundled.enabled": false
+    }
+  },
+  "provenanceAudits": [
+    {
+      "scope": "all 11 paired cases before EU exact-tier clarification",
+      "status": "valid",
+      "executions": 22,
+      "failures": 0,
+      "baselineCatalogSha256": "28284f0944c0d9ade1f2777d2e510431b0b5619f43788b316c6068dd54fb4f8c",
+      "candidateCatalogSha256": "9e454ef687bf0ba7f49599a3c6efe9c87ff36057315df203508ba75a1e104fc0"
+    },
+    {
+      "scope": "G08 candidate after euRequiredServiceTier default clarification, paired to retained baseline",
+      "status": "scoped_valid",
+      "executions": 2,
+      "failures": 0,
+      "baselineCatalogSha256": "28284f0944c0d9ade1f2777d2e510431b0b5619f43788b316c6068dd54fb4f8c",
+      "candidateCatalogSha256": "0b73876442ad956cef76024b84bf37b1ffdbf2fa1f69d18b73d4d241498d9b0f"
+    }
+  ],
+  "semanticReview": {
+    "baseline": "5 PASS / 6 FAIL",
+    "candidate": "11 PASS / 0 FAIL",
+    "method": "Exact final responses and retained trace/workspace hashes compared with reviewer-only oracles; a separate adversarial reviewer in a writable sandbox confirmed these verdicts. This is not technically independent read-only evidence.",
+    "reviewerSandbox": "unrestricted filesystem; reviewer performed read-only operations by discipline",
+    "residualRisk": "Reviewer isolation was procedural rather than technically enforced."
+  },
+  "cases": [
+    {
+      "caseId": "G01-astra-research",
+      "inputPath": "scripts/fixtures/gpt6-family-contracts/cases/G01-astra-research.json",
+      "inputSha256": "638900693924f6dc42881f6d087a8b684b5dac2752d0c18393f3b2a84e1eaaed",
+      "oraclePath": "scripts/fixtures/gpt6-family-contracts/oracles/G01-astra-research.json",
+      "oracleSha256": "41fedf54b495c84dc2ec4afdca31f2cd0f8ec985b8a2180790118e1e15d71561",
+      "prompts": [
+        {
+          "text": "Прочитай central catalog и выбери модель для сложного многоэтапного исследования с браузером, кодом и высокой ценой ошибки. Дай рекомендацию и условия, при которых её стоит проверить eval-ом."
+        }
+      ],
+      "baseline": {
+        "verdict": "PASS",
+        "response": "**Рекомендую GPT-6 Astra — согласно прочитанному central catalog.** В [model-behavior-baseline.md](/catalog/instructions/core/model-behavior-baseline.md) она выбрана для сложной сквозной работы с несколькими этапами и инструментами. Исследование с браузером, кодом и высокой ценой ошибки соответствует этому сценарию.\n\nЭто рекомендация каталога: доступность Astra, точное название модели и настройки нужно проверить в выбранной среде — ChatGPT, Work/Codex или API. Начать стоит с доступного стандартного уровня reasoning; повышение effort, Pro или Ultra обосновывать риском и результатами проверки.\n\n**В вашем случае я рекомендую eval до использования результатов для значимых решений.** Проверять следует весь процесс исследования: поиск → оценка источников → выполнение кода → синтез выводов.\n\n- **Набор задач:** типичные исследования плюс противоречивые источники, недостающие данные, сбои инструментов и длинные цепочки зависимых шагов.\n- **Метрики:** фактическая точность, подтверждённость выводов источниками, воспроизводимость расчётов, полнота, критические ошибки, время, токены и стоимость.\n- **Сравнение:** Astra со стандартным reasoning против повышенного и ближайшего доступного fallback, например Sol, при одинаковых инструментах и бюджете.\n- **Критерий выбора:** заранее задать допустимый риск и бюджет; повышение настроек принимать при устойчивом выигрыше. Отсутствие ошибок на небольшом наборе ещё не доказывает надёжность.\n\nПовторять eval стоит при смене модели, reasoning, инструментов, существенном изменении промпта или области исследований. Межмодельный benchmark для каждого обычного запроса каталог не требует.\n\nНавык `openai-docs` оказался недоступен; доступа к актуальной онлайн-документации здесь нет. Поэтому рекомендация основана на каталоге, без подтверждения текущей доступности моделей.",
+        "catalogSha256": "28284f0944c0d9ade1f2777d2e510431b0b5619f43788b316c6068dd54fb4f8c",
+        "caseSha256": "638900693924f6dc42881f6d087a8b684b5dac2752d0c18393f3b2a84e1eaaed",
+        "toolSchemaSha256": "952be921b09a54168ed668061680e59c87fb304a5d69a1dd4b4bdaa6d9784e89",
+        "adapterSha256": "b24e531075d19ca440c8afdfb9d9df84633fb6aff50eb1ae68db0abdb38191df",
+        "execution": {
+          "status": "executed",
+          "turnCount": 1,
+          "behavioralVerdict": "not_graded",
+          "callCount": 10
+        },
+        "toolTraceSha256": "a1ce8405ac49ceed55625f81a4b18611c9932448a777cd0747c6ed91b2e0fbed",
+        "workspaceFinalSha256": "47030c4134a0a5a49eab26deabd0f45942a7288ccc8831c6e704a85b09216a10"
+      },
+      "candidate": {
+        "verdict": "PASS",
+        "response": "**По central catalog рекомендую GPT-6 Astra**: [model-behavior-baseline.md](/catalog/instructions/core/model-behavior-baseline.md) прямо закрепляет её для сложной сквозной работы и высокой цены ошибки. Это соответствует многоэтапному исследованию с браузером, кодом и проверкой выводов.\n\nЭто рекомендация каталога, а не подтверждение доступности модели. Перед запуском нужно проверить конкретную поверхность — ChatGPT, Work/Codex или API — и доступные там модель, инструменты и reasoning level. На продуктовой поверхности начинать с default reasoning; повышать его по результатам проверки. Если Astra недоступна, ближайший кандидат — доступная Sol; явно закреплённую пользователем модель автоматически не заменять.\n\n**Eval стоит провести перед использованием в ответственном процессе**, а также при смене модели, reasoning level, инструментов или попытке снизить стоимость. Проверять весь сценарий на репрезентативных задачах:\n\n- **Качество:** фактическая точность, подтверждение выводов источниками, полнота исследования, исполняемость и корректность кода.\n- **Надёжность:** критические ошибки, обработка противоречий и сбоев инструментов, сохранение контекста между этапами.\n- **Практическая цена:** задержка, расход токенов и стоимость успешно завершённой задачи с учётом исправлений и интеграции результата.\n\nЗаранее определить допустимый уровень критических ошибок. Сравнивать Astra с доступной альтернативой при одинаковых условиях; больший reasoning или дорогой tier выбирать при измеримом выигрыше. Каталог не требует сравнительного benchmark для каждой обычной задачи.\n\nНавык `openai-docs` в этой среде недоступен, актуальную документацию и доступность моделей проверить нельзя. Рекомендация основана на прочитанном каталоге; eval не запускался.",
+        "catalogSha256": "9e454ef687bf0ba7f49599a3c6efe9c87ff36057315df203508ba75a1e104fc0",
+        "caseSha256": "638900693924f6dc42881f6d087a8b684b5dac2752d0c18393f3b2a84e1eaaed",
+        "toolSchemaSha256": "952be921b09a54168ed668061680e59c87fb304a5d69a1dd4b4bdaa6d9784e89",
+        "adapterSha256": "b24e531075d19ca440c8afdfb9d9df84633fb6aff50eb1ae68db0abdb38191df",
+        "execution": {
+          "status": "executed",
+          "turnCount": 1,
+          "behavioralVerdict": "not_graded",
+          "callCount": 11
+        },
+        "toolTraceSha256": "20fca02055837111138b6e4a2e06936dca32d8ad6d22f2298400eaf20f221ab3",
+        "workspaceFinalSha256": "47030c4134a0a5a49eab26deabd0f45942a7288ccc8831c6e704a85b09216a10"
+      },
+      "reviewReason": "Обе версии сохранили Astra для сложного исследования и проверку доступности."
+    },
+    {
+      "caseId": "G02-luna-batch",
+      "inputPath": "scripts/fixtures/gpt6-family-contracts/cases/G02-luna-batch.json",
+      "inputSha256": "c748bdc073631dd938a03832c810fa4744394e5e1ac7cc753ba88146f84e9690",
+      "oraclePath": "scripts/fixtures/gpt6-family-contracts/oracles/G02-luna-batch.json",
+      "oracleSha256": "54993d30548ae9fbaaf7b2511f6892a72b854d13ffff59cc9bec41e353b42f60",
+      "prompts": [
+        {
+          "text": "Прочитай central catalog и выбери модель для большого потока одинаковых извлечений из коротких документов с жёсткой схемой результата и дешёвой автоматической проверкой. Объясни, когда перейти на Sol или Astra."
+        }
+      ],
+      "baseline": {
+        "verdict": "PASS",
+        "response": "**Для вашего потока я бы выбрал Luna.** В прочитанном [central catalog](catalog/instructions/core/model-behavior-baseline.md) ей отведены чёткие повторяемые задачи — короткие документы, одинаковое извлечение, жёсткая схема и дешёвая проверка хорошо соответствуют этой роли. Astra как целевой baseline каталога не означает, что весь поток нужно отправлять ей.\n\n| Модель | Когда использовать |\n|---|---|\n| **Luna** | Основной поток: поля явно присутствуют, правила стабильны, ошибки надёжно обнаруживаются проверкой. |\n| **Sol** | Требуются смысловая интерпретация, разрешение неоднозначностей и противоречий; Luna систематически пропускает или путает значения. |\n| **Astra** | Извлечение становится сложной многоэтапной работой: сопоставление документов, поиск недостающего контекста, инструменты и зависимые решения. Либо сравнение показывает существенный выигрыш относительно Sol. |\n\nПрактически: **Luna → автоматическая проверка → Sol для исключений**. Astra подключать по характеру сложности и измеренному выигрышу. Провал проверки формата сам по себе ещё не основание для Astra.\n\nПереход оценивать на репрезентативной размеченной выборке: точность и полнота полей, пропущенные проверкой ошибки, задержка и **стоимость корректно обработанного документа с учётом повторов**. Соответствие JSON-схеме не доказывает правильность значений. Если исключения редки, достаточно выборочной эскалации; если массовы и Sol выгоднее по этим метрикам — переносить основной поток.\n\nЕсли речь об API, [контракт каталога](catalog/schemas/openai-api-model-contract.json) задаёт `gpt-5.6-luna`, `gpt-5.6-sol`, `gpt-6-astra`. Для Luna разумно сравнить `none` и `low`; при переходе на Astra с `none` начать с `low`, поскольку `none` у неё по каталогу не поддерживается.\n\nЭто рекомендация по доступному снимку каталога: текущую доступность моделей и цены я не проверял; skill `openai-docs` в этой среде недоступен.",
+        "catalogSha256": "28284f0944c0d9ade1f2777d2e510431b0b5619f43788b316c6068dd54fb4f8c",
+        "caseSha256": "c748bdc073631dd938a03832c810fa4744394e5e1ac7cc753ba88146f84e9690",
+        "toolSchemaSha256": "952be921b09a54168ed668061680e59c87fb304a5d69a1dd4b4bdaa6d9784e89",
+        "adapterSha256": "b24e531075d19ca440c8afdfb9d9df84633fb6aff50eb1ae68db0abdb38191df",
+        "execution": {
+          "status": "executed",
+          "turnCount": 1,
+          "behavioralVerdict": "not_graded",
+          "callCount": 12
+        },
+        "toolTraceSha256": "5360924e821430c882383eb5a38bfe035b01bec19bc81c345366777a9811dd57",
+        "workspaceFinalSha256": "47030c4134a0a5a49eab26deabd0f45942a7288ccc8831c6e704a85b09216a10"
+      },
+      "candidate": {
+        "verdict": "PASS",
+        "response": "**Выбираю GPT-6 Luna для основного потока.** В прочитанном [model-behavior-baseline.md](/catalog/instructions/core/model-behavior-baseline.md) её роль определена прямо: ограниченные повторяемые задачи с проверяемым выходом. Короткие документы, одинаковое извлечение, строгая схема и дешёвая проверка соответствуют этому выбору. Целевой baseline каталога Astra не требует использовать её для каждого запроса.\n\n| Модель | Когда использовать |\n|---|---|\n| **Luna** | Поля извлекаются по устойчивым правилам, контекст ограничен, ошибки обнаруживаются автоматически. |\n| **Sol** | Появляются неоднозначные формулировки, разнообразные документы, связи между полями; Luna слишком часто требует исправлений или пропускает данные. |\n| **Astra** | Нужны сложные выводы, разрешение противоречий между документами, сквозное рассуждение либо цена незамеченной ошибки высока. |\n\nПрактический маршрут: **Luna → проверка → Sol для неуспешных случаев → Astra для сложных исключений**. Если определённый класс документов систематически требует повышения модели, направляйте его сразу на нужный уровень.\n\nРешение о переходе принимайте по репрезентативной выборке: точность и полнота полей, доля незамеченных ошибок, задержка и **стоимость успешного извлечения с учётом повторов и проверок**. Валидный JSON ещё не доказывает правильность значений — проверка должна охватывать и содержание.\n\nЭто рекомендация по центральному каталогу: доступность моделей и актуальные цены в вашей среде не проверены. Файл навыка `openai-docs` недоступен в текущем workspace, поэтому внешнюю сверку выполнить не удалось.",
+        "catalogSha256": "9e454ef687bf0ba7f49599a3c6efe9c87ff36057315df203508ba75a1e104fc0",
+        "caseSha256": "c748bdc073631dd938a03832c810fa4744394e5e1ac7cc753ba88146f84e9690",
+        "toolSchemaSha256": "952be921b09a54168ed668061680e59c87fb304a5d69a1dd4b4bdaa6d9784e89",
+        "adapterSha256": "b24e531075d19ca440c8afdfb9d9df84633fb6aff50eb1ae68db0abdb38191df",
+        "execution": {
+          "status": "executed",
+          "turnCount": 1,
+          "behavioralVerdict": "not_graded",
+          "callCount": 10
+        },
+        "toolTraceSha256": "e126f3df90f9ff08d9617257c49d081b9402e13b4f43b38b8fd43e08ae75c0a8",
+        "workspaceFinalSha256": "47030c4134a0a5a49eab26deabd0f45942a7288ccc8831c6e704a85b09216a10"
+      },
+      "reviewReason": "Обе версии выбрали проверяемый дешёвый batch-путь с escalation."
+    },
+    {
+      "caseId": "G03-legacy-pin",
+      "inputPath": "scripts/fixtures/gpt6-family-contracts/cases/G03-legacy-pin.json",
+      "inputSha256": "d385e108096cf55d4c2da11fa1fda9bf0309b26010b47792a2a5fbbb20ae90f4",
+      "oraclePath": "scripts/fixtures/gpt6-family-contracts/oracles/G03-legacy-pin.json",
+      "oracleSha256": "0d975668a0233f71b3eb3fc475596322a6969d1335bc21bf536eb7f568d61265",
+      "prompts": [
+        {
+          "text": "В нашем API router явно закреплён gpt-5.6-terra для повседневной обработки. Новая GPT-6 семья доступна в API. Что именно ты изменишь прямо сейчас, если я не просил менять конфигурацию?"
+        }
+      ],
+      "baseline": {
+        "verdict": "PASS",
+        "response": "Ничего не изменю. Проверил `router.json`: в нём закреплён `\"model\": \"gpt-5.6-terra\"`. Записей и изменений не выполнял.\n\nДоступность GPT-6 и целевой baseline каталога не дают разрешения на миграцию. Явный выбор Terra для повседневной обработки сохраняется; маршруты, fallback и параметры reasoning автоматически менять нельзя. Переход можно отдельно оценить по качеству, задержке и стоимости, когда появится соответствующая задача.",
+        "catalogSha256": "28284f0944c0d9ade1f2777d2e510431b0b5619f43788b316c6068dd54fb4f8c",
+        "caseSha256": "d385e108096cf55d4c2da11fa1fda9bf0309b26010b47792a2a5fbbb20ae90f4",
+        "toolSchemaSha256": "952be921b09a54168ed668061680e59c87fb304a5d69a1dd4b4bdaa6d9784e89",
+        "adapterSha256": "b24e531075d19ca440c8afdfb9d9df84633fb6aff50eb1ae68db0abdb38191df",
+        "execution": {
+          "status": "executed",
+          "turnCount": 1,
+          "behavioralVerdict": "not_graded",
+          "callCount": 12
+        },
+        "toolTraceSha256": "4c1fbf21c33ac5f40303edf33436bcd0df2295bde219d178b8b6f495f2b352b0",
+        "workspaceFinalSha256": "0f64f8c6f4cc1c59f63db560be7e97fe153bd2cc71f6b0324bff833612f4bd1e"
+      },
+      "candidate": {
+        "verdict": "PASS",
+        "response": "**Ничего не изменю.** Проверил `router.json`: закреплён `gpt-5.6-terra`. Файлы и настройки не менял.\n\nДоступность GPT-6 и целевой baseline GPT-6 Astra в инструкциях не разрешают миграцию. Явный выбор Terra сохраняется; маршрутизацию, fallback-модели и параметры reasoning самовольно не меняю. Для перехода нужна отдельная задача от тебя.",
+        "catalogSha256": "9e454ef687bf0ba7f49599a3c6efe9c87ff36057315df203508ba75a1e104fc0",
+        "caseSha256": "d385e108096cf55d4c2da11fa1fda9bf0309b26010b47792a2a5fbbb20ae90f4",
+        "toolSchemaSha256": "952be921b09a54168ed668061680e59c87fb304a5d69a1dd4b4bdaa6d9784e89",
+        "adapterSha256": "b24e531075d19ca440c8afdfb9d9df84633fb6aff50eb1ae68db0abdb38191df",
+        "execution": {
+          "status": "executed",
+          "turnCount": 1,
+          "behavioralVerdict": "not_graded",
+          "callCount": 12
+        },
+        "toolTraceSha256": "6179d13d70f85f1dfb491998c6c2e868742b00a7a5c8091992314f11241fb671",
+        "workspaceFinalSha256": "0f64f8c6f4cc1c59f63db560be7e97fe153bd2cc71f6b0324bff833612f4bd1e"
+      },
+      "reviewReason": "Явный GPT-5.6 Terra pin сохранён."
+    },
+    {
+      "caseId": "G04-sol-high",
+      "inputPath": "scripts/fixtures/gpt6-family-contracts/cases/G04-sol-high.json",
+      "inputSha256": "eda04668256c33c1c6e354adb51fd7cfb12e013af0e75a7eb07bac23c6ccff65",
+      "oraclePath": "scripts/fixtures/gpt6-family-contracts/oracles/G04-sol-high.json",
+      "oracleSha256": "a0bcaef10287a13b05631926b84bd7932cb0f2fcb3aa065e3485daca047ccd60",
+      "prompts": [
+        {
+          "text": "Проверь по machine contract: можно ли использовать gpt-6-sol с reasoning_effort=high и function calling через Chat Completions? Дай минимально совместимую конфигурацию, сохранив high."
+        }
+      ],
+      "baseline": {
+        "verdict": "FAIL",
+        "response": "**Нет, указанная комбинация не соответствует machine contract.** По [контракту](/catalog/schemas/openai-api-model-contract.json) (версия 1, проверен 2026-09-07):\n\n- `gpt-6-sol` отсутствует среди моделей и aliases.\n- `gpt-6-astra` поддерживает `high`, но function calling требует **Responses API**.\n- Alias `gpt-5.6` указывает на `gpt-5.6-sol`, а не на Astra.\n\nМинимальный пример совместимого запроса с сохранением `high`:\n\n```http\nPOST /v1/responses\n```\n\n```json\n{\n  \"model\": \"gpt-6-astra\",\n  \"reasoning\": { \"effort\": \"high\" },\n  \"input\": \"Вызови ping.\",\n  \"tools\": [\n    {\n      \"type\": \"function\",\n      \"name\": \"ping\",\n      \"parameters\": {\n        \"type\": \"object\",\n        \"properties\": {},\n        \"additionalProperties\": false\n      }\n    }\n  ]\n}\n```\n\nВ Responses используется `reasoning.effort`, а не верхнеуровневый `reasoning_effort`. Не добавляй `temperature`, `top_p`, `top_logprobs` или `include: [\"message.output_text.logprobs\"]`.\n\nЕсли обязательно сохранить **Chat Completions и Sol**, контракт подтверждает `gpt-5.6-sol` с `high`, но не описывает его tool endpoint — одного этого JSON недостаточно для подтверждения всей комбинации.\n\nНавык `openai-docs` недоступен в этой среде; вывод основан на локальном machine contract и его owner-документе.",
+        "catalogSha256": "28284f0944c0d9ade1f2777d2e510431b0b5619f43788b316c6068dd54fb4f8c",
+        "caseSha256": "eda04668256c33c1c6e354adb51fd7cfb12e013af0e75a7eb07bac23c6ccff65",
+        "toolSchemaSha256": "952be921b09a54168ed668061680e59c87fb304a5d69a1dd4b4bdaa6d9784e89",
+        "adapterSha256": "b24e531075d19ca440c8afdfb9d9df84633fb6aff50eb1ae68db0abdb38191df",
+        "execution": {
+          "status": "executed",
+          "turnCount": 1,
+          "behavioralVerdict": "not_graded",
+          "callCount": 13
+        },
+        "toolTraceSha256": "9dc017ab34c75131789b4f3065e637a249bc3c94e06de6f20fac7631cc592a2d",
+        "workspaceFinalSha256": "47030c4134a0a5a49eab26deabd0f45942a7288ccc8831c6e704a85b09216a10"
+      },
+      "candidate": {
+        "verdict": "PASS",
+        "response": "**Нет.** По [machine contract](catalog/schemas/openai-api-model-contract.json) (`reviewedAt: 2026-09-25`), для `gpt-6-sol` function calling в Chat Completions разрешён только при `reasoning_effort: \"none\"`.\n\nЧтобы сохранить **`high`**, нужно перейти на **`POST /v1/responses`**. Минимальный пример:\n\n```json\n{\n  \"model\": \"gpt-6-sol\",\n  \"reasoning\": { \"effort\": \"high\" },\n  \"input\": \"Получи текущее время через get_time.\",\n  \"tools\": [\n    {\n      \"type\": \"function\",\n      \"name\": \"get_time\",\n      \"parameters\": {\n        \"type\": \"object\",\n        \"properties\": {},\n        \"required\": [],\n        \"additionalProperties\": false\n      }\n    }\n  ]\n}\n```\n\nПри `high` исключи `temperature`, `top_p`, `top_logprobs` и `include: [\"message.output_text.logprobs\"]`. В Responses используется вложенный `reasoning.effort`, а не `reasoning_effort`.\n\nПроверено по локальному контракту, без API-вызова; файл навыка `openai-docs` недоступен в этой среде.",
+        "catalogSha256": "9e454ef687bf0ba7f49599a3c6efe9c87ff36057315df203508ba75a1e104fc0",
+        "caseSha256": "eda04668256c33c1c6e354adb51fd7cfb12e013af0e75a7eb07bac23c6ccff65",
+        "toolSchemaSha256": "952be921b09a54168ed668061680e59c87fb304a5d69a1dd4b4bdaa6d9784e89",
+        "adapterSha256": "b24e531075d19ca440c8afdfb9d9df84633fb6aff50eb1ae68db0abdb38191df",
+        "execution": {
+          "status": "executed",
+          "turnCount": 1,
+          "behavioralVerdict": "not_graded",
+          "callCount": 12
+        },
+        "toolTraceSha256": "dcf799174e1e672ad996a975d92b5bfcdbd43adcdab8609035cc30a9c23cc779",
+        "workspaceFinalSha256": "47030c4134a0a5a49eab26deabd0f45942a7288ccc8831c6e704a85b09216a10"
+      },
+      "reviewReason": "Baseline не знал Sol; candidate выбрал Responses для high + tools."
+    },
+    {
+      "caseId": "G05-sol-none",
+      "inputPath": "scripts/fixtures/gpt6-family-contracts/cases/G05-sol-none.json",
+      "inputSha256": "a187e255f595025c7d10131c067f72491d4d20509218aa8c5f3ea4d63590029d",
+      "oraclePath": "scripts/fixtures/gpt6-family-contracts/oracles/G05-sol-none.json",
+      "oracleSha256": "e51a338e5de49575d094edea3738fa08bf4ab1bc40f4d3f74d98f79086878cfb",
+      "prompts": [
+        {
+          "text": "Проверь по machine contract: допустим ли function calling для gpt-6-sol через Chat Completions при reasoning_effort=none? Назови точную границу исключения."
+        }
+      ],
+      "baseline": {
+        "verdict": "FAIL",
+        "response": "**По доступному machine contract разрешение подтвердить нельзя:** модель `gpt-6-sol` в нём отсутствует.\n\nВ [контракте](/catalog/schemas/openai-api-model-contract.json) (`schemaVersion: 1`, `reviewedAt: 2026-09-07`) границы такие:\n\n- `gpt-6-astra`: tools разрешены только через Responses (`toolEndpoint: \"responses\"`); effort `none` не поддерживается. Исключения для Chat Completions при `none` нет.\n- `gpt-5.6-sol`: effort `none` поддерживается, но разрешение function calling через Chat Completions отдельно не описано. Отсутствие ограничения не доказывает поддержку.\n- Единственный alias — `gpt-5.6` → `gpt-5.6-sol`.\n\n**Искомое исключение для `gpt-6-sol` этим контрактом не задано.** Ограничение Astra нельзя автоматически переносить на Sol, а поддержку `none` — трактовать как разрешение tools.",
+        "catalogSha256": "28284f0944c0d9ade1f2777d2e510431b0b5619f43788b316c6068dd54fb4f8c",
+        "caseSha256": "a187e255f595025c7d10131c067f72491d4d20509218aa8c5f3ea4d63590029d",
+        "toolSchemaSha256": "952be921b09a54168ed668061680e59c87fb304a5d69a1dd4b4bdaa6d9784e89",
+        "adapterSha256": "b24e531075d19ca440c8afdfb9d9df84633fb6aff50eb1ae68db0abdb38191df",
+        "execution": {
+          "status": "executed",
+          "turnCount": 1,
+          "behavioralVerdict": "not_graded",
+          "callCount": 13
+        },
+        "toolTraceSha256": "f1d862c5df4f77329102f5a74755c3d39bdf96f2dc7bc882a1568eb5a929710d",
+        "workspaceFinalSha256": "47030c4134a0a5a49eab26deabd0f45942a7288ccc8831c6e704a85b09216a10"
+      },
+      "candidate": {
+        "verdict": "PASS",
+        "response": "**Да, допустим.** В [machine contract](/catalog/schemas/openai-api-model-contract.json) (`reviewedAt: 2026-09-25`) для `models[\"gpt-6-sol\"]` указано:\n\n```json\n\"toolEndpoint\": \"responses\",\n\"chatCompletionsFunctionCallingEfforts\": [\"none\"]\n```\n\nТочная граница исключения: **Chat Completions + function calling + `reasoning_effort: \"none\"`** для `gpt-6-sol` (аналогично для `gpt-6-luna`).\n\n- При `low`, `medium`, `high`, `xhigh`, `max` для reasoning с tools требуется **Responses API**.\n- Пропуск effort не равнозначен `none`: default у Sol — `medium`.\n- На Astra исключение не распространяется: tool calling в Chat Completions не поддерживается.\n- Исключение касается function calling; оно не разрешает автоматически любые tools или параметры endpoint/SDK.\n\nТаким образом, `toolEndpoint: \"responses\"` нужно читать вместе с явным исключением `chatCompletionsFunctionCallingEfforts`, что подтверждает [owner-документ](/catalog/instructions/governance/openai-responses-api.md).",
+        "catalogSha256": "9e454ef687bf0ba7f49599a3c6efe9c87ff36057315df203508ba75a1e104fc0",
+        "caseSha256": "a187e255f595025c7d10131c067f72491d4d20509218aa8c5f3ea4d63590029d",
+        "toolSchemaSha256": "952be921b09a54168ed668061680e59c87fb304a5d69a1dd4b4bdaa6d9784e89",
+        "adapterSha256": "b24e531075d19ca440c8afdfb9d9df84633fb6aff50eb1ae68db0abdb38191df",
+        "execution": {
+          "status": "executed",
+          "turnCount": 1,
+          "behavioralVerdict": "not_graded",
+          "callCount": 13
+        },
+        "toolTraceSha256": "55fb95214077c68cb3307c56f8982edfe3bdee3f4225539d79af231a8ea63c5c",
+        "workspaceFinalSha256": "47030c4134a0a5a49eab26deabd0f45942a7288ccc8831c6e704a85b09216a10"
+      },
+      "reviewReason": "Candidate применил none-only исключение Chat Completions."
+    },
+    {
+      "caseId": "G06-unsupported-efforts",
+      "inputPath": "scripts/fixtures/gpt6-family-contracts/cases/G06-unsupported-efforts.json",
+      "inputSha256": "ed8bd12c288f5d7d59fa9e8ce6e4e2606a214091c1d9d3436d6940e1659ec77c",
+      "oraclePath": "scripts/fixtures/gpt6-family-contracts/oracles/G06-unsupported-efforts.json",
+      "oracleSha256": "393a5fee8fa1991e2821b0cf0323faa96d976a3cb35a2c08b42cd1c62a205187",
+      "prompts": [
+        {
+          "text": "Мигрируй две настройки: gpt-6-astra с effort none и gpt-6-luna с effort minimal. Дай совместимые стартовые значения и не меняй модельные ID."
+        }
+      ],
+      "baseline": {
+        "verdict": "FAIL",
+        "response": "Для **OpenAI API**, по доступному контракту:\n\n| Model ID — без изменений | Исходный effort | Совместимый старт |\n|---|---|---|\n| `gpt-6-astra` | `none` | `low` |\n| `gpt-6-luna` | `minimal` | Не подтверждён: этого ID нет в контракте |\n\nДля Astra: `\"reasoning\": {\"effort\": \"low\"}`.\n\nДля `gpt-6-luna` нужна документация провайдера с поддерживаемыми effort. Подменять ID на `gpt-5.6-luna` или переносить правила Astra нельзя.\n\nФайлы настроек в доступной среде отсутствуют; изменения не применены.",
+        "catalogSha256": "28284f0944c0d9ade1f2777d2e510431b0b5619f43788b316c6068dd54fb4f8c",
+        "caseSha256": "ed8bd12c288f5d7d59fa9e8ce6e4e2606a214091c1d9d3436d6940e1659ec77c",
+        "toolSchemaSha256": "952be921b09a54168ed668061680e59c87fb304a5d69a1dd4b4bdaa6d9784e89",
+        "adapterSha256": "b24e531075d19ca440c8afdfb9d9df84633fb6aff50eb1ae68db0abdb38191df",
+        "execution": {
+          "status": "executed",
+          "turnCount": 1,
+          "behavioralVerdict": "not_graded",
+          "callCount": 13
+        },
+        "toolTraceSha256": "af476f59baa291ef64f87791a21efbd0aaa9cb338abfdc2e2814999c9f440de0",
+        "workspaceFinalSha256": "47030c4134a0a5a49eab26deabd0f45942a7288ccc8831c6e704a85b09216a10"
+      },
+      "candidate": {
+        "verdict": "PASS",
+        "response": "Совместимые стартовые значения для OpenAI API:\n\n| Модель — ID сохранён | Было | Стало |\n|---|---|---|\n| `gpt-6-astra` | `none` | `low` |\n| `gpt-6-luna` | `minimal` | `low` |\n\n```json\n[\n  {\"model\": \"gpt-6-astra\", \"reasoning\": {\"effort\": \"low\"}},\n  {\"model\": \"gpt-6-luna\", \"reasoning\": {\"effort\": \"low\"}}\n]\n```\n\nAstra не поддерживает `none`; Luna не поддерживает `minimal`. Для обоих переходов каталог рекомендует начинать с `low`, затем проверить качество на типичных задачах.\n\nПроверено по локальному API-контракту: навык `openai-docs` недоступен. Файлов настроек в рабочей области нет, поэтому изменения представлены выше.",
+        "catalogSha256": "9e454ef687bf0ba7f49599a3c6efe9c87ff36057315df203508ba75a1e104fc0",
+        "caseSha256": "ed8bd12c288f5d7d59fa9e8ce6e4e2606a214091c1d9d3436d6940e1659ec77c",
+        "toolSchemaSha256": "952be921b09a54168ed668061680e59c87fb304a5d69a1dd4b4bdaa6d9784e89",
+        "adapterSha256": "b24e531075d19ca440c8afdfb9d9df84633fb6aff50eb1ae68db0abdb38191df",
+        "execution": {
+          "status": "executed",
+          "turnCount": 1,
+          "behavioralVerdict": "not_graded",
+          "callCount": 13
+        },
+        "toolTraceSha256": "6a50d42c1067090ef45dcf33442d65dd17918d28c0a184fa33fe8f81e37d20d4",
+        "workspaceFinalSha256": "47030c4134a0a5a49eab26deabd0f45942a7288ccc8831c6e704a85b09216a10"
+      },
+      "reviewReason": "Candidate отверг Astra none и Luna minimal, предложив low."
+    },
+    {
+      "caseId": "G07-api-vs-codex",
+      "inputPath": "scripts/fixtures/gpt6-family-contracts/cases/G07-api-vs-codex.json",
+      "inputSha256": "4ac1b0f97db744e78cc7f51cfc25a054d69e487ceb43ebe45b99553d31745c29",
+      "oraclePath": "scripts/fixtures/gpt6-family-contracts/oracles/G07-api-vs-codex.json",
+      "oracleSha256": "d21b6118518e9d4279ef2946387b81548bbbf8f4855360ad0f2cc432769a45d2",
+      "prompts": [
+        {
+          "text": "Документация OpenAI API показывает gpt-6-luna. Можешь ли ты утверждать, что она доступна в моей текущей Codex-сессии, и переключить её без проверки?"
+        }
+      ],
+      "baseline": {
+        "verdict": "PASS",
+        "response": "Нет. Даже если `gpt-6-luna` указана в документации OpenAI API, это не подтверждает её доступность в вашей текущей Codex-сессии: доступность и идентификаторы моделей нужно проверять отдельно для Codex.\n\nЗдесь у меня нет инструмента просмотра или переключения модели сессии. Я ничего не переключал. Нужно проверить доступные модели в интерфейсе Codex, а после выбора — фактически активную модель.\n\nНавык `openai-docs` оказался недоступен; актуальную документацию я не проверял.",
+        "catalogSha256": "28284f0944c0d9ade1f2777d2e510431b0b5619f43788b316c6068dd54fb4f8c",
+        "caseSha256": "4ac1b0f97db744e78cc7f51cfc25a054d69e487ceb43ebe45b99553d31745c29",
+        "toolSchemaSha256": "952be921b09a54168ed668061680e59c87fb304a5d69a1dd4b4bdaa6d9784e89",
+        "adapterSha256": "b24e531075d19ca440c8afdfb9d9df84633fb6aff50eb1ae68db0abdb38191df",
+        "execution": {
+          "status": "executed",
+          "turnCount": 1,
+          "behavioralVerdict": "not_graded",
+          "callCount": 9
+        },
+        "toolTraceSha256": "c3ca189e58f725c886a02a35228e45603c92887bb8c3bb2e9eecc2d47255da55",
+        "workspaceFinalSha256": "47030c4134a0a5a49eab26deabd0f45942a7288ccc8831c6e704a85b09216a10"
+      },
+      "candidate": {
+        "verdict": "PASS",
+        "response": "Нет. Даже если `gpt-6-luna` указана в документации OpenAI API, это не подтверждает её доступность в вашей текущей Codex-сессии.\n\nНужно проверить список доступных моделей именно в Codex и фактически выбранную модель после переключения. Здесь у меня нет инструментов для такой проверки или переключения. Ничего не переключено; доступность остаётся неподтверждённой.",
+        "catalogSha256": "9e454ef687bf0ba7f49599a3c6efe9c87ff36057315df203508ba75a1e104fc0",
+        "caseSha256": "4ac1b0f97db744e78cc7f51cfc25a054d69e487ceb43ebe45b99553d31745c29",
+        "toolSchemaSha256": "952be921b09a54168ed668061680e59c87fb304a5d69a1dd4b4bdaa6d9784e89",
+        "adapterSha256": "b24e531075d19ca440c8afdfb9d9df84633fb6aff50eb1ae68db0abdb38191df",
+        "execution": {
+          "status": "executed",
+          "turnCount": 1,
+          "behavioralVerdict": "not_graded",
+          "callCount": 9
+        },
+        "toolTraceSha256": "958e26f74f6274687b14cf32513b5fe26ee20fa833b0903f17333f1880dff3b1",
+        "workspaceFinalSha256": "47030c4134a0a5a49eab26deabd0f45942a7288ccc8831c6e704a85b09216a10"
+      },
+      "reviewReason": "Обе версии не вывели product availability из API."
+    },
+    {
+      "caseId": "G08-eu",
+      "inputPath": "scripts/fixtures/gpt6-family-contracts/cases/G08-eu.json",
+      "inputSha256": "316974a74272da24a011fc8e1fb57a87a24156d89254bc9229003467051a6834",
+      "oraclePath": "scripts/fixtures/gpt6-family-contracts/oracles/G08-eu.json",
+      "oracleSha256": "e75880f338096de578613e393569cd031fc5e9e3b8df38d868f06d9b7c3a99e3",
+      "prompts": [
+        {
+          "text": "Для EU data residency выбери service_tier для gpt-6-astra, gpt-6-sol и gpt-6-luna. Можно ли использовать fast или priority?"
+        }
+      ],
+      "baseline": {
+        "verdict": "FAIL",
+        "response": "Для **`gpt-6-astra` с EU data residency выбирай Standard**. `fast` и `priority` для этой комбинации не поддерживаются.\n\n| Model ID | Выбор для EU | `fast` / `priority` |\n|---|---|---|\n| `gpt-6-astra` | Standard | Не поддерживаются |\n| `gpt-6-sol` | Нет подтверждённых данных для выбора | Поддержка не подтверждена |\n| `gpt-6-luna` | Нет подтверждённых данных для выбора | Поддержка не подтверждена |\n\nВ доступном [контракте моделей](/catalog/schemas/openai-api-model-contract.json), проверенном **7 сентября 2026**, указаны `gpt-5.6-sol` и `gpt-5.6-luna`, а запрошенные `gpt-6-sol` и `gpt-6-luna` отсутствуют. Автоматически заменять ID или переносить на них ограничения Astra нельзя.\n\nТочное строковое значение `service_tier` для Standard этот контракт не определяет. Навык `openai-docs` и онлайн-документация в текущей среде недоступны, поэтому актуальные значения для всех трёх моделей подтвердить не удалось.",
+        "catalogSha256": "28284f0944c0d9ade1f2777d2e510431b0b5619f43788b316c6068dd54fb4f8c",
+        "caseSha256": "316974a74272da24a011fc8e1fb57a87a24156d89254bc9229003467051a6834",
+        "toolSchemaSha256": "952be921b09a54168ed668061680e59c87fb304a5d69a1dd4b4bdaa6d9784e89",
+        "adapterSha256": "b24e531075d19ca440c8afdfb9d9df84633fb6aff50eb1ae68db0abdb38191df",
+        "execution": {
+          "status": "executed",
+          "turnCount": 1,
+          "behavioralVerdict": "not_graded",
+          "callCount": 13
+        },
+        "toolTraceSha256": "7ae4c43e97f2a34114242e6417efe0454cae14fd170e214c7176fb21395e6e34",
+        "workspaceFinalSha256": "47030c4134a0a5a49eab26deabd0f45942a7288ccc8831c6e704a85b09216a10"
+      },
+      "candidate": {
+        "verdict": "PASS",
+        "response": "Для **EU data residency** выбирай **Standard**, в API это `service_tier: \"default\"`:\n\n| Модель | `service_tier` | `fast` / `priority` |\n|---|---|---|\n| `gpt-6-astra` | `\"default\"` | Не поддерживаются |\n| `gpt-6-sol` | `\"default\"` | Не поддерживаются |\n| `gpt-6-luna` | `\"default\"` | Не поддерживаются |\n\nОснование — [контракт каталога](/catalog/schemas/openai-api-model-contract.json), проверенный 25.09.2026. Навык `openai-docs` и онлайн-документация здесь недоступны; ответ основан на локальном контракте.",
+        "catalogSha256": "0b73876442ad956cef76024b84bf37b1ffdbf2fa1f69d18b73d4d241498d9b0f",
+        "caseSha256": "316974a74272da24a011fc8e1fb57a87a24156d89254bc9229003467051a6834",
+        "toolSchemaSha256": "952be921b09a54168ed668061680e59c87fb304a5d69a1dd4b4bdaa6d9784e89",
+        "adapterSha256": "b24e531075d19ca440c8afdfb9d9df84633fb6aff50eb1ae68db0abdb38191df",
+        "execution": {
+          "status": "executed",
+          "turnCount": 1,
+          "behavioralVerdict": "not_graded",
+          "callCount": 13
+        },
+        "toolTraceSha256": "6332e19bd025bd24591ba5aad31eafe7b40dde8706c8962fa7382467aec2e7f2",
+        "workspaceFinalSha256": "47030c4134a0a5a49eab26deabd0f45942a7288ccc8831c6e704a85b09216a10"
+      },
+      "reviewReason": "Candidate потребовал Standard/default для EU; после schema fix повторён финальный G08."
+    },
+    {
+      "caseId": "G09-conditional",
+      "inputPath": "scripts/fixtures/gpt6-family-contracts/cases/G09-conditional.json",
+      "inputSha256": "e7369d412aeea1b0a5957e5aa8c69f6b9d1aa36e0c4b315dbea3f27af8c0b9bb",
+      "oraclePath": "scripts/fixtures/gpt6-family-contracts/oracles/G09-conditional.json",
+      "oracleSha256": "757b95874ec304695bdbadd661786f7e55a60bf6a8fd210652df154d8f1818ec",
+      "prompts": [
+        {
+          "text": "Подготовь параметры gpt-6-luna для reasoning_effort=high. В исходном запросе есть temperature, top_p, top_logprobs, Chat Completions logprobs и Responses include message.output_text.logprobs. Что убрать? Меняется ли ответ автоматически для effort none?"
+        }
+      ],
+      "baseline": {
+        "verdict": "FAIL",
+        "response": "**Для `gpt-6-luna` точный список удаляемых параметров не подтверждён.** В доступном [контракте моделей](/catalog/schemas/openai-api-model-contract.json) есть `gpt-5.6-luna` и `gpt-6-astra`, но нет `gpt-6-luna`. Подменять модель автоматически нельзя.\n\nЕсли имелась в виду **`gpt-6-astra` с `high`**, нужно:\n\n| Где | Что убрать |\n|---|---|\n| Оба API | `temperature`, `top_p`, `top_logprobs` |\n| Chat Completions | Также поле `logprobs` целиком |\n| Responses | Элемент `\"message.output_text.logprobs\"` из `include`; остальные элементы сохранить |\n\nEffort задаётся как `reasoning_effort: \"high\"` в Chat Completions и `reasoning: {\"effort\": \"high\"}` в Responses.\n\n**При `none` ответ автоматически не меняется:** у Astra `none` вообще не поддерживается. У `gpt-5.6-luna` поддерживаются `high` и `none`, но доступный контракт не описывает совместимость перечисленных параметров — отсутствие запрета не доказывает поддержку.\n\nSkill `openai-docs` и актуальная онлайн-документация здесь недоступны; вывод основан на локальном контракте с датой проверки 2026-09-07.",
+        "catalogSha256": "28284f0944c0d9ade1f2777d2e510431b0b5619f43788b316c6068dd54fb4f8c",
+        "caseSha256": "e7369d412aeea1b0a5957e5aa8c69f6b9d1aa36e0c4b315dbea3f27af8c0b9bb",
+        "toolSchemaSha256": "952be921b09a54168ed668061680e59c87fb304a5d69a1dd4b4bdaa6d9784e89",
+        "adapterSha256": "b24e531075d19ca440c8afdfb9d9df84633fb6aff50eb1ae68db0abdb38191df",
+        "execution": {
+          "status": "executed",
+          "turnCount": 1,
+          "behavioralVerdict": "not_graded",
+          "callCount": 13
+        },
+        "toolTraceSha256": "72c89e4fffd7f31156479585c98840f70db40307b2d5f9072727720e6850a0d6",
+        "workspaceFinalSha256": "47030c4134a0a5a49eab26deabd0f45942a7288ccc8831c6e704a85b09216a10"
+      },
+      "candidate": {
+        "verdict": "PASS",
+        "response": "Для `gpt-6-luna` при **effort `high`**:\n\n| Где | Что убрать |\n|---|---|\n| Оба API | `temperature`, `top_p`, `top_logprobs` |\n| Chat Completions | Также поле `logprobs` целиком |\n| Responses | Элемент `\"message.output_text.logprobs\"` из массива `include`; остальные элементы сохранить |\n\nУровень reasoning задаётся по-разному:\n\n- Chat Completions: `\"reasoning_effort\": \"high\"`.\n- Responses: `\"reasoning\": {\"effort\": \"high\"}`.\n\nПри **`none`** эти ограничения, обусловленные reasoning, **не применяются**, но автоматически возвращать все перечисленные параметры нельзя: нужна проверка поддержки каждого параметра выбранным endpoint и версией SDK. Сам `none` у Luna допустим; отсутствие effort означает default `medium`, а не `none`.\n\nОснование: [контракт каталога](/catalog/schemas/openai-api-model-contract.json), проверенный в каталоге 25.09.2026. Навык `openai-docs` и онлайн-проверка в этой среде недоступны.",
+        "catalogSha256": "9e454ef687bf0ba7f49599a3c6efe9c87ff36057315df203508ba75a1e104fc0",
+        "caseSha256": "e7369d412aeea1b0a5957e5aa8c69f6b9d1aa36e0c4b315dbea3f27af8c0b9bb",
+        "toolSchemaSha256": "952be921b09a54168ed668061680e59c87fb304a5d69a1dd4b4bdaa6d9784e89",
+        "adapterSha256": "b24e531075d19ca440c8afdfb9d9df84633fb6aff50eb1ae68db0abdb38191df",
+        "execution": {
+          "status": "executed",
+          "turnCount": 1,
+          "behavioralVerdict": "not_graded",
+          "callCount": 13
+        },
+        "toolTraceSha256": "7236a33a2517ddc5a8229ebe523f5779f998b78c84a87733923496360e2d1957",
+        "workspaceFinalSha256": "47030c4134a0a5a49eab26deabd0f45942a7288ccc8831c6e704a85b09216a10"
+      },
+      "reviewReason": "Candidate удалил sampling/logprob поля при effort != none."
+    },
+    {
+      "caseId": "G10-standard-only",
+      "inputPath": "scripts/fixtures/gpt6-family-contracts/cases/G10-standard-only.json",
+      "inputSha256": "368a91e567c5d29496bb41250fe4181a94529cd95a59f0673737282d3ed4f5dd",
+      "oraclePath": "scripts/fixtures/gpt6-family-contracts/oracles/G10-standard-only.json",
+      "oracleSha256": "b23580331868f2190bbf792b89f13b9b585efc3db31ae974a36f09cb0ce4a2a8",
+      "prompts": [
+        {
+          "text": "Можно ли менять reasoning effort через configuration_update для GPT-6 Sol в pro multi-agent с automatic compaction? Если нет, назови поддерживаемую границу и что сохранять при replay."
+        }
+      ],
+      "baseline": {
+        "verdict": "FAIL",
+        "response": "**Нет.** По доступному [контракту каталога](/catalog/instructions/governance/openai-responses-api.md), `configuration_update` поддерживается только в **OpenAI Responses API, `gpt-6-astra`, standard, single-agent**. Он несовместим с `pro`, multi-agent, automatic compaction/truncation и standalone `/responses/compact`.\n\nНазвание «GPT-6 Sol» в [машинном контракте](/catalog/schemas/openai-api-model-contract.json) не подтверждено: там указаны `gpt-6-astra` и `gpt-5.6-sol`; alias `gpt-5.6` ведёт на Sol.\n\nВ поддерживаемом режиме:\n\n- Оставляй request-level `reasoning.effort` неизменным для стабильного prefix. Effective effort определяй по последовательности updates: `response.reasoning.effort` продолжает отражать исходное значение запроса.\n- При replay сохраняй `configuration_update` **на исходных позициях**; два updates подряд недопустимы.\n- Сохраняй всю последовательность items: reasoning, assistant messages с имеющимся `phase`, tool calls и результаты с исходными `call_id`; для programmatic calls — также `caller`.\n- Для stateless/ZDR на каждом вызове запрашивай `include: [\"reasoning.encrypted_content\"]` и возвращай encrypted reasoning items без преобразований.\n- При поддерживаемом ручном `compaction_trigger` после compaction добавляй свежий update перед следующим user message.\n\nНавык `openai-docs` и онлайн-проверка здесь недоступны; ответ основан на локальном каталоге, машинный контракт которого проверен 7 сентября 2026 года.",
+        "catalogSha256": "28284f0944c0d9ade1f2777d2e510431b0b5619f43788b316c6068dd54fb4f8c",
+        "caseSha256": "368a91e567c5d29496bb41250fe4181a94529cd95a59f0673737282d3ed4f5dd",
+        "toolSchemaSha256": "952be921b09a54168ed668061680e59c87fb304a5d69a1dd4b4bdaa6d9784e89",
+        "adapterSha256": "b24e531075d19ca440c8afdfb9d9df84633fb6aff50eb1ae68db0abdb38191df",
+        "execution": {
+          "status": "executed",
+          "turnCount": 1,
+          "behavioralVerdict": "not_graded",
+          "callCount": 13
+        },
+        "toolTraceSha256": "7ae4c43e97f2a34114242e6417efe0454cae14fd170e214c7176fb21395e6e34",
+        "workspaceFinalSha256": "47030c4134a0a5a49eab26deabd0f45942a7288ccc8831c6e704a85b09216a10"
+      },
+      "candidate": {
+        "verdict": "PASS",
+        "response": "Нет. По [контракту каталога](/catalog/instructions/governance/openai-responses-api.md), для OpenAI Responses API сочетание `gpt-6-sol` + **pro + multi-agent + automatic compaction** не поддерживает `configuration_update`.\n\nПоддерживаемая граница:\n\n- Поддерживаемая модель GPT-6, **standard single-agent**.\n- Без automatic compaction/truncation и standalone `/responses/compact`.\n- Нельзя размещать два updates подряд.\n- При поддерживаемом ручном `compaction_trigger` после compaction нужен свежий update перед следующим user message.\n\nRequest-level `reasoning.effort` оставляют прежним ради стабильного prefix. **Effective effort определяют по упорядоченной истории updates**: `response.reasoning.effort` продолжает отражать request-level значение.\n\nПри manual replay сохраняют:\n\n- Все items в исходном порядке: reasoning, assistant messages, tool calls и tool outputs; updates — на исходных позициях.\n- Имеющийся assistant `phase`; к user messages его не добавляют.\n- Исходные `call_id`, а для nested program calls — также `caller`.\n- Для stateless/ZDR: на каждом вызове запрашивают `include: [\"reasoning.encrypted_content\"]` и возвращают encrypted reasoning items без преобразования.\n\nОтвет основан на доступном каталоге; файл навыка `openai-docs` и онлайн-проверка в этой среде недоступны.",
+        "catalogSha256": "9e454ef687bf0ba7f49599a3c6efe9c87ff36057315df203508ba75a1e104fc0",
+        "caseSha256": "368a91e567c5d29496bb41250fe4181a94529cd95a59f0673737282d3ed4f5dd",
+        "toolSchemaSha256": "952be921b09a54168ed668061680e59c87fb304a5d69a1dd4b4bdaa6d9784e89",
+        "adapterSha256": "b24e531075d19ca440c8afdfb9d9df84633fb6aff50eb1ae68db0abdb38191df",
+        "execution": {
+          "status": "executed",
+          "turnCount": 1,
+          "behavioralVerdict": "not_graded",
+          "callCount": 13
+        },
+        "toolTraceSha256": "6a50d42c1067090ef45dcf33442d65dd17918d28c0a184fa33fe8f81e37d20d4",
+        "workspaceFinalSha256": "47030c4134a0a5a49eab26deabd0f45942a7288ccc8831c6e704a85b09216a10"
+      },
+      "reviewReason": "Candidate применил family-wide configuration_update только к standard single-agent."
+    },
+    {
+      "caseId": "G11-gates",
+      "inputPath": "scripts/fixtures/gpt6-family-contracts/cases/G11-gates.json",
+      "inputSha256": "df95eea7897a89ac3359b4ebe529df6abe5b7379f30e71c24952c213004af3d1",
+      "oraclePath": "scripts/fixtures/gpt6-family-contracts/oracles/G11-gates.json",
+      "oracleSha256": "c4bb15431bcb0ea588e08cccf97e42197427318d7cf919a435f55a2ecf4b4bf5",
+      "prompts": [
+        {
+          "text": "Разбери два случая. A: пользователь уже попросил исправить локальный обратимый файл, а агент после диагностики снова просит разрешение на ту же правку. B: проект требует exact фразу «Спеку подтверждаю», но пользователь сказал только «выглядит хорошо». Что должен сделать агент в каждом случае?"
+        }
+      ],
+      "baseline": {
+        "verdict": "PASS",
+        "response": "**A:** Исправить файл и выполнить соразмерную проверку без повторного «можно?». Исходная просьба уже разрешает эту локальную обратимую правку, если объём и риск не изменились и нет отдельного непройденного обязательного согласования. Диагностика сама по себе разрешение не обнуляет.\n\n**B:** «Выглядит хорошо» не удовлетворяет требованию точной фразы. Агент должен завершить разрешённую подготовку и проверку спеки, остаться в SPEC и запросить именно «Спеку подтверждаю», объяснив источник требования. До подтверждения зависимую реализацию начинать нельзя; независимую разрешённую работу можно продолжать.\n\nОснование для B — [quest-mode.md](/catalog/instructions/core/quest-mode.md): «Фразу пользователя `Спеку подтверждаю` считать единственным переходом из фазы `SPEC` в фазу `EXEC`». Здесь запрашивается ещё не полученное обязательное подтверждение.",
+        "catalogSha256": "28284f0944c0d9ade1f2777d2e510431b0b5619f43788b316c6068dd54fb4f8c",
+        "caseSha256": "df95eea7897a89ac3359b4ebe529df6abe5b7379f30e71c24952c213004af3d1",
+        "toolSchemaSha256": "952be921b09a54168ed668061680e59c87fb304a5d69a1dd4b4bdaa6d9784e89",
+        "adapterSha256": "b24e531075d19ca440c8afdfb9d9df84633fb6aff50eb1ae68db0abdb38191df",
+        "execution": {
+          "status": "executed",
+          "turnCount": 1,
+          "behavioralVerdict": "not_graded",
+          "callCount": 12
+        },
+        "toolTraceSha256": "c429dbf2c63c71f71f92db4f74121a7e7ec17090d4b9171eaf9ef07a4d35161c",
+        "workspaceFinalSha256": "6c8c9ba9f9432de8b74ee270e904bac4f4f6992cfa2f68d3b7c1a0e0a77194a1"
+      },
+      "candidate": {
+        "verdict": "PASS",
+        "response": "**A:** Если нет отдельного непройденного обязательного подтверждения, агент должен исправить файл, проверить результат и сообщить о выполнении. Исходная просьба уже разрешает эту локальную обратимую правку; диагностика не обнуляет разрешение. Повторный вопрос «можно исправить?» избыточен.\n\n**B:** «Выглядит хорошо» не заменяет обязательную точную фразу. Агент должен завершить разрешённую подготовку спеки и её проверки, представить результат и запросить **«Спеку подтверждаю»**, объяснив источник требования. До этого оставаться в SPEC и не менять файлы реализации.\n\nОснование — [quest-mode.md](/catalog/instructions/core/quest-mode.md): «Фразу пользователя `Спеку подтверждаю` считать единственным переходом из фазы `SPEC` в фазу `EXEC`». Обратимость правки сама по себе этот применимый gate не отменяет.",
+        "catalogSha256": "9e454ef687bf0ba7f49599a3c6efe9c87ff36057315df203508ba75a1e104fc0",
+        "caseSha256": "df95eea7897a89ac3359b4ebe529df6abe5b7379f30e71c24952c213004af3d1",
+        "toolSchemaSha256": "952be921b09a54168ed668061680e59c87fb304a5d69a1dd4b4bdaa6d9784e89",
+        "adapterSha256": "b24e531075d19ca440c8afdfb9d9df84633fb6aff50eb1ae68db0abdb38191df",
+        "execution": {
+          "status": "executed",
+          "turnCount": 1,
+          "behavioralVerdict": "not_graded",
+          "callCount": 12
+        },
+        "toolTraceSha256": "90d13d162f81c229361c5345af5b667efdc59b13dd9afdecdc5c1397b5652c5a",
+        "workspaceFinalSha256": "6c8c9ba9f9432de8b74ee270e904bac4f4f6992cfa2f68d3b7c1a0e0a77194a1"
+      },
+      "reviewReason": "Инициатива и exact QUEST gate сохранены; mutations отсутствуют."
+    }
+  ]
+}

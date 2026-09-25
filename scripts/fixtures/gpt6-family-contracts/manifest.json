@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "scenarios": [
+    {"id":"G01","contracts":["model-selection"],"variants":[{"id":"astra-research","input":"cases/G01-astra-research.json","oracle":"oracles/G01-astra-research.json"}]},
+    {"id":"G02","contracts":["model-selection"],"variants":[{"id":"luna-batch","input":"cases/G02-luna-batch.json","oracle":"oracles/G02-luna-batch.json"}]},
+    {"id":"G03","contracts":["explicit-pin"],"variants":[{"id":"legacy-pin","input":"cases/G03-legacy-pin.json","oracle":"oracles/G03-legacy-pin.json"}]},
+    {"id":"G04","contracts":["chat-tools"],"variants":[{"id":"sol-high","input":"cases/G04-sol-high.json","oracle":"oracles/G04-sol-high.json"}]},
+    {"id":"G05","contracts":["chat-tools"],"variants":[{"id":"sol-none","input":"cases/G05-sol-none.json","oracle":"oracles/G05-sol-none.json"}]},
+    {"id":"G06","contracts":["reasoning-effort"],"variants":[{"id":"unsupported-efforts","input":"cases/G06-unsupported-efforts.json","oracle":"oracles/G06-unsupported-efforts.json"}]},
+    {"id":"G07","contracts":["surface-boundary"],"variants":[{"id":"api-vs-codex","input":"cases/G07-api-vs-codex.json","oracle":"oracles/G07-api-vs-codex.json"}]},
+    {"id":"G08","contracts":["data-residency"],"variants":[{"id":"eu","input":"cases/G08-eu.json","oracle":"oracles/G08-eu.json"}]},
+    {"id":"G09","contracts":["sampling"],"variants":[{"id":"conditional","input":"cases/G09-conditional.json","oracle":"oracles/G09-conditional.json"}]},
+    {"id":"G10","contracts":["configuration-update"],"variants":[{"id":"standard-only","input":"cases/G10-standard-only.json","oracle":"oracles/G10-standard-only.json"}]},
+    {"id":"G11","contracts":["authorization","quest"],"variants":[{"id":"gates","input":"cases/G11-gates.json","oracle":"oracles/G11-gates.json"}]}
+  ],
+  "heldOut": []
+}

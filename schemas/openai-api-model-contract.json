@@ -1,9 +1,12 @@
 {
   "schemaVersion": 1,
   "surface": "OpenAI API",
-  "reviewedAt": "2026-09-07",
+  "reviewedAt": "2026-09-25",
   "sources": [
     "https://developers.openai.com/api/docs/guides/latest-model?model=gpt-6-astra",
+    "https://developers.openai.com/api/docs/models/gpt-6-sol",
+    "https://developers.openai.com/api/docs/models/gpt-6-luna",
+    "https://developers.openai.com/api/docs/guides/reasoning",
     "https://developers.openai.com/api/docs/guides/upgrading-to-gpt-5p6-sol"
   ],
   "aliases": {
@@ -30,6 +33,87 @@
       "responsesUnsupportedInclude": [
         "message.output_text.logprobs"
       ],
+      "euRequiredServiceTier": "default",
+      "euUnsupportedServiceTiers": [
+        "fast",
+        "priority"
+      ]
+    },
+    "gpt-6-sol": {
+      "reasoningEfforts": [
+        "none",
+        "low",
+        "medium",
+        "high",
+        "xhigh",
+        "max"
+      ],
+      "defaultReasoningEffort": "medium",
+      "toolEndpoint": "responses",
+      "chatCompletionsFunctionCallingEfforts": [
+        "none"
+      ],
+      "parameterRestrictionsWhenReasoning": {
+        "efforts": [
+          "low",
+          "medium",
+          "high",
+          "xhigh",
+          "max"
+        ],
+        "unsupportedParameters": [
+          "temperature",
+          "top_p",
+          "top_logprobs"
+        ],
+        "chatCompletionsUnsupportedParameters": [
+          "logprobs"
+        ],
+        "responsesUnsupportedInclude": [
+          "message.output_text.logprobs"
+        ]
+      },
+      "euRequiredServiceTier": "default",
+      "euUnsupportedServiceTiers": [
+        "fast",
+        "priority"
+      ]
+    },
+    "gpt-6-luna": {
+      "reasoningEfforts": [
+        "none",
+        "low",
+        "medium",
+        "high",
+        "xhigh",
+        "max"
+      ],
+      "defaultReasoningEffort": "medium",
+      "toolEndpoint": "responses",
+      "chatCompletionsFunctionCallingEfforts": [
+        "none"
+      ],
+      "parameterRestrictionsWhenReasoning": {
+        "efforts": [
+          "low",
+          "medium",
+          "high",
+          "xhigh",
+          "max"
+        ],
+        "unsupportedParameters": [
+          "temperature",
+          "top_p",
+          "top_logprobs"
+        ],
+        "chatCompletionsUnsupportedParameters": [
+          "logprobs"
+        ],
+        "responsesUnsupportedInclude": [
+          "message.output_text.logprobs"
+        ]
+      },
+      "euRequiredServiceTier": "default",
       "euUnsupportedServiceTiers": [
         "fast",
         "priority"

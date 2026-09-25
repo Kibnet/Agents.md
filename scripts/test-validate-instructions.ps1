@@ -197,13 +197,18 @@ try {
     # Machine facts are mutated structurally, independent of prose spelling.
     $modelDataPath = Join-Path $scenarioRoot 'schemas/openai-api-model-contract.json'
     $modelOriginal = Get-Content -LiteralPath $modelDataPath -Raw
-    foreach ($case in @('effort','tools','sampling','missing-provenance')) {
+    foreach ($case in @('effort','tools','sampling','sol-effort','sol-chat-tools','luna-sampling','luna-eu','invented-gpt6-alias','missing-provenance')) {
         try {
             $modelData = $modelOriginal | ConvertFrom-Json -AsHashtable
             switch ($case) {
                 'effort' { $modelData.models['gpt-6-astra'].reasoningEfforts = @('none','low','medium','high','xhigh','max') }
                 'tools' { $modelData.models['gpt-6-astra'].toolEndpoint = 'chat-completions' }
                 'sampling' { $modelData.models['gpt-6-astra'].unsupportedParameters = @() }
+                'sol-effort' { $modelData.models['gpt-6-sol'].reasoningEfforts = @('minimal','low','medium','high','xhigh','max') }
+                'sol-chat-tools' { $modelData.models['gpt-6-sol'].chatCompletionsFunctionCallingEfforts = @('none','high') }
+                'luna-sampling' { $modelData.models['gpt-6-luna'].parameterRestrictionsWhenReasoning.unsupportedParameters = @() }
+                'luna-eu' { $modelData.models['gpt-6-luna'].euRequiredServiceTier = 'priority' }
+                'invented-gpt6-alias' { $modelData.aliases['gpt-6'] = 'gpt-6-astra' }
                 'missing-provenance' { $modelData.sources = @() }
             }
             $modelData | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $modelDataPath
@@ -233,8 +238,8 @@ try {
         @{
             Name = "configuration_update ошибочно допускает pro multi-agent"
             Path = "instructions/governance/openai-responses-api.md"
-            From = 'Использовать `configuration_update` только в Astra standard single-agent'
-            To = 'Использовать `configuration_update` в Astra pro multi-agent'
+            From = 'Использовать `configuration_update` только в поддерживаемой модели семейства GPT-6, standard single-agent'
+            To = 'Использовать `configuration_update` в любой модели GPT-6 pro multi-agent'
         },
         @{
             Name = "configuration_update compaction guard удалён"

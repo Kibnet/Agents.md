@@ -4,7 +4,7 @@ import base64
 import json
 from pathlib import Path
 
-from runtime import sha, verify_snapshot
+from runtime import resolve_fixture_file, sha, validate_case_key, validate_fixture_entry, verify_snapshot
 
 
 def read(path):
@@ -88,10 +88,19 @@ def runtime_identity(directory, fields):
         'bootstrapSha256':pointer['sha256']}
 
 
-def audit(output, baseline, candidate, selected=None, baseline_output=None, reference_candidate_output=None):
-    fixtures=Path(__file__).parent
+def audit(output, baseline, candidate, selected=None, baseline_output=None, reference_candidate_output=None, fixtures=None):
+    fixtures=(fixtures or Path(__file__).parent).resolve()
+    allowed_parent=(candidate.resolve()/'scripts'/'fixtures')
+    try:
+        relative=fixtures.relative_to(allowed_parent)
+    except ValueError as exc:
+        raise ValueError('Fixture root must be inside candidate scripts/fixtures') from exc
+    if len(relative.parts)!=1 or not (fixtures/'manifest.json').is_file():
+        raise ValueError('Fixture root must name one direct fixture pack with manifest.json')
     manifest=read(fixtures/'manifest.json')
     all_entries=planned_entries(manifest)
+    for entry in all_entries:
+        validate_fixture_entry(fixtures,entry)
     entries=select_entries(manifest,selected)
     baseline_output=baseline_output or output
     reference_candidate_output=reference_candidate_output or output
@@ -109,10 +118,11 @@ def audit(output, baseline, candidate, selected=None, baseline_output=None, refe
             failures.append(f'{phase}: {exc}')
     fields=['model','modelProvider','reasoningEffort','approvalPolicy','approvalsReviewer','sandbox','serviceTier']
     for entry in entries:
-        key=entry['caseId']; evidence={}; errors=[]
-        case=read(fixtures/entry['input'])
-        expected_image_hashes={sha((fixtures/t['image']).read_bytes()) for t in case['turns'] if 'image' in t}
-        allowed_image_hashes=expected_image_hashes | {sha((fixtures/v['image']).read_bytes()) for v in case['operations'].values() if 'image' in v}
+        key=validate_case_key(entry['caseId']); evidence={}; errors=[]
+        source=resolve_fixture_file(fixtures,entry['input'],'case input')
+        case=read(source)
+        expected_image_hashes={sha(resolve_fixture_file(fixtures,t['image'],'turn image').read_bytes()) for t in case['turns'] if 'image' in t}
+        allowed_image_hashes=expected_image_hashes | {sha(resolve_fixture_file(fixtures,v['image'],'operation image').read_bytes()) for v in case['operations'].values() if 'image' in v}
         for phase in entry['phases']:
             directory=(baseline_output if phase=='baseline' else output)/phase/key
             try:
@@ -124,7 +134,7 @@ def audit(output, baseline, candidate, selected=None, baseline_output=None, refe
                 checks=read(directory/'isolation-checks.json')
                 if state['status']!='executed': errors.append(phase+': not executed')
                 if not all(checks.values()): errors.append(phase+': isolation checks failed')
-                if provenance['caseSha256']!=sha((fixtures/entry['input']).read_bytes()): errors.append(phase+': current input drift')
+                if provenance['caseSha256']!=sha(source.read_bytes()): errors.append(phase+': current input drift')
                 if provenance['catalogSha256']!=source_hashes.get(phase): errors.append(phase+': catalog mismatch')
                 if provenance['oraclePassedToModel'] is not False: errors.append(phase+': oracle leakage flag')
                 if state['turnCount']!=len(case['turns']): errors.append(phase+': continuation count mismatch')
@@ -158,7 +168,7 @@ def audit(output, baseline, candidate, selected=None, baseline_output=None, refe
                 try:
                     refdir=reference_candidate_output/'candidate'/entry['reference']
                     refentry=next(e for e in all_entries if e['caseId']==entry['reference'])
-                    refcase=read(fixtures/refentry['input'])
+                    refcase=read(resolve_fixture_file(fixtures,refentry['input'],'reference case input'))
                     refprovenance=read(refdir/'provenance.json')
                     refrecords=[json.loads(line) for line in (refdir/'protocol.jsonl').read_text(encoding='utf-8').splitlines()]
                     referrors=validate_protocol(refrecords,refcase,refprovenance)
@@ -199,7 +209,8 @@ if __name__=='__main__':
     parser.add_argument('--cases',help='Comma-separated explicit case IDs; yields scoped provenance verdict only')
     parser.add_argument('--baseline-output',type=Path,help='Reuse baseline traces and snapshot from this output root')
     parser.add_argument('--reference-candidate-output',type=Path,help='Candidate runtime reference evidence for heldout S06/S11')
+    parser.add_argument('--fixtures',type=Path,help='Fixture pack inside candidate scripts/fixtures; defaults to outcome-contracts')
     args=parser.parse_args()
-    result=audit(args.output,args.baseline,args.candidate,args.cases.split(',') if args.cases else None,args.baseline_output,args.reference_candidate_output)
+    result=audit(args.output,args.baseline,args.candidate,args.cases.split(',') if args.cases else None,args.baseline_output,args.reference_candidate_output,args.fixtures)
     print(json.dumps({'status':result['status'],'cases':result['cases'],'failures':len(result['failures']),'behavioralVerdict':result['behavioralVerdict']},ensure_ascii=False))
     raise SystemExit(0 if result['status'] in ('valid','scoped_valid') else 1)

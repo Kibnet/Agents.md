@@ -1,0 +1,1 @@
+{"expected":["Нет для Chat Completions при high","Перейти на Responses API и сохранить high"],"forbidden":["Понизить effort без необходимости","Разрешить Chat Completions tools при high"],"grading":"Independent review; machine contract must be read from catalog."}

@@ -156,7 +156,7 @@ Get-ChildItem instructions/profiles
 | `/storm:cover`, `/storm:cleanup`, `/storm:implement ST-XXXX`, `/storm:bdd-implement ST-XXXX` или любой `/storm:*` с изменениями tests/code/behavior | `quest-governance + collaboration-baseline + testing-baseline + stack/testing profile + storm-product-development` |
 | Локальный рефакторинг модуля | `quest-governance + collaboration-baseline + stack profile + refactor-local + refactoring-policy` |
 | Массовое улучшение комментариев в hotspot-участках | `quest-governance + collaboration-baseline + stack profile + commenting-policy` |
-| Проектирование Astra / GPT-5.6 Responses API workflow | `quest-governance + collaboration-baseline + product-system-design + openai-responses-api` |
+| Проектирование GPT-6 / GPT-5.6 Responses API workflow | `quest-governance + collaboration-baseline + product-system-design + openai-responses-api` |
 
 ## Связанные документы
 

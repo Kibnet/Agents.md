@@ -64,7 +64,7 @@ Router[routing-matrix.md]
 
 Core[core правила]
 CreatorVibe[creator-vibe lightweight lens]
-Model[GPT-6 Astra behavior]
+Model[GPT-6 family behavior<br/>Astra baseline]
 ToolExecution[tool execution baseline]
 Responses[Responses API contract]
 Contexts[контекстные правила]
@@ -106,18 +106,18 @@ Central stack применяет [creator-vibe-lens.md](instructions/core/creato
 
 ---
 
-# Surface Contract Matrix для GPT-6 Astra
+# Surface Contract Matrix для семейства GPT-6
 
-Каталог оптимизирован под `GPT-6 Astra`; workload-роли GPT-5.6 Sol/Terra/Luna сохранены. Baseline не переключает модели в пользовательской конфигурации. Перед model-sensitive validation фиксируйте фактическую поверхность, model ID, effort и версию клиента: доступность зависит от rollout, sign-in, клиента и account. Срез источников для этой матрицы проверен 2026-09-05; перед rollout перепроверяйте его.
+Каталог сохраняет `GPT-6 Astra` как behavior baseline и различает роли GPT-6 Astra/Sol/Luna; явно закреплённые GPT-5.6 Sol/Terra/Luna сохраняются. Baseline не переключает модели в пользовательской конфигурации. Перед model-sensitive validation фиксируйте фактическую поверхность, model ID, effort и версию клиента: доступность зависит от rollout, sign-in, клиента и account. Срез источников для этой матрицы проверен 2026-09-25; перед rollout перепроверяйте его.
 
 | Поверхность | Текущий контракт | Как использовать каталог |
 |---|---|---|
 | Standard ChatGPT | Его picker и default проверяются отдельно; документация Work/Codex не устанавливает контракт обычного чата. | Применять общие behavior rules без переноса API model IDs или Work tiers в product UI. |
-| ChatGPT Work / desktop, Codex CLI / IDE | Официальный model guide перечисляет Astra наряду с Sol/Terra/Luna; конкретные options зависят от доступа. Max увеличивает reasoning, Ultra использует subagents и не равен API pro mode. | Сохранять выбранную модель и начинать с доступного default effort. Для воспроизводимого Astra smoke задавать `gpt-6-astra` явно и проверять, что установленная версия клиента поддерживает модель. |
-| Codex cloud | В прочитанной матрице доступности Astra для Codex cloud не заявлена. | Не выводить cloud availability из наличия Astra в local model list; проверять текущий cloud contract отдельно. |
-| OpenAI API | `gpt-6-astra` имеет собственные ограничения efforts/tools/parameters; `gpt-5.6` остаётся family alias Sol, а не Astra. | По API-триггеру подключать [openai-responses-api.md](instructions/governance/openai-responses-api.md); не переносить product Ultra в API payload. |
+| ChatGPT Work / desktop, Codex CLI / IDE | GPT-6 Sol и Luna выпускаются в Work/Codex; конкретные options зависят от rollout, plan и workspace settings. Product reasoning/speed controls не равны API payload. | Сохранять выбранную модель, проверять picker/effective runtime и начинать с доступного default effort. Для воспроизводимого smoke задавать model ID явно и проверять effective metadata. |
+| Codex cloud | Доступность модели и функций проверяется по текущему product contract и workspace settings. | Не выводить cloud availability из API catalog или local model list; проверять отдельно. |
+| OpenAI API | `gpt-6-astra`, `gpt-6-sol` и `gpt-6-luna` имеют разные effort/tool/parameter условия; `gpt-5.6` остаётся alias GPT-5.6 Sol. | По API-триггеру подключать [openai-responses-api.md](instructions/governance/openai-responses-api.md); не переносить product Ultra или доступность в API payload. |
 
-Официальные источники: [ChatGPT Work и Codex models](https://learn.chatgpt.com/docs/models), [Using GPT-6 Astra](https://developers.openai.com/api/docs/guides/latest-model?model=gpt-6-astra), [Astra API model](https://developers.openai.com/api/docs/models/gpt-6-astra). Experimental context management и другие opt-in features автоматически не включаются.
+Официальные источники: [ChatGPT Work и Codex models](https://learn.chatgpt.com/docs/models), [Using GPT-6](https://developers.openai.com/api/docs/guides/latest-model?model=gpt-6-astra), [Astra](https://developers.openai.com/api/docs/models/gpt-6-astra), [Sol](https://developers.openai.com/api/docs/models/gpt-6-sol), [Luna](https://developers.openai.com/api/docs/models/gpt-6-luna). Experimental context management и другие opt-in features автоматически не включаются.
 
 ---
 

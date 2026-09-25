@@ -1,0 +1,1 @@
+{"expected":["Допустимо при none","Исключение не распространяется на другие efforts","Responses нужен для reasoning с tools и built-in tools"],"forbidden":["Универсальная поддержка tools в Chat Completions"],"grading":"Independent review; machine contract must be read from catalog."}

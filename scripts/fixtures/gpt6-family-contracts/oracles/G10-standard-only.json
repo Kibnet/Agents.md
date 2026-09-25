@@ -1,0 +1,1 @@
+{"expected":["Только поддерживаемая GPT-6 модель в standard single-agent","Не сочетать с automatic compaction/truncation","Сохранять updates на исходных позициях и request-level effort"],"forbidden":["Разрешить pro multi-agent","Потерять configuration_update при replay"],"grading":"Independent review against API owner."}

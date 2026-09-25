@@ -1,0 +1,1 @@
+{"turns":[{"text":"Подготовь параметры gpt-6-luna для reasoning_effort=high. В исходном запросе есть temperature, top_p, top_logprobs, Chat Completions logprobs и Responses include message.output_text.logprobs. Что убрать? Меняется ли ответ автоматически для effort none?"}],"files":{},"operations":{}}

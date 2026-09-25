@@ -3,6 +3,7 @@ param(
     [Parameter(Mandatory=$true)][string]$BaselineRoot,
     [Parameter(Mandatory=$true)][string]$CandidateRoot,
     [Parameter(Mandatory=$true)][string]$OutputDirectory,
+    [string]$FixtureRoot,
     [ValidateSet('baseline','candidate','both')][string]$Phase = 'both',
     [string]$Cases,
     [switch]$HeldOut,
@@ -11,6 +12,7 @@ param(
 $ErrorActionPreference = 'Stop'
 $runtime = Join-Path $PSScriptRoot 'fixtures/outcome-contracts/runtime.py'
 $arguments = @('-B', $runtime, '--baseline', $BaselineRoot, '--candidate', $CandidateRoot, '--output', $OutputDirectory, '--phase', $Phase)
+if ($FixtureRoot) { $arguments += @('--fixture-root', $FixtureRoot) }
 if ($Cases) { $arguments += @('--cases', $Cases) }
 if ($HeldOut) { $arguments += '--heldout' }
 if ($Preflight) { $arguments += '--preflight' }
