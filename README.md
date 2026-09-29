@@ -398,7 +398,35 @@ python "$env:USERPROFILE\.codex\skills\.system\skill-installer\scripts\install-s
 
 Installer не перезаписывает существующий destination. Новый skill становится доступен следующему Codex turn/session.
 
-### 4. Добавлять только локальные ужесточения
+### 4. Установить skill для Unlimotion CLI (при необходимости)
+
+Скилл `unlimotion-cli` находится в `.agents/skills/unlimotion-cli/` этого репозитория: Codex обнаруживает его при работе внутри клона. Для использования в других проектах скопируйте скилл в личный каталог `%USERPROFILE%\.agents\skills`. Запустите PowerShell из корня клона:
+
+```powershell
+$sourceSkill = Join-Path (Get-Location) '.agents\skills\unlimotion-cli'
+$personalSkills = Join-Path $env:USERPROFILE '.agents\skills'
+$targetSkill = Join-Path $personalSkills 'unlimotion-cli'
+$skillFiles = @('SKILL.md', 'agents\openai.yaml', 'references\apply-v1.31.1.md')
+foreach ($relativePath in $skillFiles) {
+  if (-not (Test-Path -LiteralPath (Join-Path $sourceSkill $relativePath) -PathType Leaf)) {
+    throw "Запустите команды из корня репозитория; отсутствует $relativePath"
+  }
+}
+if (Test-Path -LiteralPath $targetSkill) { throw "Скилл уже установлен: $targetSkill" }
+New-Item -ItemType Directory -Path $personalSkills -Force | Out-Null
+Copy-Item -LiteralPath $sourceSkill -Destination $targetSkill -Recurse -ErrorAction Stop
+foreach ($relativePath in $skillFiles) {
+  if (-not (Test-Path -LiteralPath (Join-Path $targetSkill $relativePath) -PathType Leaf)) {
+    throw "Установка неполная: $targetSkill. Отсутствует $relativePath"
+  }
+}
+```
+
+Команды не перезаписывают уже установленный скилл. Если копирование прервалось, проверьте содержимое `$targetSkill` вручную: повторный запуск остановится на занятом каталоге. Если Codex не обнаружил новую копию автоматически, перезапустите его. Внутри этого репозитория личная копия необязательна; при совпадении имени repo и personal skill обе записи могут появиться в списке.
+
+Скилл не устанавливает сам `unlimotion-cli`. Проверка инструмента: `Get-Command unlimotion-cli`; для текущего `main` Unlimotion (`v1.32.0`) — `unlimotion-cli version --format json`, а `dotnet tool list --global` показывает версию только при глобальной установке .NET tool (здесь `1.31.1`). Скилл выбирает возможности по реально запускаемой версии и сохраняет fallback для 1.31.1; наличие исходников нового `main` не обновляет локальную команду.
+
+### 5. Добавлять только локальные ужесточения
 
 В проектах создавайте `AGENTS.override.md` только если нужны дополнительные
 локальные ограничения, команды или профиль по умолчанию. Central stack остаётся
