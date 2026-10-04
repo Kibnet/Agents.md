@@ -1,0 +1,14 @@
+{
+  "phase": "baseline-characterization",
+  "baselineHead": "62ce63992f0e7ba9a72f864f74cf774a084fbe76",
+  "root": "C:/Projects/My/Agents",
+  "exitCode": 1,
+  "status": "expected-failure",
+  "checks": {
+    "newModel": false,
+    "euFlex": false,
+    "schema2": false,
+    "astraUltrafast": false
+  },
+  "note": "Observed before candidate authoring. Failure characterizes missing new metadata, not general agent correctness."
+}

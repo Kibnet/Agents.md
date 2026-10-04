@@ -1,0 +1,9 @@
+{
+  "turns": [
+    {
+      "text": "Проверь по текущему каталогу запрос: model=gpt-6.1-sol, reasoning_effort=none, Chat Completions с function tools. Нужен минимальный reasoning и сохранение model ID/tools. Дай совместимую конфигурацию; отдельно скажи, можно ли minimal."
+    }
+  ],
+  "files": {},
+  "operations": {}
+}

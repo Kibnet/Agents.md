@@ -1,0 +1,9 @@
+{
+  "turns": [
+    {
+      "text": "Проектируем Responses multi-agent с gpt-6.1-sol. Дай контракт запроса и продолжения: поддерживаемые модели, beta enablement, кто исполняет hosted/developer tools, как replay сохраняет encrypted agent_message, attribution и call_id; как отличить финальный ответ root; compaction/limits, default concurrency; можно ли изолировать права агентов формулировкой их задания и совместить configuration_update?"
+    }
+  ],
+  "files": {},
+  "operations": {}
+}

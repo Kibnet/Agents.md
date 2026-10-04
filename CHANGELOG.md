@@ -2,6 +2,26 @@
 
 All notable changes to this instruction catalog are documented in this file.
 
+## [6.0.0] - 2026-10-04
+
+### Added
+
+- Exact GPT-6.1 Sol API contract and eight paired migration scenarios with separate reviewer oracles.
+- Astra Ultrafast region and surface boundaries; Responses multi-agent beta replay, shared-tool authorization, compaction and root-final guidance.
+
+### Changed
+
+- Work/Codex workload guidance recommends GPT-6.1 Sol when available while retaining distinct GPT-6 Sol pins and the Astra behavior baseline.
+- EU processing metadata distinguishes Standard, Flex and Batch from request service tiers and records confirmed-only coverage. Astra Batch is confirmed; Sol 6.1, Sol 6 and Luna support all three modes.
+- Cache cost guidance includes Sol 6.1 reads; product guidance records GPT-5.5 retirement scope and the Sol/Luna image-encoding reevaluation trigger.
+- Behavioral runner targets reviewed Codex CLI 0.160.0. Historical schema-1 fixtures and recorded outcomes remain frozen.
+
+### Breaking / Migration
+
+- BREAKING CHANGE: API model metadata uses schema version 2 and removes `models.*.euRequiredServiceTier`. Consumers must use `euSupportedProcessingModes`, `euSupportedServiceTiers` and `euSupportCoverage`. Batch uses its endpoint and is not a `service_tier` value.
+- Existing GPT-6 Sol and GPT-5.6 model identifiers remain distinct and valid; no alias silently upgrades them. User configuration is unchanged.
+- Activate only after runtime evidence and drift checks. Rollback requires matching postimages and restores the coordinated schema-1 owners and validators.
+
 ## [5.1.0] - 2026-09-25
 
 ### Added

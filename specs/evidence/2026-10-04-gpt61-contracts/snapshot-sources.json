@@ -1,0 +1,446 @@
+{
+  "baseline": {
+    "root": "C:\\Projects\\My\\Agents",
+    "sha256": "9d50e9409a961a853f3ec6b11f3d44af562dcd8b77c1a193bec432a58d09550c",
+    "files": [
+      {
+        "path": "AGENTS.md",
+        "sha256": "e86a47547ce30a8ba2f9bc98f0e9b6ea3cc43a070100ae2bdac1a25a735becd0"
+      },
+      {
+        "path": "schemas/openai-api-model-contract.json",
+        "sha256": "b98706fbfc4ba0a6ac88f6d61e37780b00ee8382ebbeabe911f720729ba21f4c"
+      },
+      {
+        "path": "instructions/contexts/debug-dotnet-mcp-coreclr.md",
+        "sha256": "ce7f775fe8084124ff83912fc9acbaa0bab416f9cc3d601e61c3de80a6b28844"
+      },
+      {
+        "path": "instructions/contexts/performance-optimization.md",
+        "sha256": "a45a75e0c3f5cae016504312c2ea2755bfefd5beb7d49ec19034ddd7c9f494ce"
+      },
+      {
+        "path": "instructions/contexts/session-insights-context.md",
+        "sha256": "27412194c560d2a2b9dda42e2eb5e6637e7a410c38c69ece5f7494bc6113af7f"
+      },
+      {
+        "path": "instructions/contexts/testing-dotnet.md",
+        "sha256": "78675ab390091901a2115911eed65bb6ac5e600b091d7947c0e9425676f636e6"
+      },
+      {
+        "path": "instructions/contexts/testing-frontend.md",
+        "sha256": "e9f61395e5e565b8796a984d4b674ad698239ff31fbaf70001ccfb8f4aaab6ef"
+      },
+      {
+        "path": "instructions/contexts/visual-feedback.md",
+        "sha256": "c28b06528ef2019425deeadf2ed77f0aa36185af74a466d32d9eae7da5b95e9c"
+      },
+      {
+        "path": "instructions/core/collaboration-baseline.md",
+        "sha256": "f8a7379ba9ff9e7ce967d799bf7b9d1b784d5e6f947d1665d107914a7475b96e"
+      },
+      {
+        "path": "instructions/core/creator-vibe-lens.md",
+        "sha256": "b2cb8cdb1ca4ed21a80a5b5471a41d1c8f290ea1bae0eb82bb548226d761deee"
+      },
+      {
+        "path": "instructions/core/model-behavior-baseline.md",
+        "sha256": "ff2ece6d1a90c08f9ba7a65df7792edc8959f2927971599b2bd8dd9c1cd05885"
+      },
+      {
+        "path": "instructions/core/quest-governance.md",
+        "sha256": "efdbb59c10883699ecea2b5ff05a9a57360248e958847737247917737f027916"
+      },
+      {
+        "path": "instructions/core/quest-mode.md",
+        "sha256": "0d99228f0d19fb3a47b9a77600616f70bd1d0c129af208d12c4c7ea3ea28dceb"
+      },
+      {
+        "path": "instructions/core/quest-prompt-exec.md",
+        "sha256": "78d566d4a138f81891149e56c718beade0b64b0b313cf397d8fd10a81547e9e3"
+      },
+      {
+        "path": "instructions/core/quest-prompt-spec.md",
+        "sha256": "d728a5dffbb42a7a2ab9c3fc0efb4026200e927b20a5ecb62e7bef5131ed8085"
+      },
+      {
+        "path": "instructions/core/testing-baseline.md",
+        "sha256": "74884aa2624581ae787efd4b069174f0a4114565f23354ad0fc9cfd6ba12ada5"
+      },
+      {
+        "path": "instructions/core/tool-execution-baseline.md",
+        "sha256": "4b9222effd4b013f5f97ae7337e8e066f8721a84a31f5e684ec308aa5b0be783"
+      },
+      {
+        "path": "instructions/governance/commenting-policy.md",
+        "sha256": "97538336b054f21e4e77da99933d836079e850e23e76dde1733b82a1e95a8556"
+      },
+      {
+        "path": "instructions/governance/commit-message-policy.md",
+        "sha256": "3b2f7b36b297323cefac6b9a1debcd2b36c87ce70d5cc22cc7e1897d7c9e55a3"
+      },
+      {
+        "path": "instructions/governance/document-contract.md",
+        "sha256": "00d6375e49d869e30fb03732669eb02afa5c4db5e3e32c963639612e971a18b5"
+      },
+      {
+        "path": "instructions/governance/github-delivery-policy.md",
+        "sha256": "d0e8f752f163f4255753f2cbf959e698db657947ace8d0f0f17c6462bf1fc877"
+      },
+      {
+        "path": "instructions/governance/openai-responses-api.md",
+        "sha256": "2e5cb6e450e10f7ed34c0e38b1de298579c3511358aee3cca096292d69de09cf"
+      },
+      {
+        "path": "instructions/governance/refactoring-policy.md",
+        "sha256": "4b614ff9f2771e22a3af868cfef4f6ea71aac9d90edc8d26dd03f001ed02d5c9"
+      },
+      {
+        "path": "instructions/governance/review-loops.md",
+        "sha256": "01e53c4cf93b46aa3d5243c2e124b47f7c685a4f6c7bab4b7cb8c08f83471b3c"
+      },
+      {
+        "path": "instructions/governance/routing-matrix.md",
+        "sha256": "e8579f4bafaa6aaca6b197f005c2c2fd71c31ccbbfea9f67aebbbc8c0f8aa910"
+      },
+      {
+        "path": "instructions/governance/spec-linter.md",
+        "sha256": "3f910cbc6bb6af01626f45c5a94e9c75a08797dbb324c0fa76e118e7b55a0383"
+      },
+      {
+        "path": "instructions/governance/spec-rubric.md",
+        "sha256": "89a33f595047a07d64c105be6ea9206bf494a049cef7954345c12047ca63d051"
+      },
+      {
+        "path": "instructions/governance/versioning-policy.md",
+        "sha256": "b05d9d42b312cddd646ed43589c867ebd0b04429eb331877206e55ee82d64673"
+      },
+      {
+        "path": "instructions/onboarding/AGENTS.consumer.template.md",
+        "sha256": "81330b3f0ece4210d3c62bf3b9a838588d6f8df94fc7237f577655ac5f2d55e6"
+      },
+      {
+        "path": "instructions/onboarding/AGENTS.override.template.md",
+        "sha256": "cf26d12383d984763df8850f5eb5e5bf7a86dcdd56284d3363bd62ad67260b71"
+      },
+      {
+        "path": "instructions/onboarding/local-environment.md",
+        "sha256": "917671ae6dfc3e295c09a78da26ee36ef3c574ecb45b10762116bd5de17301d2"
+      },
+      {
+        "path": "instructions/onboarding/quick-start.md",
+        "sha256": "fcece6060daa920a97c12bc0388b066e2333b23d30b36aec0d13263c2ff0303b"
+      },
+      {
+        "path": "instructions/profiles/business-process-automation.md",
+        "sha256": "afbc3973c20de57800c40cc1358fc82027378b2b83a4cf0907dd95f544c59024"
+      },
+      {
+        "path": "instructions/profiles/domain-logic-extraction.md",
+        "sha256": "61d0a5f60b77629917871e51ad578c53220958e1d904df70ed394888431a1ed6"
+      },
+      {
+        "path": "instructions/profiles/dotnet-backend-api.md",
+        "sha256": "270cfa06d3abb4bfbcd5650bd1af43971389bd4ca6e7dab8fd95d74c805943bf"
+      },
+      {
+        "path": "instructions/profiles/dotnet-desktop-client.md",
+        "sha256": "df31ac706c82ec27ef3d1db58512615368a53b6c1410dc409700381a9322bce2"
+      },
+      {
+        "path": "instructions/profiles/dotnet-ravendb.md",
+        "sha256": "6897cca3d2f0bdc2b37b17713af0f14ea3239dcb02fc514e4cf836c199db612c"
+      },
+      {
+        "path": "instructions/profiles/frontend-spa-typescript.md",
+        "sha256": "98d237d3e5c77d34eef11cdf18f4fffaa707f0cb31d70a68b6aa532a212f52c9"
+      },
+      {
+        "path": "instructions/profiles/product-system-design.md",
+        "sha256": "ca9d1966ee822685167bf39ebd691ad36b24818aff6b21d3e5cb028da650feee"
+      },
+      {
+        "path": "instructions/profiles/python-hardware-gpio.md",
+        "sha256": "b27d899ce38123ffcb2f0f1c5f149c5c385e49264d76cfef28df91590c2426ec"
+      },
+      {
+        "path": "instructions/profiles/refactor-architecture.md",
+        "sha256": "2096a0dfb64912cbd1678b89f075f529ccd94650b25d2bd42212a0ff39d27994"
+      },
+      {
+        "path": "instructions/profiles/refactor-local.md",
+        "sha256": "b3286e728c54eb4e81913cd2a77954db114e2e9197281cd1c3e11b4f7803970d"
+      },
+      {
+        "path": "instructions/profiles/refactor-mechanical.md",
+        "sha256": "85c0e7191626f5b84f2940e8083eaeb8e9437d86e02a3700c25acabd8b7acb34"
+      },
+      {
+        "path": "instructions/profiles/rendering-pipeline.md",
+        "sha256": "2b9ac3945782a9230257a1b02be17921e274bdc3465aec65ecee163c542abc6d"
+      },
+      {
+        "path": "instructions/profiles/storm-product-development.md",
+        "sha256": "01d469be78137564d163d28feaaf3f58feb6dcf19b1de0972490308e60828fa0"
+      },
+      {
+        "path": "instructions/profiles/ui-automation-testing.md",
+        "sha256": "c70bac0c07641441dfe16969eab53d05922012b4813ef1c8245c839a32d9a031"
+      },
+      {
+        "path": "instructions/profiles/ui-feature-parity.md",
+        "sha256": "f1bd0ab7cf646639596664fcb0a140398dec1e13e2769e3fe95c58530930bd28"
+      },
+      {
+        "path": "templates/codex/local-environment/README.md",
+        "sha256": "6d696f8e39a53c0ba5b7e4ca54dab0674366b9e95a1655ac85d916a6427a7610"
+      },
+      {
+        "path": "templates/specs/_template-small.md",
+        "sha256": "27197c21f32f49262dbe6d5dd2dc63320943f12e5139cce9f58b3d931fd8c981"
+      },
+      {
+        "path": "templates/specs/_template.md",
+        "sha256": "4dafea7fdb30cdb41577ca4b221bd1971800f343f8006e5c2d6d92ee40597414"
+      },
+      {
+        "path": "templates/storm/process-audit.md",
+        "sha256": "3021c43b38fb802391d91df47f65dd4fc8abc6efa830caddbb2337a3af7370ab"
+      },
+      {
+        "path": "templates/storm/product-goal.md",
+        "sha256": "7c657ed1fe3fae90e5e25cae9c9d70ac086a0d281aec2f27ed1c4c5314963c62"
+      },
+      {
+        "path": "templates/storm/ranking.md",
+        "sha256": "22d7acc40ddaaa7011a385c153daa89a83d9a2e7a72d259b4af54e46ea63c078"
+      },
+      {
+        "path": "templates/storm/traceability.md",
+        "sha256": "14c1c3c985593c54ef85d9e5eb45d44b78d4ecd56de6f870eae4ab8250d078df"
+      }
+    ]
+  },
+  "candidate": {
+    "root": "C:\\Users\\Kibnet\\.codex\\worktrees\\gpt61-contracts\\Agents",
+    "sha256": "7015680d09283ac81891857c171192b0c7f5bc2f29b84104c141b92085bcb38b",
+    "files": [
+      {
+        "path": "AGENTS.md",
+        "sha256": "e86a47547ce30a8ba2f9bc98f0e9b6ea3cc43a070100ae2bdac1a25a735becd0"
+      },
+      {
+        "path": "schemas/openai-api-model-contract.json",
+        "sha256": "b92007c64067e4908977fbd716393d384f111cabead41efa8b0a54c56d1f7cae"
+      },
+      {
+        "path": "instructions/contexts/debug-dotnet-mcp-coreclr.md",
+        "sha256": "0de0e39fd9a5a5755cd7ed3c2626678c51e3c9af47e0d1b8c8a4c364e067f2c6"
+      },
+      {
+        "path": "instructions/contexts/performance-optimization.md",
+        "sha256": "d8a74538c30b43323a761f2422815068893213382e1431e2924dec2195e29c68"
+      },
+      {
+        "path": "instructions/contexts/session-insights-context.md",
+        "sha256": "74181175d57e86323c413eabcf9c6b71d912647c1d2d1f7695d2277421b0b3a2"
+      },
+      {
+        "path": "instructions/contexts/testing-dotnet.md",
+        "sha256": "672e59052df9f6a7bb5889a24e5ed3bd262f0387cbd2f6ac9d621610432deb88"
+      },
+      {
+        "path": "instructions/contexts/testing-frontend.md",
+        "sha256": "3a9ec2761880aea07a31ce7ff8a71404ed1103b7e2dafc01d6bc265aa9d01da7"
+      },
+      {
+        "path": "instructions/contexts/visual-feedback.md",
+        "sha256": "d320b17aa25589fedfa5fb84e5da6d4209b8a7c20eed9a00194395a63288eaf6"
+      },
+      {
+        "path": "instructions/core/collaboration-baseline.md",
+        "sha256": "ede88522b5f2e3250285d85704f1d9fafa1d35e111976c986905426b960d2ac0"
+      },
+      {
+        "path": "instructions/core/creator-vibe-lens.md",
+        "sha256": "b2cb8cdb1ca4ed21a80a5b5471a41d1c8f290ea1bae0eb82bb548226d761deee"
+      },
+      {
+        "path": "instructions/core/model-behavior-baseline.md",
+        "sha256": "66e73afed0359a9b9aa47183ffd8de1f24114b5bbaaf9358350b4e4979eb70b7"
+      },
+      {
+        "path": "instructions/core/quest-governance.md",
+        "sha256": "070f2ca708031be848a78ab6a2c72fd0ffb87584b2f5df33797f9c049928823a"
+      },
+      {
+        "path": "instructions/core/quest-mode.md",
+        "sha256": "1c312697deb54a1300580d9efe888383c38b75f4a15530c60f1f9e7ede50162b"
+      },
+      {
+        "path": "instructions/core/quest-prompt-exec.md",
+        "sha256": "cbb4631d9fc0689f241377ba661e626357d1da59683351b5d4a6c29d97fe7a97"
+      },
+      {
+        "path": "instructions/core/quest-prompt-spec.md",
+        "sha256": "d728a5dffbb42a7a2ab9c3fc0efb4026200e927b20a5ecb62e7bef5131ed8085"
+      },
+      {
+        "path": "instructions/core/testing-baseline.md",
+        "sha256": "67bd588845b41ebea2bdab0f0ba65bba143e535592be19cd362c5cb8dd55c84f"
+      },
+      {
+        "path": "instructions/core/tool-execution-baseline.md",
+        "sha256": "271089c8ffb25eb61ca35a061ea825db3a8108dfd3422171e546c54fad4aa010"
+      },
+      {
+        "path": "instructions/governance/commenting-policy.md",
+        "sha256": "2d0733f41916a0f8a1d40a6e34fbcf13a8085eb614b62b2b0377db01e4f58a47"
+      },
+      {
+        "path": "instructions/governance/commit-message-policy.md",
+        "sha256": "f338c0f7d1efed9f564b6375b8c80b3cf4c8ab9dcd9340091ae8a760acba6d06"
+      },
+      {
+        "path": "instructions/governance/document-contract.md",
+        "sha256": "00d6375e49d869e30fb03732669eb02afa5c4db5e3e32c963639612e971a18b5"
+      },
+      {
+        "path": "instructions/governance/github-delivery-policy.md",
+        "sha256": "4a7f2b87bf7993229e68829d6449476ec61edfe7105718e158bcb73e77e9fde6"
+      },
+      {
+        "path": "instructions/governance/openai-responses-api.md",
+        "sha256": "c9020280a5b77a03fac5a93989224b521125476d653c35fa19bd590b291f1ec4"
+      },
+      {
+        "path": "instructions/governance/refactoring-policy.md",
+        "sha256": "6e8126e3878c580df554526aedb32996b811c9414e1e60e1e41b7f5f6643f8e8"
+      },
+      {
+        "path": "instructions/governance/review-loops.md",
+        "sha256": "720fbb76981707104dd7a89f266e817bcb6a9aaeff50a37041f9eb59ac5578e7"
+      },
+      {
+        "path": "instructions/governance/routing-matrix.md",
+        "sha256": "c9e6e5bcfd7877af6498b3b28d349b00de78eb72634a45fa893b1648ca005500"
+      },
+      {
+        "path": "instructions/governance/spec-linter.md",
+        "sha256": "cf4b2c00e6221d9f4b3ae5fc0ebbcc919bf02438e38a010973d161f26475d72b"
+      },
+      {
+        "path": "instructions/governance/spec-rubric.md",
+        "sha256": "f35713e1b593a24600a48da5419b9c6abdb3c7da35b8967d79b862b3cfe3d87a"
+      },
+      {
+        "path": "instructions/governance/versioning-policy.md",
+        "sha256": "5b8e12fbb9452b3a6e007f0bc64a42301f2ee3e806c050cdc5d5cf7ccbd98abf"
+      },
+      {
+        "path": "instructions/onboarding/AGENTS.consumer.template.md",
+        "sha256": "81330b3f0ece4210d3c62bf3b9a838588d6f8df94fc7237f577655ac5f2d55e6"
+      },
+      {
+        "path": "instructions/onboarding/AGENTS.override.template.md",
+        "sha256": "68cd90b7d86c53286b155946cebc2adbe790da001bec6950313788934cec7292"
+      },
+      {
+        "path": "instructions/onboarding/local-environment.md",
+        "sha256": "917671ae6dfc3e295c09a78da26ee36ef3c574ecb45b10762116bd5de17301d2"
+      },
+      {
+        "path": "instructions/onboarding/quick-start.md",
+        "sha256": "fcece6060daa920a97c12bc0388b066e2333b23d30b36aec0d13263c2ff0303b"
+      },
+      {
+        "path": "instructions/profiles/business-process-automation.md",
+        "sha256": "fb618412cf6712c28c683d9bbe4e9e21469d8f3431ac825faad641187c72aec6"
+      },
+      {
+        "path": "instructions/profiles/domain-logic-extraction.md",
+        "sha256": "0a0971444ac9f133957909f5da6e90526a2ce5ed8e206cb962715ed981a928a5"
+      },
+      {
+        "path": "instructions/profiles/dotnet-backend-api.md",
+        "sha256": "270cfa06d3abb4bfbcd5650bd1af43971389bd4ca6e7dab8fd95d74c805943bf"
+      },
+      {
+        "path": "instructions/profiles/dotnet-desktop-client.md",
+        "sha256": "df31ac706c82ec27ef3d1db58512615368a53b6c1410dc409700381a9322bce2"
+      },
+      {
+        "path": "instructions/profiles/dotnet-ravendb.md",
+        "sha256": "c0fd31a6cbc474bd1097888d44094f829a37db802d321ba0db4542f34d7e36eb"
+      },
+      {
+        "path": "instructions/profiles/frontend-spa-typescript.md",
+        "sha256": "8d45f3cae4109f00ec2671763a0b0e208cd6b80e595d291ffb8b31263707be7f"
+      },
+      {
+        "path": "instructions/profiles/product-system-design.md",
+        "sha256": "ca9d1966ee822685167bf39ebd691ad36b24818aff6b21d3e5cb028da650feee"
+      },
+      {
+        "path": "instructions/profiles/python-hardware-gpio.md",
+        "sha256": "b8a7ffced1abfc6a34530e35eecaf8e397e8940c129eeec4897a574ed13ef0b3"
+      },
+      {
+        "path": "instructions/profiles/refactor-architecture.md",
+        "sha256": "0352894aea7d596ccf9804a381f4b8a94e951aec1d2b3dabbc91a504073735fa"
+      },
+      {
+        "path": "instructions/profiles/refactor-local.md",
+        "sha256": "b3286e728c54eb4e81913cd2a77954db114e2e9197281cd1c3e11b4f7803970d"
+      },
+      {
+        "path": "instructions/profiles/refactor-mechanical.md",
+        "sha256": "fc63136c0107bcc597ff599c872466a5cf2f9e800fac657efa6010efdc3095d4"
+      },
+      {
+        "path": "instructions/profiles/rendering-pipeline.md",
+        "sha256": "33bb2018d2a233a89d7d7f72ed6d32ac9eb15b5a8df6ca9fc3f606cd3db8d1dc"
+      },
+      {
+        "path": "instructions/profiles/storm-product-development.md",
+        "sha256": "01d469be78137564d163d28feaaf3f58feb6dcf19b1de0972490308e60828fa0"
+      },
+      {
+        "path": "instructions/profiles/ui-automation-testing.md",
+        "sha256": "c70bac0c07641441dfe16969eab53d05922012b4813ef1c8245c839a32d9a031"
+      },
+      {
+        "path": "instructions/profiles/ui-feature-parity.md",
+        "sha256": "3a002749417bb9f8723a881d5e4170a2ec2da16787d6f1633e9923f7375fc4f1"
+      },
+      {
+        "path": "templates/codex/local-environment/README.md",
+        "sha256": "63a9730845ba7e898c94bb5575be754b23d09dfed1e22e04bff48d82fbb8da3f"
+      },
+      {
+        "path": "templates/specs/_template-small.md",
+        "sha256": "d4262e6b8eb11eb962d8694de4d334677566042033f51de15b4b7c9c4d0e9b29"
+      },
+      {
+        "path": "templates/specs/_template.md",
+        "sha256": "506f7183c8ad045648f1bb198bfaeaefa6724ea0f44c4f05e06a9f6f44d07411"
+      },
+      {
+        "path": "templates/storm/process-audit.md",
+        "sha256": "3021c43b38fb802391d91df47f65dd4fc8abc6efa830caddbb2337a3af7370ab"
+      },
+      {
+        "path": "templates/storm/product-goal.md",
+        "sha256": "25317c6e246ba8e12b174600181c1e4dbf9ce538ae34437fcf22d0cb14aceccd"
+      },
+      {
+        "path": "templates/storm/ranking.md",
+        "sha256": "22d7acc40ddaaa7011a385c153daa89a83d9a2e7a72d259b4af54e46ea63c078"
+      },
+      {
+        "path": "templates/storm/traceability.md",
+        "sha256": "14c1c3c985593c54ef85d9e5eb45d44b78d4ecd56de6f870eae4ab8250d078df"
+      }
+    ]
+  }
+}

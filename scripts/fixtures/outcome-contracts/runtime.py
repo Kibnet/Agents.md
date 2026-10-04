@@ -20,7 +20,7 @@ import tomllib
 
 MODEL = 'gpt-6-astra'
 EFFORT = 'high'
-VERSION = '0.154.0'
+VERSION = '0.160.0'
 
 
 def dump(path, value):

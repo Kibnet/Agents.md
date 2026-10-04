@@ -125,6 +125,24 @@ class RuntimeBoundaryTests(unittest.TestCase):
             self.assertIn('files',case); self.assertIn('operations',case)
             self.assertTrue(oracle['expected']); self.assertTrue(oracle['forbidden'])
 
+    def test_gpt61_pack_has_eight_pairs_with_separate_oracles(self):
+        fixtures=Path(__file__).parent.parent/'gpt61-contracts'
+        manifest=json.loads((fixtures/'manifest.json').read_text(encoding='utf-8'))
+        entries=planned_entries(manifest)
+        self.assertEqual(8,len(entries))
+        self.assertEqual(16,sum(len(e['phases']) for e in entries))
+        self.assertEqual([],manifest['heldOut'])
+        root=Path(__file__).resolve().parents[3]
+        catalog,_=snapshot(root,self.path/'new-pack-snapshot')
+        self.assertFalse(any('/oracles/' in name for name in catalog))
+        for entry in entries:
+            validate_fixture_entry(fixtures,entry)
+            case=json.loads((fixtures/entry['input']).read_text(encoding='utf-8'))
+            oracle=json.loads((fixtures/entry['oracle']).read_text(encoding='utf-8'))
+            self.assertTrue(case['turns'])
+            self.assertIn('files',case); self.assertIn('operations',case)
+            self.assertTrue(oracle['expected']); self.assertTrue(oracle['forbidden'])
+
     def test_actual_prompt_and_tools_are_audited(self):
         tools=[{'name':'fixture_read','type':'function'}]
         provenance={'adapterSha256':sha(b'adapter'),'toolSchemaSha256':sha(json.dumps(tools,sort_keys=True).encode())}

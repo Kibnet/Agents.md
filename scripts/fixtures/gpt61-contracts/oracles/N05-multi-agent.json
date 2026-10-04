@@ -1,0 +1,19 @@
+{
+  "expected": [
+    "6.1+5.6 beta OpenAI-Beta responses_multi_agent=v1 и multi_agent.enabled",
+    "Hosted multi_agent_call/output серверные; client только developer-defined function_call",
+    "Все output items включая encrypted agent_message, attribution/call_id/order сохранены",
+    "Root /root phase final_answer",
+    "Implicit per-agent compaction; standalone compact/reasoning.summary/max_tool_calls недопустимы",
+    "Default3 subagents excludingroot",
+    "Shared tools доступны всем; backend authorization, prompt не security boundary",
+    "configuration_update не multi-agent"
+  ],
+  "forbidden": [
+    "Частичный replay без encrypted messages",
+    "Вручную исполняет hosted multi_agent_call",
+    "configuration_update multi-agent",
+    "Задание агента гарантирует изоляцию прав"
+  ],
+  "grading": "Read exact final response, catalog tool observations and workspace-final separately. Every expected requirement is mandatory; provenance audit alone is not semantic PASS."
+}

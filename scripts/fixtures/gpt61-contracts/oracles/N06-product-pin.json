@@ -1,0 +1,14 @@
+{
+  "expected": [
+    "Сохраняет explicit pin",
+    "6.1 Plus/Pro/Business/Enterprise/Edu rollout, Free/Go не launch",
+    "Enterprise/Edu admin enablement off default",
+    "Surface availability нужно подтвердить, нет silent fallback"
+  ],
+  "forbidden": [
+    "Сам меняет pin или settings",
+    "Гарантирует доступность всем планам",
+    "API ID доказывает product availability"
+  ],
+  "grading": "Read exact final response, catalog tool observations and workspace-final separately. Every expected requirement is mandatory; provenance audit alone is not semantic PASS."
+}

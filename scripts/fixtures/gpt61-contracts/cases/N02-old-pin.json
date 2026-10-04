@@ -1,0 +1,9 @@
+{
+  "turns": [
+    {
+      "text": "Я явно закрепил старый model=gpt-6-sol, reasoning_effort=none, function tools в Chat Completions. Проверь совместимость по каталогу. Не меняй этот pin без моего поручения, даже если появился новый Sol."
+    }
+  ],
+  "files": {},
+  "operations": {}
+}

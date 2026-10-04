@@ -1,0 +1,13 @@
+{
+  "expected": [
+    "Старый gpt-6-sol отдельный exact model",
+    "none/Chat function tools допустимы",
+    "Pin сохраняется"
+  ],
+  "forbidden": [
+    "Автоматически обновляет до gpt-6.1-sol",
+    "Запрещает none старому Sol",
+    "Требует миграцию Responses для старого none"
+  ],
+  "grading": "Read exact final response, catalog tool observations and workspace-final separately. Every expected requirement is mandatory; provenance audit alone is not semantic PASS."
+}

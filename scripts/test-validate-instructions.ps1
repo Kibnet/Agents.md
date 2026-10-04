@@ -197,7 +197,7 @@ try {
     # Machine facts are mutated structurally, independent of prose spelling.
     $modelDataPath = Join-Path $scenarioRoot 'schemas/openai-api-model-contract.json'
     $modelOriginal = Get-Content -LiteralPath $modelDataPath -Raw
-    foreach ($case in @('effort','tools','sampling','sol-effort','sol-chat-tools','luna-sampling','luna-eu','invented-gpt6-alias','missing-provenance')) {
+    foreach ($case in @('effort','tools','sampling','sol-effort','sol-chat-tools','luna-sampling','luna-eu','schema1','sol61-none','sol61-minimal','sol61-tools','sol61-sampling','sol61-eu-flex','astra-eu-batch','eu-exhaustive','obsolete-eu-field','ultrafast-eu','sol61-ultrafast','multi-agent-beta','batch-tier','invented-gpt61-alias','invented-gpt6-alias','missing-provenance')) {
         try {
             $modelData = $modelOriginal | ConvertFrom-Json -AsHashtable
             switch ($case) {
@@ -207,7 +207,21 @@ try {
                 'sol-effort' { $modelData.models['gpt-6-sol'].reasoningEfforts = @('minimal','low','medium','high','xhigh','max') }
                 'sol-chat-tools' { $modelData.models['gpt-6-sol'].chatCompletionsFunctionCallingEfforts = @('none','high') }
                 'luna-sampling' { $modelData.models['gpt-6-luna'].parameterRestrictionsWhenReasoning.unsupportedParameters = @() }
-                'luna-eu' { $modelData.models['gpt-6-luna'].euRequiredServiceTier = 'priority' }
+                'luna-eu' { $modelData.models['gpt-6-luna'].euSupportedServiceTiers = @('priority') }
+                'schema1' { $modelData.schemaVersion = 1 }
+                'sol61-none' { $modelData.models['gpt-6.1-sol'].reasoningEfforts += 'none' }
+                'sol61-minimal' { $modelData.models['gpt-6.1-sol'].reasoningEfforts += 'minimal' }
+                'sol61-tools' { $modelData.models['gpt-6.1-sol'].chatCompletionsFunctionCallingEfforts = @('low') }
+                'sol61-sampling' { $modelData.models['gpt-6.1-sol'].unsupportedParameters = @() }
+                'sol61-eu-flex' { $modelData.models['gpt-6.1-sol'].euSupportedProcessingModes = @('standard','batch') }
+                'astra-eu-batch' { $modelData.models['gpt-6-astra'].euSupportedProcessingModes = @('standard') }
+                'eu-exhaustive' { $modelData.models['gpt-6-astra'].euSupportCoverage = 'exhaustive' }
+                'obsolete-eu-field' { $modelData.models['gpt-6-sol'].euRequiredServiceTier = 'default' }
+                'ultrafast-eu' { $modelData.models['gpt-6-astra'].ultrafast.processingRegions += 'EU' }
+                'sol61-ultrafast' { $modelData.models['gpt-6.1-sol'].ultrafast.available = $true }
+                'multi-agent-beta' { $modelData.models['gpt-6.1-sol'].multiAgent.beta = 'stable' }
+                'batch-tier' { $modelData.migration.batchIsServiceTier = $true }
+                'invented-gpt61-alias' { $modelData.aliases['gpt-6.1'] = 'gpt-6.1-sol' }
                 'invented-gpt6-alias' { $modelData.aliases['gpt-6'] = 'gpt-6-astra' }
                 'missing-provenance' { $modelData.sources = @() }
             }

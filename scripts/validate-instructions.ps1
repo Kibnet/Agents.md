@@ -499,14 +499,35 @@ $modelContractPath = Join-Path $resolvedRoot 'schemas/openai-api-model-contract.
 if (Test-Path -LiteralPath $modelContractPath) {
     try {
         $models = Get-Content -LiteralPath $modelContractPath -Raw | ConvertFrom-Json -AsHashtable
-        if ($models.schemaVersion -ne 1 -or $models.surface -cne 'OpenAI API') { throw 'schema/surface mismatch' }
+        if ($models.schemaVersion -ne 2 -or $models.surface -cne 'OpenAI API') { throw 'schema/surface mismatch' }
         $astra = $models.models['gpt-6-astra']
         if (($astra.reasoningEfforts -join ',') -cne 'low,medium,high,xhigh,max') { throw 'Astra effort contract' }
         if ($astra.toolEndpoint -cne 'responses') { throw 'Astra tools require Responses' }
         if (($astra.unsupportedParameters -join ',') -cne 'temperature,top_p,top_logprobs') { throw 'Astra sampling contract' }
         if (($astra.chatCompletionsUnsupportedParameters -join ',') -cne 'logprobs' -or
             ($astra.responsesUnsupportedInclude -join ',') -cne 'message.output_text.logprobs') { throw 'Astra logprobs contract' }
-        if ($astra.euRequiredServiceTier -cne 'default' -or ($astra.euUnsupportedServiceTiers -join ',') -cne 'fast,priority') { throw 'Astra EU tier contract' }
+        $sol61 = $models.models['gpt-6.1-sol']
+        if (($sol61.reasoningEfforts -join ',') -cne 'low,medium,high,xhigh,max' -or $sol61.defaultReasoningEffort -cne 'medium') { throw 'Sol 6.1 effort contract' }
+        if ($sol61.toolEndpoint -cne 'responses' -or $sol61.chatCompletionsFunctionCallingEfforts.Count -ne 0) { throw 'Sol 6.1 tool endpoint contract' }
+        if (($sol61.unsupportedParameters -join ',') -cne 'temperature,top_p,top_logprobs' -or
+            ($sol61.chatCompletionsUnsupportedParameters -join ',') -cne 'logprobs' -or
+            ($sol61.responsesUnsupportedInclude -join ',') -cne 'message.output_text.logprobs') { throw 'Sol 6.1 sampling contract' }
+        foreach ($model in @('gpt-6-astra','gpt-6.1-sol','gpt-6-sol','gpt-6-luna')) {
+            $entry = $models.models[$model]
+            $modes = if ($model -ceq 'gpt-6-astra') { 'standard,batch' } else { 'standard,flex,batch' }
+            $tiers = if ($model -ceq 'gpt-6-astra') { 'default' } else { 'default,flex' }
+            if ($entry.ContainsKey('euRequiredServiceTier') -or ($entry.euSupportedProcessingModes -join ',') -cne $modes -or
+                ($entry.euSupportedServiceTiers -join ',') -cne $tiers -or $entry.euSupportCoverage -cne 'confirmed-only' -or
+                ($entry.euUnsupportedServiceTiers -join ',') -cne 'fast,priority,ultrafast') { throw "$model EU mode/tier contract" }
+        }
+        if ($astra.ultrafast.serviceTier -cne 'ultrafast' -or $astra.ultrafast.endpoint -cne 'responses' -or
+            ($astra.ultrafast.processingRegions -join ',') -cne 'global,US' -or $sol61.ultrafast.available -ne $false) { throw 'Ultrafast region/availability contract' }
+        if ($models.migration.fromSchemaVersion -ne 1 -or $models.migration.batchIsServiceTier -ne $false -or
+            ($models.migration.removedFields -join ',') -cne 'models.*.euRequiredServiceTier' -or
+            ($models.migration.replacementFields -join ',') -cne 'euSupportedProcessingModes,euSupportedServiceTiers,euSupportCoverage') { throw 'schema 2 migration contract' }
+        foreach ($model in @('gpt-6.1-sol','gpt-5.6-sol','gpt-5.6-terra','gpt-5.6-luna')) {
+            if ($models.models[$model].multiAgent.available -ne $true -or $models.models[$model].multiAgent.beta -cne 'responses_multi_agent=v1') { throw "$model multi-agent beta contract" }
+        }
         foreach ($model in @('gpt-6-sol','gpt-6-luna')) {
             $entry = $models.models[$model]
             if (($entry.reasoningEfforts -join ',') -cne 'none,low,medium,high,xhigh,max' -or $entry.defaultReasoningEffort -cne 'medium') { throw "$model effort contract" }
@@ -516,13 +537,12 @@ if (Test-Path -LiteralPath $modelContractPath) {
                 ($restricted.unsupportedParameters -join ',') -cne 'temperature,top_p,top_logprobs' -or
                 ($restricted.chatCompletionsUnsupportedParameters -join ',') -cne 'logprobs' -or
                 ($restricted.responsesUnsupportedInclude -join ',') -cne 'message.output_text.logprobs') { throw "$model conditional sampling contract" }
-            if ($entry.euRequiredServiceTier -cne 'default' -or ($entry.euUnsupportedServiceTiers -join ',') -cne 'fast,priority') { throw "$model EU tier contract" }
         }
         foreach ($model in @('gpt-5.6-sol','gpt-5.6-terra','gpt-5.6-luna')) {
             if (($models.models[$model].reasoningEfforts -join ',') -cne 'none,low,medium,high,xhigh,max') { throw "$model effort contract" }
         }
-        if ($models.aliases['gpt-5.6'] -cne 'gpt-5.6-sol' -or $models.aliases.ContainsKey('gpt-6') -or
-            [string]::IsNullOrWhiteSpace($models.reviewedAt) -or $models.sources.Count -lt 4) { throw 'provenance/alias contract' }
+        if ($models.aliases['gpt-5.6'] -cne 'gpt-5.6-sol' -or $models.aliases.ContainsKey('gpt-6') -or $models.aliases.ContainsKey('gpt-6.1') -or
+            [string]::IsNullOrWhiteSpace($models.reviewedAt) -or $models.sources.Count -lt 9) { throw 'provenance/alias contract' }
     } catch { Add-Error "Нарушен machine contract OpenAI API: $($_.Exception.Message)" }
 }
 

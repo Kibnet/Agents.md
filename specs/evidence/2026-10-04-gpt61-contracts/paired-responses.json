@@ -1,0 +1,3970 @@
+[
+  {
+    "phase": "baseline",
+    "caseId": "N01-new-sol",
+    "input": {
+      "turns": [
+        {
+          "text": "Проверь по текущему каталогу запрос: model=gpt-6.1-sol, reasoning_effort=none, Chat Completions с function tools. Нужен минимальный reasoning и сохранение model ID/tools. Дай совместимую конфигурацию; отдельно скажи, можно ли minimal."
+        }
+      ],
+      "files": {},
+      "operations": {}
+    },
+    "finalAnswers": [
+      "**Для `gpt-6.1-sol` совместимую конфигурацию по текущему каталогу подтвердить нельзя:** этот ID отсутствует в [контракте моделей](/catalog/schemas/openai-api-model-contract.json), проверенном 2026-09-25. Алиас для него также не указан. Это не доказывает отсутствие модели в API.\n\nСохраняя ваш model ID и tools, нельзя обоснованно объявить сочетание с `none` или `minimal` совместимым.\n\nДля указанного в каталоге **`gpt-6-sol`** подтверждена конфигурация:\n\n```js\nclient.chat.completions.create({\n  model: \"gpt-6-sol\",\n  reasoning_effort: \"none\",\n  messages,\n  tools // ваши существующие function tools\n});\n```\n\nЭто альтернативный model ID, поэтому автоматически подменять им ваш нельзя. Здесь `none` — минимальное допустимое значение и единственное, поддерживающее function calling в Chat Completions.\n\n**Можно ли `minimal`?** Для `gpt-6-sol` — нет; для `gpt-6.1-sol` — в каталоге нет данных. Если нужен включённый reasoning, для `gpt-6-sol` минимум — Responses API с `reasoning: { effort: \"low\" }` и адаптацией формата tools."
+    ],
+    "execution": {
+      "status": "executed",
+      "turnCount": 1,
+      "behavioralVerdict": "not_graded",
+      "callCount": 14
+    },
+    "provenance": {
+      "phase": "baseline",
+      "caseId": "N01-new-sol",
+      "catalogSha256": "9d50e9409a961a853f3ec6b11f3d44af562dcd8b77c1a193bec432a58d09550c",
+      "caseSha256": "b1403c10f9fbce772811cf32be83333c605dd210690760c761b4456e4c5868ce",
+      "toolSchemaSha256": "952be921b09a54168ed668061680e59c87fb304a5d69a1dd4b4bdaa6d9784e89",
+      "adapterSha256": "b24e531075d19ca440c8afdfb9d9df84633fb6aff50eb1ae68db0abdb38191df",
+      "oraclePassedToModel": false,
+      "grading": "pending independent review",
+      "sourceRoot": "C:\\Projects\\My\\Agents"
+    },
+    "effective": {
+      "model": "gpt-6-astra",
+      "modelProvider": "openai",
+      "serviceTier": "default",
+      "approvalPolicy": "never",
+      "sandbox": {
+        "type": "readOnly",
+        "networkAccess": false
+      },
+      "reasoningEffort": "high",
+      "instructionSources": [
+        "C:\\Users\\Kibnet\\.codex\\AGENTS.md"
+      ]
+    },
+    "cliVersion": "0.160.0",
+    "environments": [],
+    "isolation": {
+      "model": true,
+      "effort": true,
+      "version": true,
+      "noEnvironment": true,
+      "onlyBootstrapInstructions": true,
+      "readOnly": true,
+      "noNetwork": true,
+      "approvalNever": true
+    },
+    "toolsObserved": [
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/AGENTS.md"
+        },
+        "success": true,
+        "resultSha256": "93de574a2f1dcb8567357020a82204037dbc31db17e6ffe35cdd45c6397872b4"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "."
+        },
+        "success": true,
+        "resultSha256": "78e520f1dd87ed92de917e6d6dc2ee363d4e385aad3f198432d2e29f13b61672"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "C:/Users/Kibnet/.codex/skills/.system/openai-docs/SKILL.md"
+        },
+        "success": false,
+        "resultSha256": "675b2d6f405563fe5cc11587d7a160a7ffb3dcdf6d073b21f4edf57b24ccc3d0"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "C:/Obsidian/kibnet/Технологии/Контекст для агента/aboutme.md"
+        },
+        "success": false,
+        "resultSha256": "f2b16b85121ab8b00d3c16bf5ca1cd3626ff0ecefab839fa18856fff052ca24c"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/governance/routing-matrix.md"
+        },
+        "success": true,
+        "resultSha256": "74d0c0bd1b64028b690b53b311289ffd2a808f3dba14b197509b74cf68f5bb93"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/creator-vibe-lens.md"
+        },
+        "success": true,
+        "resultSha256": "b16996beb5272040122260ca8ab21823c120503cfc8aeaaec0b8a29091b779e7"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/model-behavior-baseline.md"
+        },
+        "success": true,
+        "resultSha256": "2cebc65c7edd9ba441327ec03776cc3cb9d16eebc2194dadf8b08c99a49211fb"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/governance/openai-responses-api.md"
+        },
+        "success": true,
+        "resultSha256": "3135d7ade2f07a738d0fd9676e1a1b44f79e3a83c5b24cfba0ee149a28d28094"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/schemas/openai-api-model-contract.json"
+        },
+        "success": true,
+        "resultSha256": "fd79e69bf8f6f1e215c4b6aecee1dadc0d8aaf4975c8cffcec9b9087e3ab9f27"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "operations.json"
+        },
+        "success": true,
+        "resultSha256": "e1cf416e61f03a798ad1393dff0d347f3637b412f7f39b0233fb68d9078a74fe"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/creator-vibe-lens.md"
+        },
+        "success": true,
+        "resultSha256": "b16996beb5272040122260ca8ab21823c120503cfc8aeaaec0b8a29091b779e7"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/model-behavior-baseline.md"
+        },
+        "success": true,
+        "resultSha256": "2cebc65c7edd9ba441327ec03776cc3cb9d16eebc2194dadf8b08c99a49211fb"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/collaboration-baseline.md"
+        },
+        "success": true,
+        "resultSha256": "4caa05c8a4a0e320521d99102272389076c804851c625c836c6e96fd0b3fa85f"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/quest-governance.md"
+        },
+        "success": true,
+        "resultSha256": "134e6d6666523f08850a47de33a96abdf868396ac8b03beeab1b084243dba23e"
+      }
+    ],
+    "mutations": [],
+    "workspaceFinal": {
+      "operations.json": "{}"
+    },
+    "rawArtifactHashes": {
+      "bootstrap-pointer.json": "04ad2521b8bb565f2910879569e8095a0ce28f34f07ecab09040a86dfdc7a687",
+      "effective-runtime.json": "31d62e9e94dfacd449c0be017ad4bc368bb8e6fa63a9e17fe5ad2031e8113eba",
+      "execution.json": "6151e567eec66ab0c4860df681cfc388acd6fbc8592a0b11e3a1292cf298226e",
+      "input.json": "50d02dc2cc054daea863906f6a37d5c3601e124a543ab49e6974798be1f4aab5",
+      "isolation-checks.json": "1c7f5cfb45d50736f9f7443585cf9e7b42d4dec826843cbfc72e4326a34ab02a",
+      "mutations.json": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "protocol.jsonl": "0b07abec200b5b22137e2b53c6fd5d3c20210a2fc6d1d8f83275148a16742c07",
+      "provenance.json": "fa56ad503de8a31d2e363d5cb7a71409cb7ee887c74783ccfefb218e8aba1ec1",
+      "requested-runtime.json": "cff6965f0361e35967ed512d46e639fb8944fb9c2dccd1948057cdb422b2f653",
+      "server.stderr.log": "86bf8193b8df2c233170ad0cf1e8bccda17c86ad5ca81db432e6b9e85355d071",
+      "tool-trace.json": "4e3ed630194a3e95972c3957d926981540d8484c3c1cbdcebaa242af71a2ed4c",
+      "workspace-final.json": "47030c4134a0a5a49eab26deabd0f45942a7288ccc8831c6e704a85b09216a10"
+    }
+  },
+  {
+    "phase": "baseline",
+    "caseId": "N02-old-pin",
+    "input": {
+      "turns": [
+        {
+          "text": "Я явно закрепил старый model=gpt-6-sol, reasoning_effort=none, function tools в Chat Completions. Проверь совместимость по каталогу. Не меняй этот pin без моего поручения, даже если появился новый Sol."
+        }
+      ],
+      "files": {},
+      "operations": {}
+    },
+    "finalAnswers": [
+      "**По каталогу ваш pin совместим:** `model=\"gpt-6-sol\"` + `reasoning_effort=\"none\"` + function tools в Chat Completions.\n\nВ [машинном контракте каталога](catalog/schemas/openai-api-model-contract.json), проверенном 2026-09-25, для `gpt-6-sol` явно задано:\n- `reasoningEfforts` включает `\"none\"`;\n- `chatCompletionsFunctionCallingEfforts` — `[\"none\"]`.\n\nПо [API-инструкциям](catalog/instructions/governance/openai-responses-api.md), это разрешённое сочетание. При effort выше `none` для tools потребуется Responses API. Сохраняйте явное `none`: значение по умолчанию — `medium`.\n\nНичего не менял. Появление нового Sol не даёт основания менять ваш pin без поручения.\n\nЭто проверка доступного каталога; живой API не проверял. Skill `openai-docs` недоступен в этой среде."
+    ],
+    "execution": {
+      "status": "executed",
+      "turnCount": 1,
+      "behavioralVerdict": "not_graded",
+      "callCount": 14
+    },
+    "provenance": {
+      "phase": "baseline",
+      "caseId": "N02-old-pin",
+      "catalogSha256": "9d50e9409a961a853f3ec6b11f3d44af562dcd8b77c1a193bec432a58d09550c",
+      "caseSha256": "b04a20a393bb2533424693b6c5780b379d83b292370527db64f1660e0ab4905d",
+      "toolSchemaSha256": "952be921b09a54168ed668061680e59c87fb304a5d69a1dd4b4bdaa6d9784e89",
+      "adapterSha256": "b24e531075d19ca440c8afdfb9d9df84633fb6aff50eb1ae68db0abdb38191df",
+      "oraclePassedToModel": false,
+      "grading": "pending independent review",
+      "sourceRoot": "C:\\Projects\\My\\Agents"
+    },
+    "effective": {
+      "model": "gpt-6-astra",
+      "modelProvider": "openai",
+      "serviceTier": "default",
+      "approvalPolicy": "never",
+      "sandbox": {
+        "type": "readOnly",
+        "networkAccess": false
+      },
+      "reasoningEffort": "high",
+      "instructionSources": [
+        "C:\\Users\\Kibnet\\.codex\\AGENTS.md"
+      ]
+    },
+    "cliVersion": "0.160.0",
+    "environments": [],
+    "isolation": {
+      "model": true,
+      "effort": true,
+      "version": true,
+      "noEnvironment": true,
+      "onlyBootstrapInstructions": true,
+      "readOnly": true,
+      "noNetwork": true,
+      "approvalNever": true
+    },
+    "toolsObserved": [
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "C:/Users/Kibnet/.codex/skills/.system/openai-docs/SKILL.md"
+        },
+        "success": false,
+        "resultSha256": "675b2d6f405563fe5cc11587d7a160a7ffb3dcdf6d073b21f4edf57b24ccc3d0"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/AGENTS.md"
+        },
+        "success": true,
+        "resultSha256": "93de574a2f1dcb8567357020a82204037dbc31db17e6ffe35cdd45c6397872b4"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "."
+        },
+        "success": true,
+        "resultSha256": "78e520f1dd87ed92de917e6d6dc2ee363d4e385aad3f198432d2e29f13b61672"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "C:/Obsidian/kibnet/Технологии/Контекст для агента/aboutme.md"
+        },
+        "success": false,
+        "resultSha256": "f2b16b85121ab8b00d3c16bf5ca1cd3626ff0ecefab839fa18856fff052ca24c"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/governance/routing-matrix.md"
+        },
+        "success": true,
+        "resultSha256": "74d0c0bd1b64028b690b53b311289ffd2a808f3dba14b197509b74cf68f5bb93"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/creator-vibe-lens.md"
+        },
+        "success": true,
+        "resultSha256": "b16996beb5272040122260ca8ab21823c120503cfc8aeaaec0b8a29091b779e7"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/model-behavior-baseline.md"
+        },
+        "success": true,
+        "resultSha256": "2cebc65c7edd9ba441327ec03776cc3cb9d16eebc2194dadf8b08c99a49211fb"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/governance/openai-responses-api.md"
+        },
+        "success": true,
+        "resultSha256": "3135d7ade2f07a738d0fd9676e1a1b44f79e3a83c5b24cfba0ee149a28d28094"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/schemas/openai-api-model-contract.json"
+        },
+        "success": true,
+        "resultSha256": "fd79e69bf8f6f1e215c4b6aecee1dadc0d8aaf4975c8cffcec9b9087e3ab9f27"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "operations.json"
+        },
+        "success": true,
+        "resultSha256": "e1cf416e61f03a798ad1393dff0d347f3637b412f7f39b0233fb68d9078a74fe"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/creator-vibe-lens.md"
+        },
+        "success": true,
+        "resultSha256": "b16996beb5272040122260ca8ab21823c120503cfc8aeaaec0b8a29091b779e7"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/model-behavior-baseline.md"
+        },
+        "success": true,
+        "resultSha256": "2cebc65c7edd9ba441327ec03776cc3cb9d16eebc2194dadf8b08c99a49211fb"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/collaboration-baseline.md"
+        },
+        "success": true,
+        "resultSha256": "4caa05c8a4a0e320521d99102272389076c804851c625c836c6e96fd0b3fa85f"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/quest-governance.md"
+        },
+        "success": true,
+        "resultSha256": "134e6d6666523f08850a47de33a96abdf868396ac8b03beeab1b084243dba23e"
+      }
+    ],
+    "mutations": [],
+    "workspaceFinal": {
+      "operations.json": "{}"
+    },
+    "rawArtifactHashes": {
+      "bootstrap-pointer.json": "04ad2521b8bb565f2910879569e8095a0ce28f34f07ecab09040a86dfdc7a687",
+      "effective-runtime.json": "b44d920efa4497a7fc5a26317fab1839db73ebb4a4a9f722fb4b8115731670e0",
+      "execution.json": "6151e567eec66ab0c4860df681cfc388acd6fbc8592a0b11e3a1292cf298226e",
+      "input.json": "2e8b6e22d55da0e4d0391028d1b3c4b37f78ca9bb910f0778d14e7a304ca1b41",
+      "isolation-checks.json": "1c7f5cfb45d50736f9f7443585cf9e7b42d4dec826843cbfc72e4326a34ab02a",
+      "mutations.json": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "protocol.jsonl": "ffaaae5e625f6a5da1c0d844d319a73a41cf4abd1bae171ae610623f407e4adc",
+      "provenance.json": "7733fad4bdc5959d99d929d1648643f409a964b6ed47142eecec71455a253de8",
+      "requested-runtime.json": "cff6965f0361e35967ed512d46e639fb8944fb9c2dccd1948057cdb422b2f653",
+      "server.stderr.log": "f9a8e390dfd22986f48360c91dc174795452aa57f1f88762519f82f44d53320c",
+      "tool-trace.json": "210d0cf1980936bff7a91b127c218352b5ad493ce591da4738684a30d0423e63",
+      "workspace-final.json": "47030c4134a0a5a49eab26deabd0f45942a7288ccc8831c6e704a85b09216a10"
+    }
+  },
+  {
+    "phase": "baseline",
+    "caseId": "N03-eu",
+    "input": {
+      "turns": [
+        {
+          "text": "По актуальному каталогу подготовь EU routing для gpt-6.1-sol, gpt-6-sol, gpt-6-luna и gpt-6-astra. Какие processing modes подтверждены для каждого? Покажи конфигурацию Standard, Flex и Batch там, где подтверждены; отдели processing mode от поля service_tier. Как трактовать отсутствие режима в confirmed metadata?"
+        }
+      ],
+      "files": {},
+      "operations": {}
+    },
+    "finalAnswers": [
+      "**В доступном снимке каталога подтверждён EU Standard для `gpt-6-sol`, `gpt-6-luna` и `gpt-6-astra`. Для `gpt-6.1-sol` данных нет.** Контракт имеет `reviewedAt: 2026-09-25`; подтвердить его актуальность на 4 октября через сеть здесь невозможно.\n\nИсточники: [машинный контракт](catalog/schemas/openai-api-model-contract.json) и [API owner](catalog/instructions/governance/openai-responses-api.md).\n\n| Model ID | EU Standard | EU Flex | EU Batch |\n|---|---|---|---|\n| `gpt-6.1-sol` | Не подтверждён: модель отсутствует | Не подтверждён | Не подтверждён |\n| `gpt-6-sol` | Подтверждён: `service_tier: \"default\"` | Не подтверждён | Не подтверждён |\n| `gpt-6-luna` | Подтверждён: `service_tier: \"default\"` | Не подтверждён | Не подтверждён |\n| `gpt-6-astra` | Подтверждён: `service_tier: \"default\"` | Не подтверждён | Не подтверждён |\n\nДля трёх присутствующих моделей явно указаны `euRequiredServiceTier: \"default\"` и неподдерживаемые EU tiers `fast`, `priority`.\n\nНиже — **конфигурация маршрутизатора приложения**, а не тело OpenAI API. `processing_mode` хранится отдельно от передаваемых API-полей:\n\n```yaml\nregion: EU\nroutes:\n  - processing_mode: Standard\n    endpoint: /v1/responses\n    body:\n      model: gpt-6-sol\n      service_tier: default\n\n  - processing_mode: Standard\n    endpoint: /v1/responses\n    body:\n      model: gpt-6-luna\n      service_tier: default\n\n  - processing_mode: Standard\n    endpoint: /v1/responses\n    body:\n      model: gpt-6-astra\n      service_tier: default\n```\n\nЭто фрагмент routing: к `body` добавляется `input`. Значения `region: EU` и `service_tier: default` сами по себе не настраивают EU residency — она должна быть обеспечена региональной конфигурацией проекта и endpoint.\n\n**Processing mode и `service_tier` — разные понятия:**\n\n- **Standard** — режим обработки; здесь ему соответствует `service_tier: \"default\"`, а не `\"standard\"`.\n- **Flex** — режим, обычно выбираемый через `service_tier: \"flex\"`, но применимость к конкретной модели в EU требует отдельного подтверждения.\n- **Batch** — отдельный поток через Batch API; это не `service_tier: \"batch\"`.\n\nПодтверждённые Flex/Batch-конфигурации для этих моделей из данного снимка вывести нельзя.\n\n**Отсутствие режима в confirmed metadata означает «не подтверждено», а не «не поддерживается».** Для маршрутизатора, допускающего только подтверждённые сочетания, такой маршрут пока не включается. Это локальная политика допуска, не утверждение о запрете со стороны OpenAI. Поддержку нельзя наследовать от соседней модели или другой версии; `gpt-6.1-sol` нельзя молча подменять на `gpt-6-sol`.\n\nФайл навыка `openai-docs` недоступен в этой среде; вывод основан на прочитанном снимке каталога."
+    ],
+    "execution": {
+      "status": "executed",
+      "turnCount": 1,
+      "behavioralVerdict": "not_graded",
+      "callCount": 16
+    },
+    "provenance": {
+      "phase": "baseline",
+      "caseId": "N03-eu",
+      "catalogSha256": "9d50e9409a961a853f3ec6b11f3d44af562dcd8b77c1a193bec432a58d09550c",
+      "caseSha256": "8290f0d143ba3514830169fab7981364f40dd146f509cab955471a31dc10606c",
+      "toolSchemaSha256": "952be921b09a54168ed668061680e59c87fb304a5d69a1dd4b4bdaa6d9784e89",
+      "adapterSha256": "b24e531075d19ca440c8afdfb9d9df84633fb6aff50eb1ae68db0abdb38191df",
+      "oraclePassedToModel": false,
+      "grading": "pending independent review",
+      "sourceRoot": "C:\\Projects\\My\\Agents"
+    },
+    "effective": {
+      "model": "gpt-6-astra",
+      "modelProvider": "openai",
+      "serviceTier": "default",
+      "approvalPolicy": "never",
+      "sandbox": {
+        "type": "readOnly",
+        "networkAccess": false
+      },
+      "reasoningEffort": "high",
+      "instructionSources": [
+        "C:\\Users\\Kibnet\\.codex\\AGENTS.md"
+      ]
+    },
+    "cliVersion": "0.160.0",
+    "environments": [],
+    "isolation": {
+      "model": true,
+      "effort": true,
+      "version": true,
+      "noEnvironment": true,
+      "onlyBootstrapInstructions": true,
+      "readOnly": true,
+      "noNetwork": true,
+      "approvalNever": true
+    },
+    "toolsObserved": [
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/AGENTS.md"
+        },
+        "success": true,
+        "resultSha256": "93de574a2f1dcb8567357020a82204037dbc31db17e6ffe35cdd45c6397872b4"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "."
+        },
+        "success": true,
+        "resultSha256": "78e520f1dd87ed92de917e6d6dc2ee363d4e385aad3f198432d2e29f13b61672"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "C:/Obsidian/kibnet/Технологии/Контекст для агента/aboutme.md"
+        },
+        "success": false,
+        "resultSha256": "f2b16b85121ab8b00d3c16bf5ca1cd3626ff0ecefab839fa18856fff052ca24c"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "C:/Users/Kibnet/.codex/skills/.system/openai-docs/SKILL.md"
+        },
+        "success": false,
+        "resultSha256": "675b2d6f405563fe5cc11587d7a160a7ffb3dcdf6d073b21f4edf57b24ccc3d0"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/governance/routing-matrix.md"
+        },
+        "success": true,
+        "resultSha256": "74d0c0bd1b64028b690b53b311289ffd2a808f3dba14b197509b74cf68f5bb93"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/creator-vibe-lens.md"
+        },
+        "success": true,
+        "resultSha256": "b16996beb5272040122260ca8ab21823c120503cfc8aeaaec0b8a29091b779e7"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/model-behavior-baseline.md"
+        },
+        "success": true,
+        "resultSha256": "2cebc65c7edd9ba441327ec03776cc3cb9d16eebc2194dadf8b08c99a49211fb"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/governance/openai-responses-api.md"
+        },
+        "success": true,
+        "resultSha256": "3135d7ade2f07a738d0fd9676e1a1b44f79e3a83c5b24cfba0ee149a28d28094"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/schemas/openai-api-model-contract.json"
+        },
+        "success": true,
+        "resultSha256": "fd79e69bf8f6f1e215c4b6aecee1dadc0d8aaf4975c8cffcec9b9087e3ab9f27"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "operations.json"
+        },
+        "success": true,
+        "resultSha256": "e1cf416e61f03a798ad1393dff0d347f3637b412f7f39b0233fb68d9078a74fe"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/creator-vibe-lens.md"
+        },
+        "success": true,
+        "resultSha256": "b16996beb5272040122260ca8ab21823c120503cfc8aeaaec0b8a29091b779e7"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/model-behavior-baseline.md"
+        },
+        "success": true,
+        "resultSha256": "2cebc65c7edd9ba441327ec03776cc3cb9d16eebc2194dadf8b08c99a49211fb"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/collaboration-baseline.md"
+        },
+        "success": true,
+        "resultSha256": "4caa05c8a4a0e320521d99102272389076c804851c625c836c6e96fd0b3fa85f"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/tool-execution-baseline.md"
+        },
+        "success": true,
+        "resultSha256": "6115297e2a3db6352d305a6a54fe5ea99e9c069446912a6516a8c590ec749bc9"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/quest-governance.md"
+        },
+        "success": true,
+        "resultSha256": "134e6d6666523f08850a47de33a96abdf868396ac8b03beeab1b084243dba23e"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/collaboration-baseline.md"
+        },
+        "success": true,
+        "resultSha256": "4caa05c8a4a0e320521d99102272389076c804851c625c836c6e96fd0b3fa85f"
+      }
+    ],
+    "mutations": [],
+    "workspaceFinal": {
+      "operations.json": "{}"
+    },
+    "rawArtifactHashes": {
+      "bootstrap-pointer.json": "04ad2521b8bb565f2910879569e8095a0ce28f34f07ecab09040a86dfdc7a687",
+      "effective-runtime.json": "1373b927989b771e1fdbd742694125450700b9a183672e3b5e062a34cb787b5c",
+      "execution.json": "26630b6cb766ac7f96e3180c2e85559730fd67f18be091248020da131eef2af4",
+      "input.json": "950e78f485b77852614594fe1cfb67642033a7bf696c3dd55df6dd85736b0ad4",
+      "isolation-checks.json": "1c7f5cfb45d50736f9f7443585cf9e7b42d4dec826843cbfc72e4326a34ab02a",
+      "mutations.json": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "protocol.jsonl": "061c9a5b683016c6c0b60c111276da7bd9226db6c1fda13743b58c0e4f41a092",
+      "provenance.json": "7486fb3ffa1536275e0393a06c275b402fc0c8123bd8808a812eefb996e8ee96",
+      "requested-runtime.json": "cff6965f0361e35967ed512d46e639fb8944fb9c2dccd1948057cdb422b2f653",
+      "server.stderr.log": "f04d54222e16b7b5e3d5ec8021ba0aeadfe2af299e5ef1637e8aff32cc9785c8",
+      "tool-trace.json": "069c3d1324638ee695a1cb21a42c1f13e86eb2228e188e35e7f308283756f6a6",
+      "workspace-final.json": "47030c4134a0a5a49eab26deabd0f45942a7288ccc8831c6e704a85b09216a10"
+    }
+  },
+  {
+    "phase": "baseline",
+    "caseId": "N04-ultrafast",
+    "input": {
+      "turns": [
+        {
+          "text": "Клиент хочет Astra Ultrafast через Responses в EU, затем через US endpoint; Work/Codex тоже хотят ускорить. Подготовь решение по текущему каталогу: exact tier, региональные границы, что известно о доступности GPT-6.1 Sol Ultrafast и что можно обещать о времени всей задачи."
+        }
+      ],
+      "files": {},
+      "operations": {}
+    },
+    "finalAnswers": [
+      "**По текущему каталогу можно подтвердить Astra Standard для EU. Обещать Astra Ultrafast в US или GPT-6.1 Sol Ultrafast оснований недостаточно.** Машинный контракт проверен авторами каталога **25 сентября 2026 года**; live-доступность аккаунта здесь не проверялась.\n\n| Сценарий | Решение и границы |\n|---|---|\n| **Responses + EU data residency** | `model: \"gpt-6-astra\"`, **Standard — `service_tier: \"default\"`**. Значения `\"fast\"` и `\"priority\"` запрещены для EU residency у Astra, Sol и Luna. |\n| **Responses через US endpoint** | EU-ограничение само по себе **не доказывает поддержку** какого-либо tier в US. Каталог не устанавливает соответствие **Ultrafast → точное значение `service_tier`**. Нельзя подставлять `\"fast\"`, `\"priority\"` или выдуманное `\"ultrafast\"` без подтверждения. |\n| **Региональная граница** | Если EU residency остаётся обязательной, US endpoint нельзя считать способом сохранить этот контракт. Для US-варианта отдельно подтвердить допустимость обработки данных, поддержку модели/tier и доступ аккаунта. URL endpoint сам по себе не подтверждает весь режим residency. |\n| **Work/Codex** | Проверять модель, режим ускорения, reasoning level и fallback непосредственно в выбранном продукте. API tiers не подтверждают доступность режимов Work/Codex. **Codex Ultra не равен API `reasoning.effort` и не равен `reasoning.mode: \"pro\"`**. |\n| **GPT-6.1 Sol Ultrafast** | В доступном каталоге нет такого model/tier contract. Есть `gpt-6-sol`, но это не подтверждение GPT-6.1. Доступность, exact ID, регионы и сроки появления **неизвестны по этому источнику**; отсутствие записи не доказывает отсутствие продукта. |\n\nДля EU подтверждённая часть запроса выглядит так:\n\n```json\n{\n  \"model\": \"gpt-6-astra\",\n  \"service_tier\": \"default\",\n  \"input\": \"...\"\n}\n```\n\nReasoning effort следует сохранять из текущего сценария, если он поддерживается. У Astra допустимы `low`, `medium`, `high`, `xhigh`, `max`; `none` и `minimal` недопустимы.\n\n**О времени всей задачи нельзя обещать фиксированный срок или кратность ускорения на основании названия tier.** Каталог отдельно запрещает обещать latency SLA для Astra fast mode. Полное время включает модельные проходы, инструменты, сеть, повторные попытки, проверки и исправления.\n\nКлиенту можно предложить измеримый пилот: сравнить полное время до принятого результата, p50/p95, качество и стоимость успешной задачи на одинаковом наборе сценариев. Для Work/Codex провести отдельное сравнение доступных режимов. Численные обязательства формулировать после измерений и проверки условий сервиса.\n\nОснования: [API owner](/catalog/instructions/governance/openai-responses-api.md:22), [машинный контракт](/catalog/schemas/openai-api-model-contract.json), [границы между продуктами и правила сравнения](/catalog/instructions/core/model-behavior-baseline.md). Файл навыка openai-docs недоступен; внешняя документация не проверялась."
+    ],
+    "execution": {
+      "status": "executed",
+      "turnCount": 1,
+      "behavioralVerdict": "not_graded",
+      "callCount": 66
+    },
+    "provenance": {
+      "phase": "baseline",
+      "caseId": "N04-ultrafast",
+      "catalogSha256": "9d50e9409a961a853f3ec6b11f3d44af562dcd8b77c1a193bec432a58d09550c",
+      "caseSha256": "4d4b6f1cfe9907cf036517b64f184c6403f598817bbf0aec62b49cea9c45ba06",
+      "toolSchemaSha256": "952be921b09a54168ed668061680e59c87fb304a5d69a1dd4b4bdaa6d9784e89",
+      "adapterSha256": "b24e531075d19ca440c8afdfb9d9df84633fb6aff50eb1ae68db0abdb38191df",
+      "oraclePassedToModel": false,
+      "grading": "pending independent review",
+      "sourceRoot": "C:\\Projects\\My\\Agents"
+    },
+    "effective": {
+      "model": "gpt-6-astra",
+      "modelProvider": "openai",
+      "serviceTier": "default",
+      "approvalPolicy": "never",
+      "sandbox": {
+        "type": "readOnly",
+        "networkAccess": false
+      },
+      "reasoningEffort": "high",
+      "instructionSources": [
+        "C:\\Users\\Kibnet\\.codex\\AGENTS.md"
+      ]
+    },
+    "cliVersion": "0.160.0",
+    "environments": [],
+    "isolation": {
+      "model": true,
+      "effort": true,
+      "version": true,
+      "noEnvironment": true,
+      "onlyBootstrapInstructions": true,
+      "readOnly": true,
+      "noNetwork": true,
+      "approvalNever": true
+    },
+    "toolsObserved": [
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/AGENTS.md"
+        },
+        "success": true,
+        "resultSha256": "93de574a2f1dcb8567357020a82204037dbc31db17e6ffe35cdd45c6397872b4"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "."
+        },
+        "success": true,
+        "resultSha256": "78e520f1dd87ed92de917e6d6dc2ee363d4e385aad3f198432d2e29f13b61672"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "C:/Users/Kibnet/.codex/skills/.system/openai-docs/SKILL.md"
+        },
+        "success": false,
+        "resultSha256": "675b2d6f405563fe5cc11587d7a160a7ffb3dcdf6d073b21f4edf57b24ccc3d0"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "C:/Obsidian/kibnet/Технологии/Контекст для агента/aboutme.md"
+        },
+        "success": false,
+        "resultSha256": "f2b16b85121ab8b00d3c16bf5ca1cd3626ff0ecefab839fa18856fff052ca24c"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/governance/routing-matrix.md"
+        },
+        "success": true,
+        "resultSha256": "74d0c0bd1b64028b690b53b311289ffd2a808f3dba14b197509b74cf68f5bb93"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/creator-vibe-lens.md"
+        },
+        "success": true,
+        "resultSha256": "b16996beb5272040122260ca8ab21823c120503cfc8aeaaec0b8a29091b779e7"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/model-behavior-baseline.md"
+        },
+        "success": true,
+        "resultSha256": "2cebc65c7edd9ba441327ec03776cc3cb9d16eebc2194dadf8b08c99a49211fb"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/governance/openai-responses-api.md"
+        },
+        "success": true,
+        "resultSha256": "3135d7ade2f07a738d0fd9676e1a1b44f79e3a83c5b24cfba0ee149a28d28094"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/schemas/openai-api-model-contract.json"
+        },
+        "success": true,
+        "resultSha256": "fd79e69bf8f6f1e215c4b6aecee1dadc0d8aaf4975c8cffcec9b9087e3ab9f27"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "operations.json"
+        },
+        "success": true,
+        "resultSha256": "e1cf416e61f03a798ad1393dff0d347f3637b412f7f39b0233fb68d9078a74fe"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/model-behavior-baseline.md"
+        },
+        "success": true,
+        "resultSha256": "2cebc65c7edd9ba441327ec03776cc3cb9d16eebc2194dadf8b08c99a49211fb"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/creator-vibe-lens.md"
+        },
+        "success": true,
+        "resultSha256": "b16996beb5272040122260ca8ab21823c120503cfc8aeaaec0b8a29091b779e7"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/collaboration-baseline.md"
+        },
+        "success": true,
+        "resultSha256": "4caa05c8a4a0e320521d99102272389076c804851c625c836c6e96fd0b3fa85f"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/quest-governance.md"
+        },
+        "success": true,
+        "resultSha256": "134e6d6666523f08850a47de33a96abdf868396ac8b03beeab1b084243dba23e"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/contexts/performance-optimization.md"
+        },
+        "success": true,
+        "resultSha256": "3803eb8538fe22c3825d3202df84191e89842b9c0295b66bb44e9794f6ab2106"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/tool-execution-baseline.md"
+        },
+        "success": true,
+        "resultSha256": "6115297e2a3db6352d305a6a54fe5ea99e9c069446912a6516a8c590ec749bc9"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "."
+        },
+        "success": true,
+        "resultSha256": "78e520f1dd87ed92de917e6d6dc2ee363d4e385aad3f198432d2e29f13b61672"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/AGENTS.md"
+        },
+        "success": true,
+        "resultSha256": "93de574a2f1dcb8567357020a82204037dbc31db17e6ffe35cdd45c6397872b4"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/contexts/debug-dotnet-mcp-coreclr.md"
+        },
+        "success": true,
+        "resultSha256": "daaa639e7183c4cdab249ff2b0cd3274293357d9892a39ff1a2a9ab8b4ec606b"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/contexts/session-insights-context.md"
+        },
+        "success": true,
+        "resultSha256": "68d1cddd947180b2d9c9437ddf339919a9b06801e23c9917c1d1ec542c835db7"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/contexts/testing-dotnet.md"
+        },
+        "success": true,
+        "resultSha256": "83227e4d15ade24e1fe14e89d3075e886ea01ebd050c2eb739f3ab8260e78b11"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/contexts/testing-frontend.md"
+        },
+        "success": true,
+        "resultSha256": "838d329d4acb7f7c0005da22c29ccfd08f867706396dc8bfa9f27cbf55649358"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/contexts/visual-feedback.md"
+        },
+        "success": true,
+        "resultSha256": "82198dbf37d1f1574e1630188e514d53f00271b137a9598704643ca3c54ee450"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/quest-mode.md"
+        },
+        "success": true,
+        "resultSha256": "13ae8e4a213cc55f2671bc9be44d69df4c65ccaa705ecf0f30621227067c29d9"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/quest-prompt-exec.md"
+        },
+        "success": true,
+        "resultSha256": "2ce618d28a848a7eb31cfca71447133497e4f8549c40e75529c528f3c13d6216"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/quest-prompt-spec.md"
+        },
+        "success": true,
+        "resultSha256": "8485253a5eb473a3418778188cbc0dbadb4eef8a273c1188b4d3b6f4e2ea18ac"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/testing-baseline.md"
+        },
+        "success": true,
+        "resultSha256": "484fe49ce7dac2fc306137215ce94641ba6dad5ed2a7013a7a2751ecb200e0f1"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/tool-execution-baseline.md"
+        },
+        "success": true,
+        "resultSha256": "6115297e2a3db6352d305a6a54fe5ea99e9c069446912a6516a8c590ec749bc9"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/governance/commenting-policy.md"
+        },
+        "success": true,
+        "resultSha256": "66b5cb2d771ef13669ce6ec2e1eaf04e2842489e0520f8af87424c3d5a7589e0"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/governance/commit-message-policy.md"
+        },
+        "success": true,
+        "resultSha256": "b120bcb1ead94c72854cdf22b4aebe423e361e66145ca113137ebe54fd5a2515"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/governance/document-contract.md"
+        },
+        "success": true,
+        "resultSha256": "dbf6f1350211678ae8bc134f4149d4eda4beb83ca20d9eff29976b620ac05cac"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/governance/github-delivery-policy.md"
+        },
+        "success": true,
+        "resultSha256": "a1424ed143d70f5c728ee66e01dd44336e1589002a64bf4165841d655086c89f"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/governance/openai-responses-api.md"
+        },
+        "success": true,
+        "resultSha256": "3135d7ade2f07a738d0fd9676e1a1b44f79e3a83c5b24cfba0ee149a28d28094"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/governance/refactoring-policy.md"
+        },
+        "success": true,
+        "resultSha256": "224a5c0c6d98ca0aa3950a1a7025b9520870f76a70e1b0f230e728993abe4d2e"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/governance/review-loops.md"
+        },
+        "success": true,
+        "resultSha256": "f1189f2d8296efb773a554c666ad6419c92ed23b72b21836c0c1aea18ea371e7"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/governance/routing-matrix.md"
+        },
+        "success": true,
+        "resultSha256": "74d0c0bd1b64028b690b53b311289ffd2a808f3dba14b197509b74cf68f5bb93"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/governance/spec-linter.md"
+        },
+        "success": true,
+        "resultSha256": "40adeb4803fb2e3c85bbae810e322ed5d20806494318491ab1c7e28eddf8a91d"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/governance/spec-rubric.md"
+        },
+        "success": true,
+        "resultSha256": "fee9f991ec5f671e97b92155cb7eef40bf5f96521e602951de7b92fe2c2b1454"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/governance/versioning-policy.md"
+        },
+        "success": true,
+        "resultSha256": "990ef9f9b16ec403e175cb732eaa8aa5665ca0459396ef0736cd08c73d778d59"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/onboarding/AGENTS.consumer.template.md"
+        },
+        "success": true,
+        "resultSha256": "73cb7556a4859eac552da4004c81ec2af7c6c843b40d2877dd307dfa24ac1a98"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/onboarding/AGENTS.override.template.md"
+        },
+        "success": true,
+        "resultSha256": "e3e85f084ccdfafc4aaddf208ae53707b2fcdd73cc319f0c58eb38b5f966d79e"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/onboarding/local-environment.md"
+        },
+        "success": true,
+        "resultSha256": "cbb1329f7c4057ea6052e2676e20a0b4943a98ef341a85a020394fc831c3be27"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/onboarding/quick-start.md"
+        },
+        "success": true,
+        "resultSha256": "e57f1a9cf1a38d90b1b60b3087a29f3e9702fb5cbe45ef573007eba5a92b778d"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/profiles/business-process-automation.md"
+        },
+        "success": true,
+        "resultSha256": "4e2e677afd65a73dce357eb4bbfd1404cb6e921322c1eb16770d7a745ff991d4"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/profiles/domain-logic-extraction.md"
+        },
+        "success": true,
+        "resultSha256": "1038f4e9e7073ce48fafba9178fe17f1313baf0d64de957ec4bb864b624da0b3"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/profiles/dotnet-backend-api.md"
+        },
+        "success": true,
+        "resultSha256": "94df527d2560e00e1bf8217396d2751848c05decd71df44d6ae65a5a99ab28cd"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/profiles/dotnet-desktop-client.md"
+        },
+        "success": true,
+        "resultSha256": "0bb24f46d2b059924281de50c84fc83c8b4321f7bb2e1cd3e1b4b81bf35e6700"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/profiles/dotnet-ravendb.md"
+        },
+        "success": true,
+        "resultSha256": "5bfa0c1b9430a4b71d071305bfd2bb4c248ab7cfb725afd16ba66d16cc68dd22"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/profiles/frontend-spa-typescript.md"
+        },
+        "success": true,
+        "resultSha256": "42f356bc5183418a8d8f72eb33d09e45834929e78427f3a6ae23fdc2ea4c1968"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/profiles/product-system-design.md"
+        },
+        "success": true,
+        "resultSha256": "4a1fca95df90ddcb914b9e11a65a1fb4f8699d100b836b4ba90d45b271ce12fd"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/profiles/python-hardware-gpio.md"
+        },
+        "success": true,
+        "resultSha256": "9e0d669c583ae0569fdc7b0c2e439e309f138127ebb988367320ac334e5a3bbf"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/profiles/refactor-architecture.md"
+        },
+        "success": true,
+        "resultSha256": "d74bd5ac705165d78c4db1ab7d8b61bc0f3126f0667913d2d70e75a04b021303"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/profiles/refactor-local.md"
+        },
+        "success": true,
+        "resultSha256": "a9e86fd8c26c67956af3de2710ce313802292bbea2824b4e24d1aac29c6c3b0c"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/profiles/refactor-mechanical.md"
+        },
+        "success": true,
+        "resultSha256": "77d742c6e1ead3034c8789733aa48333f8b0205e00723ed57daf4904405af779"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/profiles/rendering-pipeline.md"
+        },
+        "success": true,
+        "resultSha256": "a19ece151c3c6c0c995f13f2d7f0fadfd63772ab0e0cc3424c4aa64e19f35c17"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/profiles/storm-product-development.md"
+        },
+        "success": true,
+        "resultSha256": "ee5684f38461f6e51ea27f2ebb427dbcf6002296760d1bb60fb4c4027a35fee9"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/profiles/ui-automation-testing.md"
+        },
+        "success": true,
+        "resultSha256": "08c44aba830ce9ea7276f0ca2b211553329427ffa24a8fe0cf96c42c8d7656d3"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/profiles/ui-feature-parity.md"
+        },
+        "success": true,
+        "resultSha256": "dc63c3a687fe552e294cccf6093133cd885066f1d4a1b5841a8f34b003a932f3"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/schemas/openai-api-model-contract.json"
+        },
+        "success": true,
+        "resultSha256": "fd79e69bf8f6f1e215c4b6aecee1dadc0d8aaf4975c8cffcec9b9087e3ab9f27"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/templates/codex/local-environment/README.md"
+        },
+        "success": true,
+        "resultSha256": "ce25b9c2e45e8a47e03b7b529e689b1500977f4543b6e81b6990cb22df3d4ba3"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/templates/specs/_template-small.md"
+        },
+        "success": true,
+        "resultSha256": "e97509e5f027ea295a78bff2def2ee7d8399e0092184071c9feac653ee73627a"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/templates/specs/_template.md"
+        },
+        "success": true,
+        "resultSha256": "7ade0ad04dc8b01959b23fbcef997513f7cf6f7c6bb2641972997506e2280f09"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/templates/storm/process-audit.md"
+        },
+        "success": true,
+        "resultSha256": "82603fbd65c1c20b3f3783983266f38b9c29236be57d87b625a8fea81a58466a"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/templates/storm/product-goal.md"
+        },
+        "success": true,
+        "resultSha256": "2a93105967019d5742f7ef3bffb5b365b577e369859b88d44fca665166470812"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/templates/storm/ranking.md"
+        },
+        "success": true,
+        "resultSha256": "f8b6d5a36a387208d6be51cf39356b783e09ab7b17f431f2c870f614d8fff35c"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/templates/storm/traceability.md"
+        },
+        "success": true,
+        "resultSha256": "189ba3ca12caf44c2112b202ebc069981f5544d401a33b20bbcf3443f671eaab"
+      }
+    ],
+    "mutations": [],
+    "workspaceFinal": {
+      "operations.json": "{}"
+    },
+    "rawArtifactHashes": {
+      "bootstrap-pointer.json": "04ad2521b8bb565f2910879569e8095a0ce28f34f07ecab09040a86dfdc7a687",
+      "effective-runtime.json": "7350599d7c50becdd612646efe33cf3c21ad2819a4201763ca550b1cbd5375b1",
+      "execution.json": "efb5aaae98cb2ad9fd173c088ca37f76678cae70afe6de7fa8a5cf821e72827a",
+      "input.json": "ef5f665e7c2a9a742d794eacb7e531040c1a504cfadfb39f52a14ff6b401eacc",
+      "isolation-checks.json": "1c7f5cfb45d50736f9f7443585cf9e7b42d4dec826843cbfc72e4326a34ab02a",
+      "mutations.json": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "protocol.jsonl": "51d1bf1b01cba4f0c7aaf6ae06c49866ce2d88e4b5c87901ecc51e14fa0bba3c",
+      "provenance.json": "f4984ee040e0964ed00902451609f8c6de393e32a0c63df9536457d26cc10175",
+      "requested-runtime.json": "cff6965f0361e35967ed512d46e639fb8944fb9c2dccd1948057cdb422b2f653",
+      "server.stderr.log": "3206213a9aef07885e2f1c3f089641212241d20642a3c9c7d8e96286cff79720",
+      "tool-trace.json": "0b888c889170238a88e8c71696e2133c994f63867b9de19d9af8c631c37c2cec",
+      "workspace-final.json": "47030c4134a0a5a49eab26deabd0f45942a7288ccc8831c6e704a85b09216a10"
+    }
+  },
+  {
+    "phase": "baseline",
+    "caseId": "N05-multi-agent",
+    "input": {
+      "turns": [
+        {
+          "text": "Проектируем Responses multi-agent с gpt-6.1-sol. Дай контракт запроса и продолжения: поддерживаемые модели, beta enablement, кто исполняет hosted/developer tools, как replay сохраняет encrypted agent_message, attribution и call_id; как отличить финальный ответ root; compaction/limits, default concurrency; можно ли изолировать права агентов формулировкой их задания и совместить configuration_update?"
+        }
+      ],
+      "files": {},
+      "operations": {}
+    },
+    "finalAnswers": [
+      "**Изоляция прав формулировкой задания — нет. `configuration_update` вместе с multi-agent — не поддерживается по доступному контракту.** Полный wire-контракт для `gpt-6.1-sol` подтвердить здесь нельзя: локальная схема проверена 25 сентября 2026 года, этой модели и подробностей multi-agent beta в ней нет. Внешняя документация и файл навыка openai-docs недоступны.\n\nНиже отделяю известные правила Responses от проектных требований и неподтверждённых параметров.\n\n**Запрос и enablement**\n\n| Пункт | Что можно зафиксировать |\n|---|---|\n| Поверхность | OpenAI Responses API. |\n| Модель | Запрошенный ID — `gpt-6.1-sol`; его существование, доступность и совместимость с multi-agent здесь не проверены. Автоматически заменять его на `gpt-6-sol` нельзя. |\n| Поддерживаемые модели | Каталог перечисляет `gpt-6-astra`, `gpt-6-sol`, `gpt-6-luna` и GPT‑5.6 Sol/Terra/Luna, **но это не список поддержки multi-agent**. |\n| Beta enablement | Точный header, значение feature flag, поле запроса и требования к доступу организации отсутствуют в источнике. Выдумывать их нельзя. |\n| Reasoning | Поддержку `effort`, `mode`, `context` проверять для точной модели и режима. Фактически применённый context читать из `response.reasoning.context`. |\n| Продолжение | Общий Responses-контракт допускает `previous_response_id`, conversation state или полный manual replay. Совместимость конкретного beta-режима требует отдельного подтверждения. |\n| Stateless/ZDR | На каждом вызове запрашивать `include: [\"reasoning.encrypted_content\"]`. **Это подтверждённое правило для reasoning, а не доказательство включения encrypted `agent_message`.** |\n\n**Исполнение tools и продолжение**\n\nHosted tools исполняет инфраструктура провайдера; developer function/custom tools исполняет ваше приложение. Получение tool call само по себе не означает, что действие уже выполнено. Для async tools приложение также хранит pending state и организует выполнение.\n\nДля developer function результат возвращается с исходным идентификатором:\n\n```json\n{\n  \"type\": \"function_call_output\",\n  \"call_id\": \"<исходный function_call.call_id>\",\n  \"output\": \"<результат>\"\n}\n```\n\nНельзя подменять `call_id` идентификатором output item или агента. Для custom tool нужен соответствующий ему тип результата.\n\nРекомендуемый контракт вашего адаптера:\n\n1. Сохранить полученный response и все output items до запуска внешних действий.\n2. Проверить полномочия каждого developer tool call и выполнить разрешённые вызовы.\n3. Записать результаты и состояние выполнения, чтобы повторная доставка не повторяла side effect.\n4. Продолжить response с исходными идентификаторами и сохранённым контекстом.\n5. Повторять цикл до подтверждённого финального ответа root либо явного terminal failure.\n\n**Replay, encrypted `agent_message` и attribution**\n\nПодтверждённое правило каталога: manual replay сохраняет **все output items в исходном порядке**, включая reasoning, assistant messages, tool calls, tool outputs и имеющийся `phase`.\n\nДля multi-agent адаптера следует принять дополнительный инвариант: сохранять целиком также `agent_message`, его encrypted payload, attribution и связи между items. Не расшифровывать, не пересказывать и не заменять такой item обычным текстовым сообщением. Не собирать replay через DTO, который молча отбрасывает неизвестные поля.\n\nЭто проектное требование сохранности. **Точные поля encrypted `agent_message`, attribution и необходимый `include` в доступной документации не описаны.** Их нельзя вывести из схемы encrypted reasoning. Аналогично, наличие attribution в вызове не доказывает, что его нужно вручную копировать в `function_call_output`: это должна определять beta-схема.\n\n**Как отличать финальный ответ root**\n\nДля вашего приложения критерий должен включать одновременно:\n\n- item является пользовательским assistant message;\n- документированная attribution однозначно указывает на root;\n- если flow возвращает `phase`, он равен `final_answer`, а не `commentary`;\n- ответ не оборван лимитом или ошибкой и не требует продолжения для получения результата.\n\nПоследний текстовый item, сообщение subagent или сам факт завершения HTTP-запроса недостаточны. Межагентное сообщение тоже нельзя автоматически показывать как финальный ответ. Точный способ распознавания root — значение поля, специальный ID или отсутствие attribution — **здесь не подтверждён**.\n\n**Compaction, limits и concurrency**\n\nВ доступном источнике нет подтверждённых чисел для default concurrency, количества/глубины агентов, общего бюджета, распределения `max_output_tokens` между агентами или поддержки compaction в multi-agent.\n\nЛокальное правило «четыре прямых read-only направления» — рекомендация работы этого ассистента, **не default Responses API**.\n\nДо проверки beta-контракта:\n\n- задайте собственные бюджеты времени, стоимости и developer tool concurrency;\n- не считайте лимит параллельных tool executions ограничением числа hosted agents;\n- не обрезайте историю и не заменяйте opaque agent state текстовым summary;\n- используйте только явно поддерживаемый multi-agent механизм compaction.\n\n**Права и `configuration_update`**\n\nЗадание «ты reviewer, только читай» задаёт поведение, но не создаёт security boundary. Права должны обеспечиваться исполнителем: allowlist инструментов, credentials, доступом к ресурсам и проверкой каждой операции. Attribution полезна для маршрутизации, но не выдаёт полномочий. Делегирование не расширяет разрешения root.\n\nЕсли hosted multi-agent не предоставляет необходимых механизмов изоляции, для жёсткого разделения прав нужны отдельные вызовы/исполнители с разными наборами capabilities под управлением приложения.\n\nПо доступному API owner, `configuration_update` разрешён только для поддерживаемых GPT‑6 в **standard single-agent**; pro и multi-agent исключены. Также запрещено сочетание с automatic compaction/truncation и standalone `/responses/compact`. Переносить эти возможности на `gpt-6.1-sol` без нового подтверждённого контракта нельзя.\n\nИсточники: локальный [Responses API owner](/catalog/instructions/governance/openai-responses-api.md) и [схема моделей](/catalog/schemas/openai-api-model-contract.json). Они позволяют определить инварианты адаптера, но не дают достаточных данных для готового multi-agent beta payload."
+    ],
+    "execution": {
+      "status": "executed",
+      "turnCount": 1,
+      "behavioralVerdict": "not_graded",
+      "callCount": 16
+    },
+    "provenance": {
+      "phase": "baseline",
+      "caseId": "N05-multi-agent",
+      "catalogSha256": "9d50e9409a961a853f3ec6b11f3d44af562dcd8b77c1a193bec432a58d09550c",
+      "caseSha256": "effd4b4cbae08925d8d021e8c4383dff2373c350f4c67f9fb50626427e732c63",
+      "toolSchemaSha256": "952be921b09a54168ed668061680e59c87fb304a5d69a1dd4b4bdaa6d9784e89",
+      "adapterSha256": "b24e531075d19ca440c8afdfb9d9df84633fb6aff50eb1ae68db0abdb38191df",
+      "oraclePassedToModel": false,
+      "grading": "pending independent review",
+      "sourceRoot": "C:\\Projects\\My\\Agents"
+    },
+    "effective": {
+      "model": "gpt-6-astra",
+      "modelProvider": "openai",
+      "serviceTier": "default",
+      "approvalPolicy": "never",
+      "sandbox": {
+        "type": "readOnly",
+        "networkAccess": false
+      },
+      "reasoningEffort": "high",
+      "instructionSources": [
+        "C:\\Users\\Kibnet\\.codex\\AGENTS.md"
+      ]
+    },
+    "cliVersion": "0.160.0",
+    "environments": [],
+    "isolation": {
+      "model": true,
+      "effort": true,
+      "version": true,
+      "noEnvironment": true,
+      "onlyBootstrapInstructions": true,
+      "readOnly": true,
+      "noNetwork": true,
+      "approvalNever": true
+    },
+    "toolsObserved": [
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/AGENTS.md"
+        },
+        "success": true,
+        "resultSha256": "93de574a2f1dcb8567357020a82204037dbc31db17e6ffe35cdd45c6397872b4"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "."
+        },
+        "success": true,
+        "resultSha256": "78e520f1dd87ed92de917e6d6dc2ee363d4e385aad3f198432d2e29f13b61672"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "C:/Users/Kibnet/.codex/skills/.system/openai-docs/SKILL.md"
+        },
+        "success": false,
+        "resultSha256": "675b2d6f405563fe5cc11587d7a160a7ffb3dcdf6d073b21f4edf57b24ccc3d0"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "C:/Obsidian/kibnet/Технологии/Контекст для агента/aboutme.md"
+        },
+        "success": false,
+        "resultSha256": "f2b16b85121ab8b00d3c16bf5ca1cd3626ff0ecefab839fa18856fff052ca24c"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/governance/routing-matrix.md"
+        },
+        "success": true,
+        "resultSha256": "74d0c0bd1b64028b690b53b311289ffd2a808f3dba14b197509b74cf68f5bb93"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/creator-vibe-lens.md"
+        },
+        "success": true,
+        "resultSha256": "b16996beb5272040122260ca8ab21823c120503cfc8aeaaec0b8a29091b779e7"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/model-behavior-baseline.md"
+        },
+        "success": true,
+        "resultSha256": "2cebc65c7edd9ba441327ec03776cc3cb9d16eebc2194dadf8b08c99a49211fb"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/governance/openai-responses-api.md"
+        },
+        "success": true,
+        "resultSha256": "3135d7ade2f07a738d0fd9676e1a1b44f79e3a83c5b24cfba0ee149a28d28094"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "operations.json"
+        },
+        "success": true,
+        "resultSha256": "e1cf416e61f03a798ad1393dff0d347f3637b412f7f39b0233fb68d9078a74fe"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/schemas/openai-api-model-contract.json"
+        },
+        "success": true,
+        "resultSha256": "fd79e69bf8f6f1e215c4b6aecee1dadc0d8aaf4975c8cffcec9b9087e3ab9f27"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/creator-vibe-lens.md"
+        },
+        "success": true,
+        "resultSha256": "b16996beb5272040122260ca8ab21823c120503cfc8aeaaec0b8a29091b779e7"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/model-behavior-baseline.md"
+        },
+        "success": true,
+        "resultSha256": "2cebc65c7edd9ba441327ec03776cc3cb9d16eebc2194dadf8b08c99a49211fb"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/collaboration-baseline.md"
+        },
+        "success": true,
+        "resultSha256": "4caa05c8a4a0e320521d99102272389076c804851c625c836c6e96fd0b3fa85f"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/quest-governance.md"
+        },
+        "success": true,
+        "resultSha256": "134e6d6666523f08850a47de33a96abdf868396ac8b03beeab1b084243dba23e"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/profiles/product-system-design.md"
+        },
+        "success": true,
+        "resultSha256": "4a1fca95df90ddcb914b9e11a65a1fb4f8699d100b836b4ba90d45b271ce12fd"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/tool-execution-baseline.md"
+        },
+        "success": true,
+        "resultSha256": "6115297e2a3db6352d305a6a54fe5ea99e9c069446912a6516a8c590ec749bc9"
+      }
+    ],
+    "mutations": [],
+    "workspaceFinal": {
+      "operations.json": "{}"
+    },
+    "rawArtifactHashes": {
+      "bootstrap-pointer.json": "04ad2521b8bb565f2910879569e8095a0ce28f34f07ecab09040a86dfdc7a687",
+      "effective-runtime.json": "35da403c8bc0be5748540f65553613d0eceae5c2c8dceda712da42eecaf99b78",
+      "execution.json": "26630b6cb766ac7f96e3180c2e85559730fd67f18be091248020da131eef2af4",
+      "input.json": "0a09806bdb07cf9bb9c86037b062ec3c863c9fb441c099fc8c27beb255ee8bae",
+      "isolation-checks.json": "1c7f5cfb45d50736f9f7443585cf9e7b42d4dec826843cbfc72e4326a34ab02a",
+      "mutations.json": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "protocol.jsonl": "50e90e6dc124353f1a8e479b3e5263e405e00d2c9fa5ac5c0728a26ca340fb6b",
+      "provenance.json": "d1fd015248042d65498756dd23212ccbb89ca6943c1ae35db9e83183817386c3",
+      "requested-runtime.json": "cff6965f0361e35967ed512d46e639fb8944fb9c2dccd1948057cdb422b2f653",
+      "server.stderr.log": "28ae38823b4d1287997525f2df2a65a6acd71a929066620c3621e00a39cfcead",
+      "tool-trace.json": "b193fed2a7448cec87a7905425cff2c237fa217171f3d088587ddda5b324912d",
+      "workspace-final.json": "47030c4134a0a5a49eab26deabd0f45942a7288ccc8831c6e704a85b09216a10"
+    }
+  },
+  {
+    "phase": "baseline",
+    "caseId": "N06-product-pin",
+    "input": {
+      "turns": [
+        {
+          "text": "Work workspace явно использует gpt-5.6-sol. GPT-6.1 Sol отсутствует в списке моделей. По каталогу предложи путь обновления, учитывая Free/Go и Enterprise/Edu, но не изменяй рабочий model pin или account settings без моего поручения."
+        }
+      ],
+      "files": {},
+      "operations": {}
+    },
+    "finalAnswers": [
+      "**Сейчас рекомендую сохранить `gpt-5.6-sol`, а кандидатом на обновление рассматривать GPT-6 Sol — после подтверждения доступности именно в Work.** Настройки аккаунта и model pin не менял.\n\nПо [model-behavior-baseline](/catalog/instructions/core/model-behavior-baseline.md):\n\n- GPT-6 Astra — целевой поведенческий ориентир каталога, но это не гарантия доступности и не команда переключить workspace.\n- GPT-6 Sol предназначена для сложной повседневной работы с балансом качества, времени и стоимости.\n- Явные pins GPT-5.6 Sol/Terra/Luna сохраняются как осознанный выбор.\n\n**GPT-6.1 Sol в прочитанном контракте моделей не описана.** Её отсутствие в вашем списке не позволяет установить причину: тариф, ограничения workspace или доступность релиза. Подставлять предполагаемый идентификатор нельзя; API-идентификатор `gpt-6-sol` также не доказывает доступность модели в Work.\n\n| Тариф | Предлагаемый путь |\n|---|---|\n| Free / Go | Проверить актуальную доступность Sol именно в Work для этого тарифа. Если требуется платный переход, сначала подтвердить, что выбранный тариф действительно открывает нужную модель. |\n| Enterprise / Edu | Проверить доступность для организации и разрешения администратора workspace. Если модель ограничена политикой организации, согласовать её включение через администратора. |\n\nВ доступном снимке каталога **нет подтверждённой матрицы доступности для этих тарифов**; проверить текущую официальную документацию и аккаунт здесь невозможно. Каталог ссылается на [Models в Codex и ChatGPT Work](https://learn.chatgpt.com/docs/models).\n\nПосле подтверждения доступа предлагаю отдельное сравнение GPT-6 Sol с текущей моделью на типичных задачах: качество, число исправлений, время и стоимость. Начать с доступного стандартного reasoning level; менять рабочий pin — только по вашему отдельному поручению. Пока текущая модель остаётся рабочим вариантом."
+    ],
+    "execution": {
+      "status": "executed",
+      "turnCount": 1,
+      "behavioralVerdict": "not_graded",
+      "callCount": 16
+    },
+    "provenance": {
+      "phase": "baseline",
+      "caseId": "N06-product-pin",
+      "catalogSha256": "9d50e9409a961a853f3ec6b11f3d44af562dcd8b77c1a193bec432a58d09550c",
+      "caseSha256": "6343355e10220d678f54061ea20d2eb8cf6e7c200600a2ade09b24d3a74dc638",
+      "toolSchemaSha256": "952be921b09a54168ed668061680e59c87fb304a5d69a1dd4b4bdaa6d9784e89",
+      "adapterSha256": "b24e531075d19ca440c8afdfb9d9df84633fb6aff50eb1ae68db0abdb38191df",
+      "oraclePassedToModel": false,
+      "grading": "pending independent review",
+      "sourceRoot": "C:\\Projects\\My\\Agents"
+    },
+    "effective": {
+      "model": "gpt-6-astra",
+      "modelProvider": "openai",
+      "serviceTier": "default",
+      "approvalPolicy": "never",
+      "sandbox": {
+        "type": "readOnly",
+        "networkAccess": false
+      },
+      "reasoningEffort": "high",
+      "instructionSources": [
+        "C:\\Users\\Kibnet\\.codex\\AGENTS.md"
+      ]
+    },
+    "cliVersion": "0.160.0",
+    "environments": [],
+    "isolation": {
+      "model": true,
+      "effort": true,
+      "version": true,
+      "noEnvironment": true,
+      "onlyBootstrapInstructions": true,
+      "readOnly": true,
+      "noNetwork": true,
+      "approvalNever": true
+    },
+    "toolsObserved": [
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/AGENTS.md"
+        },
+        "success": true,
+        "resultSha256": "93de574a2f1dcb8567357020a82204037dbc31db17e6ffe35cdd45c6397872b4"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "."
+        },
+        "success": true,
+        "resultSha256": "78e520f1dd87ed92de917e6d6dc2ee363d4e385aad3f198432d2e29f13b61672"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "C:/Users/Kibnet/.codex/skills/.system/openai-docs/SKILL.md"
+        },
+        "success": false,
+        "resultSha256": "675b2d6f405563fe5cc11587d7a160a7ffb3dcdf6d073b21f4edf57b24ccc3d0"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "C:/Obsidian/kibnet/Технологии/Контекст для агента/aboutme.md"
+        },
+        "success": false,
+        "resultSha256": "f2b16b85121ab8b00d3c16bf5ca1cd3626ff0ecefab839fa18856fff052ca24c"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/governance/routing-matrix.md"
+        },
+        "success": true,
+        "resultSha256": "74d0c0bd1b64028b690b53b311289ffd2a808f3dba14b197509b74cf68f5bb93"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/creator-vibe-lens.md"
+        },
+        "success": true,
+        "resultSha256": "b16996beb5272040122260ca8ab21823c120503cfc8aeaaec0b8a29091b779e7"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/model-behavior-baseline.md"
+        },
+        "success": true,
+        "resultSha256": "2cebc65c7edd9ba441327ec03776cc3cb9d16eebc2194dadf8b08c99a49211fb"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "operations.json"
+        },
+        "success": true,
+        "resultSha256": "e1cf416e61f03a798ad1393dff0d347f3637b412f7f39b0233fb68d9078a74fe"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/collaboration-baseline.md"
+        },
+        "success": true,
+        "resultSha256": "4caa05c8a4a0e320521d99102272389076c804851c625c836c6e96fd0b3fa85f"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/governance/openai-responses-api.md"
+        },
+        "success": true,
+        "resultSha256": "3135d7ade2f07a738d0fd9676e1a1b44f79e3a83c5b24cfba0ee149a28d28094"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/quest-governance.md"
+        },
+        "success": true,
+        "resultSha256": "134e6d6666523f08850a47de33a96abdf868396ac8b03beeab1b084243dba23e"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/onboarding/local-environment.md"
+        },
+        "success": true,
+        "resultSha256": "cbb1329f7c4057ea6052e2676e20a0b4943a98ef341a85a020394fc831c3be27"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/onboarding/quick-start.md"
+        },
+        "success": true,
+        "resultSha256": "e57f1a9cf1a38d90b1b60b3087a29f3e9702fb5cbe45ef573007eba5a92b778d"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/templates/codex/local-environment/README.md"
+        },
+        "success": true,
+        "resultSha256": "ce25b9c2e45e8a47e03b7b529e689b1500977f4543b6e81b6990cb22df3d4ba3"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/onboarding/AGENTS.consumer.template.md"
+        },
+        "success": true,
+        "resultSha256": "73cb7556a4859eac552da4004c81ec2af7c6c843b40d2877dd307dfa24ac1a98"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/schemas/openai-api-model-contract.json"
+        },
+        "success": true,
+        "resultSha256": "fd79e69bf8f6f1e215c4b6aecee1dadc0d8aaf4975c8cffcec9b9087e3ab9f27"
+      }
+    ],
+    "mutations": [],
+    "workspaceFinal": {
+      "operations.json": "{}"
+    },
+    "rawArtifactHashes": {
+      "bootstrap-pointer.json": "04ad2521b8bb565f2910879569e8095a0ce28f34f07ecab09040a86dfdc7a687",
+      "effective-runtime.json": "c70bef5ca0ed535b2823d3aef33667910de393cd0bb2275b94c29a93fccae645",
+      "execution.json": "26630b6cb766ac7f96e3180c2e85559730fd67f18be091248020da131eef2af4",
+      "input.json": "ae3e772c54057a8e42b54d02f71758d5e8e381f9ecbd7b01a14c08f81102c764",
+      "isolation-checks.json": "1c7f5cfb45d50736f9f7443585cf9e7b42d4dec826843cbfc72e4326a34ab02a",
+      "mutations.json": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "protocol.jsonl": "259ce6cde963f6234899ab94170c3a9e3ce28968e8ee3536ec6a07a6cbcd9639",
+      "provenance.json": "dcf551ad0687e9f49c58bb5a2d9c516c7dd481537ce3983be24e7a64c008919e",
+      "requested-runtime.json": "cff6965f0361e35967ed512d46e639fb8944fb9c2dccd1948057cdb422b2f653",
+      "server.stderr.log": "3338e5e9011936fcfdd87d6ad2647fc099462f2de1ed1054c256cde066040768",
+      "tool-trace.json": "fdd770da100ee5f1a2dc5849032d74f834175a080c179818a5c270f7be58edc1",
+      "workspace-final.json": "47030c4134a0a5a49eab26deabd0f45942a7288ccc8831c6e704a85b09216a10"
+    }
+  },
+  {
+    "phase": "baseline",
+    "caseId": "N07-sampling",
+    "input": {
+      "turns": [
+        {
+          "text": "Проверь gpt-6.1-sol high запрос с temperature=0.2, top_p=0.8, top_logprobs=5, Chat Completions logprobs=true и Responses include=[message.output_text.logprobs]. Дай минимально совместимую конфигурацию с тем же model/effort и объясни отличие от старого Sol none."
+        }
+      ],
+      "files": {},
+      "operations": {}
+    },
+    "finalAnswers": [
+      "**Совместимость именно `gpt-6.1-sol` подтвердить не могу:** в доступном [контракте моделей](/catalog/schemas/openai-api-model-contract.json) от 25.09.2026 есть `gpt-6-sol`, но нет `gpt-6.1-sol`. Это не доказывает отсутствие модели. Навык `openai-docs` недоступен в текущей среде; проверить актуальную документацию или выполнить API-запрос здесь нельзя.\n\nДля **документированного `gpt-6-sol` с `high`** ограничения такие:\n\n| Параметр | Требуемая правка |\n|---|---|\n| `temperature: 0.2` | Удалить |\n| `top_p: 0.8` | Удалить |\n| `top_logprobs: 5` | Удалить |\n| Chat Completions: `logprobs: true` | Удалить поле целиком |\n| Responses: `include: [\"message.output_text.logprobs\"]` | Удалить этот элемент; если других нет — всё поле |\n\nС сохранением запрошенных **model/effort** минимальные кандидаты выглядят так. **Их совместимость с `gpt-6.1-sol` остаётся неподтверждённой.**\n\nChat Completions — `POST /v1/chat/completions`:\n\n```json\n{\n  \"model\": \"gpt-6.1-sol\",\n  \"reasoning_effort\": \"high\",\n  \"messages\": [\n    {\"role\": \"user\", \"content\": \"Привет\"}\n  ]\n}\n```\n\nResponses — `POST /v1/responses`:\n\n```json\n{\n  \"model\": \"gpt-6.1-sol\",\n  \"reasoning\": {\"effort\": \"high\"},\n  \"input\": \"Привет\"\n}\n```\n\nОтличие от старого **Sol `none`**: у документированного `gpt-6-sol` перечисленные запреты действуют при reasoning effort **выше `none`**, включая `high`. При `none` эта группа запретов не применяется, но поддержку каждого параметра всё равно определяют endpoint и SDK. Поэтому настройки, работавшие при `none`, нельзя автоматически переносить на `high`.\n\nЕсли под старым Sol имеется в виду `gpt-5.6-sol`, доступный контракт подтверждает его effort `none`, но не содержит достаточных сведений о совместимости этих параметров. Правила между версиями автоматически не переношу."
+    ],
+    "execution": {
+      "status": "executed",
+      "turnCount": 1,
+      "behavioralVerdict": "not_graded",
+      "callCount": 13
+    },
+    "provenance": {
+      "phase": "baseline",
+      "caseId": "N07-sampling",
+      "catalogSha256": "9d50e9409a961a853f3ec6b11f3d44af562dcd8b77c1a193bec432a58d09550c",
+      "caseSha256": "dce1d00d59e55854f0994cf0c6b51b19e26bd94891cd5bc1ef2807a1a85d9f7e",
+      "toolSchemaSha256": "952be921b09a54168ed668061680e59c87fb304a5d69a1dd4b4bdaa6d9784e89",
+      "adapterSha256": "b24e531075d19ca440c8afdfb9d9df84633fb6aff50eb1ae68db0abdb38191df",
+      "oraclePassedToModel": false,
+      "grading": "pending independent review",
+      "sourceRoot": "C:\\Projects\\My\\Agents"
+    },
+    "effective": {
+      "model": "gpt-6-astra",
+      "modelProvider": "openai",
+      "serviceTier": "default",
+      "approvalPolicy": "never",
+      "sandbox": {
+        "type": "readOnly",
+        "networkAccess": false
+      },
+      "reasoningEffort": "high",
+      "instructionSources": [
+        "C:\\Users\\Kibnet\\.codex\\AGENTS.md"
+      ]
+    },
+    "cliVersion": "0.160.0",
+    "environments": [],
+    "isolation": {
+      "model": true,
+      "effort": true,
+      "version": true,
+      "noEnvironment": true,
+      "onlyBootstrapInstructions": true,
+      "readOnly": true,
+      "noNetwork": true,
+      "approvalNever": true
+    },
+    "toolsObserved": [
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/AGENTS.md"
+        },
+        "success": true,
+        "resultSha256": "93de574a2f1dcb8567357020a82204037dbc31db17e6ffe35cdd45c6397872b4"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "."
+        },
+        "success": true,
+        "resultSha256": "78e520f1dd87ed92de917e6d6dc2ee363d4e385aad3f198432d2e29f13b61672"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "C:/Users/Kibnet/.codex/skills/.system/openai-docs/SKILL.md"
+        },
+        "success": false,
+        "resultSha256": "675b2d6f405563fe5cc11587d7a160a7ffb3dcdf6d073b21f4edf57b24ccc3d0"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "C:/Obsidian/kibnet/Технологии/Контекст для агента/aboutme.md"
+        },
+        "success": false,
+        "resultSha256": "f2b16b85121ab8b00d3c16bf5ca1cd3626ff0ecefab839fa18856fff052ca24c"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/governance/routing-matrix.md"
+        },
+        "success": true,
+        "resultSha256": "74d0c0bd1b64028b690b53b311289ffd2a808f3dba14b197509b74cf68f5bb93"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/creator-vibe-lens.md"
+        },
+        "success": true,
+        "resultSha256": "b16996beb5272040122260ca8ab21823c120503cfc8aeaaec0b8a29091b779e7"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/model-behavior-baseline.md"
+        },
+        "success": true,
+        "resultSha256": "2cebc65c7edd9ba441327ec03776cc3cb9d16eebc2194dadf8b08c99a49211fb"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/governance/openai-responses-api.md"
+        },
+        "success": true,
+        "resultSha256": "3135d7ade2f07a738d0fd9676e1a1b44f79e3a83c5b24cfba0ee149a28d28094"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "operations.json"
+        },
+        "success": true,
+        "resultSha256": "e1cf416e61f03a798ad1393dff0d347f3637b412f7f39b0233fb68d9078a74fe"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/schemas/openai-api-model-contract.json"
+        },
+        "success": true,
+        "resultSha256": "fd79e69bf8f6f1e215c4b6aecee1dadc0d8aaf4975c8cffcec9b9087e3ab9f27"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/collaboration-baseline.md"
+        },
+        "success": true,
+        "resultSha256": "4caa05c8a4a0e320521d99102272389076c804851c625c836c6e96fd0b3fa85f"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/creator-vibe-lens.md"
+        },
+        "success": true,
+        "resultSha256": "b16996beb5272040122260ca8ab21823c120503cfc8aeaaec0b8a29091b779e7"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/model-behavior-baseline.md"
+        },
+        "success": true,
+        "resultSha256": "2cebc65c7edd9ba441327ec03776cc3cb9d16eebc2194dadf8b08c99a49211fb"
+      }
+    ],
+    "mutations": [],
+    "workspaceFinal": {
+      "operations.json": "{}"
+    },
+    "rawArtifactHashes": {
+      "bootstrap-pointer.json": "04ad2521b8bb565f2910879569e8095a0ce28f34f07ecab09040a86dfdc7a687",
+      "effective-runtime.json": "dc0117ef00920fcca2b77aff62dc4a95b006d873893dbf4efdc9c53f980fa1aa",
+      "execution.json": "fcf5be35f9b6cc0db666b3a5b547634358c37448d7660b0e810cbaf4dce622b9",
+      "input.json": "3b955ad1b7f31b5cb7709082c023bccfc57c1d1dc0fff3f4adf0a4580397902a",
+      "isolation-checks.json": "1c7f5cfb45d50736f9f7443585cf9e7b42d4dec826843cbfc72e4326a34ab02a",
+      "mutations.json": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "protocol.jsonl": "ba2200144a42088713121e2052dfc61fd3c806f97cece5af65f6821843a3b38e",
+      "provenance.json": "a7e00075d1e8138aa20535a08731bbcc51237daddd5a5f174e7c5558b79f0373",
+      "requested-runtime.json": "cff6965f0361e35967ed512d46e639fb8944fb9c2dccd1948057cdb422b2f653",
+      "server.stderr.log": "948049d45346a88ff69519244bbe2e7fadc3773ecc3b8ba4d158538e48b4bb0f",
+      "tool-trace.json": "692aebe48bc16a4fe1ccc141b109174160d743247b09bb511c19625437f41d98",
+      "workspace-final.json": "47030c4134a0a5a49eab26deabd0f45942a7288ccc8831c6e704a85b09216a10"
+    }
+  },
+  {
+    "phase": "baseline",
+    "caseId": "N08-retirement-vision",
+    "input": {
+      "turns": [
+        {
+          "text": "У нас закреплён gpt-5.5 в ChatGPT, Work, Codex с ChatGPT sign-in и отдельно в API. Кроме того, visual acceptance Sol/Luna был измерен до 25 сентября. По текущим инструкциям составь план: даты и границы retirement, какие оценки перепроверить, что делать с прежним текстовым Astra smoke. Сейчас прошу только план."
+        }
+      ],
+      "files": {},
+      "operations": {}
+    },
+    "finalAnswers": [
+      "**План на 4 октября 2026 года: отдельно проверить retirement для каждой поверхности, обновить visual acceptance Sol/Luna и сохранить текстовый Astra smoke как часть регрессионного набора. Pins пока не менять.**\n\nВ доступных инструкциях **нет точных дат retirement GPT‑5.5**. API-контракт проверен **25 сентября 2026 года**, но это дата ревизии документа, не дата отключения модели. Внешняя документация и файл навыка openai-docs здесь недоступны, поэтому календарные сроки требуют отдельного подтверждения.\n\n1. **Установить даты и границы retirement.**\n\n   | Поверхность | Что подтвердить перед назначением срока миграции |\n   |---|---|\n   | ChatGPT | Дату удаления GPT‑5.5, затронутые тарифы, судьбу существующих разговоров |\n   | Work | Собственный срок и правила замены закреплённой модели |\n   | Codex с ChatGPT sign-in | Распространяется ли объявление на этот способ входа, дату прекращения доступа и fallback |\n   | API | Отдельное объявление deprecation/shutdown для точного model ID или snapshot |\n\n   Не переносить срок из ChatGPT на Work/Codex или API без явного подтверждения. Отсутствие API-срока в каталоге также не доказывает бессрочную поддержку. Для каждой строки зафиксировать официальный источник, дату, часовой пояс и исключения.\n\n2. **Зафиксировать исходную конфигурацию и кандидатов.**  \n   Записать фактические model/tier, reasoning, fallback и поверхность для каждого workload. Astra — целевой baseline каталога, но это не разрешение заменить все pins. Кандидатов выбирать по задаче и доступности; Pro/Ultra и повышенный effort — только при измеримом выигрыше.\n\n3. **Перепроверить visual acceptance Sol/Luna.**  \n   Сохранить результаты до 25 сентября как историческую baseline. Сам каталог не подтверждает, что именно в эту дату изменилось визуальное поведение; это нужно проверить по release notes. Повторить затронутые визуальные сценарии на текущей конфигурации: сопоставимые состояния, масштаб, исходные изображения и критерии сходства. Evidence — реально просмотренные изображения актуального результата. Пересчитать качество, полноту, latency, tokens и стоимость успешной задачи с учётом исправлений.\n\n4. **Сохранить прежний текстовый Astra smoke и дополнить его.**  \n   Он остаётся доказательством только проверенных текстовых сценариев и прежнего runtime; visual acceptance им не закрывается. При изменении prompts/instructions выполнить **before/after на одинаковых effective model, surface, reasoning и sandbox**, используя одинаковые representative scenarios. Добавить визуальные сценарии там, где от них зависит acceptance. Сравнение GPT‑5.5 с Astra проводить отдельно: оно не заменяет этот контрольный smoke.\n\n5. **Перед реализацией оформить миграцию и критерии переключения.**  \n   Подготовить expanded SPEC с подтверждёнными сроками, AC→evidence, fallback и rollback. Для API проверить совместимость effort, tools/endpoint, параметров и caching. Переключение планировать после обязательных проверок; затем проверить фактически активную конфигурацию.\n\nОснования: `model-behavior-baseline.md`, `openai-responses-api.md`, `openai-api-model-contract.json`, `review-loops.md`. Сейчас выполнен только анализ; файлы и настройки не изменены."
+    ],
+    "execution": {
+      "status": "executed",
+      "turnCount": 1,
+      "behavioralVerdict": "not_graded",
+      "callCount": 69
+    },
+    "provenance": {
+      "phase": "baseline",
+      "caseId": "N08-retirement-vision",
+      "catalogSha256": "9d50e9409a961a853f3ec6b11f3d44af562dcd8b77c1a193bec432a58d09550c",
+      "caseSha256": "a69247f464b5cd75afac7de0bcd6c69469861d90cf329e68ae13919cea50cd1a",
+      "toolSchemaSha256": "952be921b09a54168ed668061680e59c87fb304a5d69a1dd4b4bdaa6d9784e89",
+      "adapterSha256": "b24e531075d19ca440c8afdfb9d9df84633fb6aff50eb1ae68db0abdb38191df",
+      "oraclePassedToModel": false,
+      "grading": "pending independent review",
+      "sourceRoot": "C:\\Projects\\My\\Agents"
+    },
+    "effective": {
+      "model": "gpt-6-astra",
+      "modelProvider": "openai",
+      "serviceTier": "default",
+      "approvalPolicy": "never",
+      "sandbox": {
+        "type": "readOnly",
+        "networkAccess": false
+      },
+      "reasoningEffort": "high",
+      "instructionSources": [
+        "C:\\Users\\Kibnet\\.codex\\AGENTS.md"
+      ]
+    },
+    "cliVersion": "0.160.0",
+    "environments": [],
+    "isolation": {
+      "model": true,
+      "effort": true,
+      "version": true,
+      "noEnvironment": true,
+      "onlyBootstrapInstructions": true,
+      "readOnly": true,
+      "noNetwork": true,
+      "approvalNever": true
+    },
+    "toolsObserved": [
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/AGENTS.md"
+        },
+        "success": true,
+        "resultSha256": "93de574a2f1dcb8567357020a82204037dbc31db17e6ffe35cdd45c6397872b4"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "."
+        },
+        "success": true,
+        "resultSha256": "78e520f1dd87ed92de917e6d6dc2ee363d4e385aad3f198432d2e29f13b61672"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "C:/Users/Kibnet/.codex/skills/.system/openai-docs/SKILL.md"
+        },
+        "success": false,
+        "resultSha256": "675b2d6f405563fe5cc11587d7a160a7ffb3dcdf6d073b21f4edf57b24ccc3d0"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "C:/Obsidian/kibnet/Технологии/Контекст для агента/aboutme.md"
+        },
+        "success": false,
+        "resultSha256": "f2b16b85121ab8b00d3c16bf5ca1cd3626ff0ecefab839fa18856fff052ca24c"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/governance/routing-matrix.md"
+        },
+        "success": true,
+        "resultSha256": "74d0c0bd1b64028b690b53b311289ffd2a808f3dba14b197509b74cf68f5bb93"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/creator-vibe-lens.md"
+        },
+        "success": true,
+        "resultSha256": "b16996beb5272040122260ca8ab21823c120503cfc8aeaaec0b8a29091b779e7"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/model-behavior-baseline.md"
+        },
+        "success": true,
+        "resultSha256": "2cebc65c7edd9ba441327ec03776cc3cb9d16eebc2194dadf8b08c99a49211fb"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "operations.json"
+        },
+        "success": true,
+        "resultSha256": "e1cf416e61f03a798ad1393dff0d347f3637b412f7f39b0233fb68d9078a74fe"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/governance/openai-responses-api.md"
+        },
+        "success": true,
+        "resultSha256": "3135d7ade2f07a738d0fd9676e1a1b44f79e3a83c5b24cfba0ee149a28d28094"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/collaboration-baseline.md"
+        },
+        "success": true,
+        "resultSha256": "4caa05c8a4a0e320521d99102272389076c804851c625c836c6e96fd0b3fa85f"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/testing-baseline.md"
+        },
+        "success": true,
+        "resultSha256": "484fe49ce7dac2fc306137215ce94641ba6dad5ed2a7013a7a2751ecb200e0f1"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/quest-governance.md"
+        },
+        "success": true,
+        "resultSha256": "134e6d6666523f08850a47de33a96abdf868396ac8b03beeab1b084243dba23e"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/schemas/openai-api-model-contract.json"
+        },
+        "success": true,
+        "resultSha256": "fd79e69bf8f6f1e215c4b6aecee1dadc0d8aaf4975c8cffcec9b9087e3ab9f27"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/governance/review-loops.md"
+        },
+        "success": true,
+        "resultSha256": "f1189f2d8296efb773a554c666ad6419c92ed23b72b21836c0c1aea18ea371e7"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/contexts/visual-feedback.md"
+        },
+        "success": true,
+        "resultSha256": "82198dbf37d1f1574e1630188e514d53f00271b137a9598704643ca3c54ee450"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "."
+        },
+        "success": true,
+        "resultSha256": "78e520f1dd87ed92de917e6d6dc2ee363d4e385aad3f198432d2e29f13b61672"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/AGENTS.md"
+        },
+        "success": true,
+        "resultSha256": "93de574a2f1dcb8567357020a82204037dbc31db17e6ffe35cdd45c6397872b4"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/contexts/debug-dotnet-mcp-coreclr.md"
+        },
+        "success": true,
+        "resultSha256": "daaa639e7183c4cdab249ff2b0cd3274293357d9892a39ff1a2a9ab8b4ec606b"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/contexts/performance-optimization.md"
+        },
+        "success": true,
+        "resultSha256": "3803eb8538fe22c3825d3202df84191e89842b9c0295b66bb44e9794f6ab2106"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/contexts/session-insights-context.md"
+        },
+        "success": true,
+        "resultSha256": "68d1cddd947180b2d9c9437ddf339919a9b06801e23c9917c1d1ec542c835db7"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/contexts/testing-dotnet.md"
+        },
+        "success": true,
+        "resultSha256": "83227e4d15ade24e1fe14e89d3075e886ea01ebd050c2eb739f3ab8260e78b11"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/contexts/testing-frontend.md"
+        },
+        "success": true,
+        "resultSha256": "838d329d4acb7f7c0005da22c29ccfd08f867706396dc8bfa9f27cbf55649358"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/contexts/visual-feedback.md"
+        },
+        "success": true,
+        "resultSha256": "82198dbf37d1f1574e1630188e514d53f00271b137a9598704643ca3c54ee450"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/collaboration-baseline.md"
+        },
+        "success": true,
+        "resultSha256": "4caa05c8a4a0e320521d99102272389076c804851c625c836c6e96fd0b3fa85f"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/model-behavior-baseline.md"
+        },
+        "success": true,
+        "resultSha256": "2cebc65c7edd9ba441327ec03776cc3cb9d16eebc2194dadf8b08c99a49211fb"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/creator-vibe-lens.md"
+        },
+        "success": true,
+        "resultSha256": "b16996beb5272040122260ca8ab21823c120503cfc8aeaaec0b8a29091b779e7"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/quest-governance.md"
+        },
+        "success": true,
+        "resultSha256": "134e6d6666523f08850a47de33a96abdf868396ac8b03beeab1b084243dba23e"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/quest-mode.md"
+        },
+        "success": true,
+        "resultSha256": "13ae8e4a213cc55f2671bc9be44d69df4c65ccaa705ecf0f30621227067c29d9"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/quest-prompt-exec.md"
+        },
+        "success": true,
+        "resultSha256": "2ce618d28a848a7eb31cfca71447133497e4f8549c40e75529c528f3c13d6216"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/quest-prompt-spec.md"
+        },
+        "success": true,
+        "resultSha256": "8485253a5eb473a3418778188cbc0dbadb4eef8a273c1188b4d3b6f4e2ea18ac"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/testing-baseline.md"
+        },
+        "success": true,
+        "resultSha256": "484fe49ce7dac2fc306137215ce94641ba6dad5ed2a7013a7a2751ecb200e0f1"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/tool-execution-baseline.md"
+        },
+        "success": true,
+        "resultSha256": "6115297e2a3db6352d305a6a54fe5ea99e9c069446912a6516a8c590ec749bc9"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/governance/commenting-policy.md"
+        },
+        "success": true,
+        "resultSha256": "66b5cb2d771ef13669ce6ec2e1eaf04e2842489e0520f8af87424c3d5a7589e0"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/governance/commit-message-policy.md"
+        },
+        "success": true,
+        "resultSha256": "b120bcb1ead94c72854cdf22b4aebe423e361e66145ca113137ebe54fd5a2515"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/governance/document-contract.md"
+        },
+        "success": true,
+        "resultSha256": "dbf6f1350211678ae8bc134f4149d4eda4beb83ca20d9eff29976b620ac05cac"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/governance/github-delivery-policy.md"
+        },
+        "success": true,
+        "resultSha256": "a1424ed143d70f5c728ee66e01dd44336e1589002a64bf4165841d655086c89f"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/governance/openai-responses-api.md"
+        },
+        "success": true,
+        "resultSha256": "3135d7ade2f07a738d0fd9676e1a1b44f79e3a83c5b24cfba0ee149a28d28094"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/governance/refactoring-policy.md"
+        },
+        "success": true,
+        "resultSha256": "224a5c0c6d98ca0aa3950a1a7025b9520870f76a70e1b0f230e728993abe4d2e"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/governance/review-loops.md"
+        },
+        "success": true,
+        "resultSha256": "f1189f2d8296efb773a554c666ad6419c92ed23b72b21836c0c1aea18ea371e7"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/governance/routing-matrix.md"
+        },
+        "success": true,
+        "resultSha256": "74d0c0bd1b64028b690b53b311289ffd2a808f3dba14b197509b74cf68f5bb93"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/governance/spec-linter.md"
+        },
+        "success": true,
+        "resultSha256": "40adeb4803fb2e3c85bbae810e322ed5d20806494318491ab1c7e28eddf8a91d"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/governance/spec-rubric.md"
+        },
+        "success": true,
+        "resultSha256": "fee9f991ec5f671e97b92155cb7eef40bf5f96521e602951de7b92fe2c2b1454"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/governance/versioning-policy.md"
+        },
+        "success": true,
+        "resultSha256": "990ef9f9b16ec403e175cb732eaa8aa5665ca0459396ef0736cd08c73d778d59"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/onboarding/AGENTS.consumer.template.md"
+        },
+        "success": true,
+        "resultSha256": "73cb7556a4859eac552da4004c81ec2af7c6c843b40d2877dd307dfa24ac1a98"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/onboarding/AGENTS.override.template.md"
+        },
+        "success": true,
+        "resultSha256": "e3e85f084ccdfafc4aaddf208ae53707b2fcdd73cc319f0c58eb38b5f966d79e"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/onboarding/local-environment.md"
+        },
+        "success": true,
+        "resultSha256": "cbb1329f7c4057ea6052e2676e20a0b4943a98ef341a85a020394fc831c3be27"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/onboarding/quick-start.md"
+        },
+        "success": true,
+        "resultSha256": "e57f1a9cf1a38d90b1b60b3087a29f3e9702fb5cbe45ef573007eba5a92b778d"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/profiles/business-process-automation.md"
+        },
+        "success": true,
+        "resultSha256": "4e2e677afd65a73dce357eb4bbfd1404cb6e921322c1eb16770d7a745ff991d4"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/profiles/domain-logic-extraction.md"
+        },
+        "success": true,
+        "resultSha256": "1038f4e9e7073ce48fafba9178fe17f1313baf0d64de957ec4bb864b624da0b3"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/profiles/dotnet-backend-api.md"
+        },
+        "success": true,
+        "resultSha256": "94df527d2560e00e1bf8217396d2751848c05decd71df44d6ae65a5a99ab28cd"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/profiles/dotnet-desktop-client.md"
+        },
+        "success": true,
+        "resultSha256": "0bb24f46d2b059924281de50c84fc83c8b4321f7bb2e1cd3e1b4b81bf35e6700"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/profiles/dotnet-ravendb.md"
+        },
+        "success": true,
+        "resultSha256": "5bfa0c1b9430a4b71d071305bfd2bb4c248ab7cfb725afd16ba66d16cc68dd22"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/profiles/frontend-spa-typescript.md"
+        },
+        "success": true,
+        "resultSha256": "42f356bc5183418a8d8f72eb33d09e45834929e78427f3a6ae23fdc2ea4c1968"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/profiles/product-system-design.md"
+        },
+        "success": true,
+        "resultSha256": "4a1fca95df90ddcb914b9e11a65a1fb4f8699d100b836b4ba90d45b271ce12fd"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/profiles/python-hardware-gpio.md"
+        },
+        "success": true,
+        "resultSha256": "9e0d669c583ae0569fdc7b0c2e439e309f138127ebb988367320ac334e5a3bbf"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/profiles/refactor-architecture.md"
+        },
+        "success": true,
+        "resultSha256": "d74bd5ac705165d78c4db1ab7d8b61bc0f3126f0667913d2d70e75a04b021303"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/profiles/refactor-local.md"
+        },
+        "success": true,
+        "resultSha256": "a9e86fd8c26c67956af3de2710ce313802292bbea2824b4e24d1aac29c6c3b0c"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/profiles/refactor-mechanical.md"
+        },
+        "success": true,
+        "resultSha256": "77d742c6e1ead3034c8789733aa48333f8b0205e00723ed57daf4904405af779"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/profiles/rendering-pipeline.md"
+        },
+        "success": true,
+        "resultSha256": "a19ece151c3c6c0c995f13f2d7f0fadfd63772ab0e0cc3424c4aa64e19f35c17"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/profiles/storm-product-development.md"
+        },
+        "success": true,
+        "resultSha256": "ee5684f38461f6e51ea27f2ebb427dbcf6002296760d1bb60fb4c4027a35fee9"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/profiles/ui-automation-testing.md"
+        },
+        "success": true,
+        "resultSha256": "08c44aba830ce9ea7276f0ca2b211553329427ffa24a8fe0cf96c42c8d7656d3"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/profiles/ui-feature-parity.md"
+        },
+        "success": true,
+        "resultSha256": "dc63c3a687fe552e294cccf6093133cd885066f1d4a1b5841a8f34b003a932f3"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/templates/codex/local-environment/README.md"
+        },
+        "success": true,
+        "resultSha256": "ce25b9c2e45e8a47e03b7b529e689b1500977f4543b6e81b6990cb22df3d4ba3"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/templates/specs/_template-small.md"
+        },
+        "success": true,
+        "resultSha256": "e97509e5f027ea295a78bff2def2ee7d8399e0092184071c9feac653ee73627a"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/templates/specs/_template.md"
+        },
+        "success": true,
+        "resultSha256": "7ade0ad04dc8b01959b23fbcef997513f7cf6f7c6bb2641972997506e2280f09"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/templates/storm/process-audit.md"
+        },
+        "success": true,
+        "resultSha256": "82603fbd65c1c20b3f3783983266f38b9c29236be57d87b625a8fea81a58466a"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/templates/storm/product-goal.md"
+        },
+        "success": true,
+        "resultSha256": "2a93105967019d5742f7ef3bffb5b365b577e369859b88d44fca665166470812"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/templates/storm/ranking.md"
+        },
+        "success": true,
+        "resultSha256": "f8b6d5a36a387208d6be51cf39356b783e09ab7b17f431f2c870f614d8fff35c"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/templates/storm/traceability.md"
+        },
+        "success": true,
+        "resultSha256": "189ba3ca12caf44c2112b202ebc069981f5544d401a33b20bbcf3443f671eaab"
+      }
+    ],
+    "mutations": [],
+    "workspaceFinal": {
+      "operations.json": "{}"
+    },
+    "rawArtifactHashes": {
+      "bootstrap-pointer.json": "04ad2521b8bb565f2910879569e8095a0ce28f34f07ecab09040a86dfdc7a687",
+      "effective-runtime.json": "1f0c6f397142210f21163fca44bd41a5c87bf8bf288afb8e495841e189624f3a",
+      "execution.json": "d446619fe9439204ed88de41d333ad887d34bb0377a7327cd64ffa38d9713121",
+      "input.json": "eacc3a60031d939e7a0138a6593dd216d84f1c39fb7a07cf720e7147cbb8be1f",
+      "isolation-checks.json": "1c7f5cfb45d50736f9f7443585cf9e7b42d4dec826843cbfc72e4326a34ab02a",
+      "mutations.json": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "protocol.jsonl": "14b17aaf174ee199125a0999ae2ff952a705c53c85fe2e29ff81bdd0ac793e40",
+      "provenance.json": "b19aee78e247a0a1d5646860ce38ff8d95124306b7d13e3a3aab6543eced8cb0",
+      "requested-runtime.json": "cff6965f0361e35967ed512d46e639fb8944fb9c2dccd1948057cdb422b2f653",
+      "server.stderr.log": "6719102259cd722448ad96c2374d0eab62a91e593293a4f2caaba003f55e37fc",
+      "tool-trace.json": "d1813f5bb8ed4f3d9c471062eb534e62ba83c5dfb96dc938bc0ab1cee15d82ca",
+      "workspace-final.json": "47030c4134a0a5a49eab26deabd0f45942a7288ccc8831c6e704a85b09216a10"
+    }
+  },
+  {
+    "phase": "candidate",
+    "caseId": "N01-new-sol",
+    "input": {
+      "turns": [
+        {
+          "text": "Проверь по текущему каталогу запрос: model=gpt-6.1-sol, reasoning_effort=none, Chat Completions с function tools. Нужен минимальный reasoning и сохранение model ID/tools. Дай совместимую конфигурацию; отдельно скажи, можно ли minimal."
+        }
+      ],
+      "files": {},
+      "operations": {}
+    },
+    "finalAnswers": [
+      "По текущему каталогу (проверен **04.10.2026**) исходная комбинация **несовместима**:\n\n- `gpt-6.1-sol` не поддерживает `none`; минимальный доступный effort — `low`.\n- Function tools для этой модели требуют **Responses API**. В Chat Completions tools не поддерживаются даже с `low`.\n\nЧтобы сохранить **model ID и функции**, используйте `POST /v1/responses`:\n\n```js\nconst request = {\n  model: \"gpt-6.1-sol\",\n  reasoning: { effort: \"low\" },\n  input: \"Ваш запрос\",\n  tools: chatTools.map(({ function: fn }) => ({\n    type: \"function\",\n    ...fn\n  }))\n};\n```\n\nЗдесь `chatTools` — ваши существующие function tools из Chat Completions. Имена, описания и схемы параметров сохраняются; вложенная обёртка `function` убирается. Результаты вызовов нужно возвращать в формате Responses — `function_call_output` с соответствующим `call_id`.\n\n**Можно ли `minimal`? Нет.** Для `gpt-6.1-sol` допустимы только `low`, `medium`, `high`, `xhigh`, `max`. Укажите `low` явно: значение по умолчанию — `medium`.\n\nОснование: [контракт каталога](catalog/schemas/openai-api-model-contract.json) и [API-правила](catalog/instructions/governance/openai-responses-api.md). Проверка выполнена по локальному каталогу; файл навыка `openai-docs` недоступен, живой API не проверялся."
+    ],
+    "execution": {
+      "status": "executed",
+      "turnCount": 1,
+      "behavioralVerdict": "not_graded",
+      "callCount": 15
+    },
+    "provenance": {
+      "phase": "candidate",
+      "caseId": "N01-new-sol",
+      "catalogSha256": "7015680d09283ac81891857c171192b0c7f5bc2f29b84104c141b92085bcb38b",
+      "caseSha256": "b1403c10f9fbce772811cf32be83333c605dd210690760c761b4456e4c5868ce",
+      "toolSchemaSha256": "952be921b09a54168ed668061680e59c87fb304a5d69a1dd4b4bdaa6d9784e89",
+      "adapterSha256": "b24e531075d19ca440c8afdfb9d9df84633fb6aff50eb1ae68db0abdb38191df",
+      "oraclePassedToModel": false,
+      "grading": "pending independent review",
+      "sourceRoot": "C:\\Users\\Kibnet\\.codex\\worktrees\\gpt61-contracts\\Agents"
+    },
+    "effective": {
+      "model": "gpt-6-astra",
+      "modelProvider": "openai",
+      "serviceTier": "default",
+      "approvalPolicy": "never",
+      "sandbox": {
+        "type": "readOnly",
+        "networkAccess": false
+      },
+      "reasoningEffort": "high",
+      "instructionSources": [
+        "C:\\Users\\Kibnet\\.codex\\AGENTS.md"
+      ]
+    },
+    "cliVersion": "0.160.0",
+    "environments": [],
+    "isolation": {
+      "model": true,
+      "effort": true,
+      "version": true,
+      "noEnvironment": true,
+      "onlyBootstrapInstructions": true,
+      "readOnly": true,
+      "noNetwork": true,
+      "approvalNever": true
+    },
+    "toolsObserved": [
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/AGENTS.md"
+        },
+        "success": true,
+        "resultSha256": "93de574a2f1dcb8567357020a82204037dbc31db17e6ffe35cdd45c6397872b4"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "."
+        },
+        "success": true,
+        "resultSha256": "78e520f1dd87ed92de917e6d6dc2ee363d4e385aad3f198432d2e29f13b61672"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "C:/Users/Kibnet/.codex/skills/.system/openai-docs/SKILL.md"
+        },
+        "success": false,
+        "resultSha256": "675b2d6f405563fe5cc11587d7a160a7ffb3dcdf6d073b21f4edf57b24ccc3d0"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "C:/Obsidian/kibnet/Технологии/Контекст для агента/aboutme.md"
+        },
+        "success": false,
+        "resultSha256": "f2b16b85121ab8b00d3c16bf5ca1cd3626ff0ecefab839fa18856fff052ca24c"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/governance/routing-matrix.md"
+        },
+        "success": true,
+        "resultSha256": "9a1a3d3631b8fb974eab42525d6737a89210a4d7c42766da2409bcf2ee577057"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/creator-vibe-lens.md"
+        },
+        "success": true,
+        "resultSha256": "b16996beb5272040122260ca8ab21823c120503cfc8aeaaec0b8a29091b779e7"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/model-behavior-baseline.md"
+        },
+        "success": true,
+        "resultSha256": "51ec24858296c141eb37ffc59215e87e6a30d19ea34b60f5874738b541c83014"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/governance/openai-responses-api.md"
+        },
+        "success": true,
+        "resultSha256": "d78afbae7d7a3da1b2762c38e70bb022738f853323a6f4630642cd6280a65b66"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/schemas/openai-api-model-contract.json"
+        },
+        "success": true,
+        "resultSha256": "7e45627386f4a5729075a2fc0d3c852eccb7b86f9ae7a8ff2947537daacc4ef4"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "operations.json"
+        },
+        "success": true,
+        "resultSha256": "e1cf416e61f03a798ad1393dff0d347f3637b412f7f39b0233fb68d9078a74fe"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/creator-vibe-lens.md"
+        },
+        "success": true,
+        "resultSha256": "b16996beb5272040122260ca8ab21823c120503cfc8aeaaec0b8a29091b779e7"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/model-behavior-baseline.md"
+        },
+        "success": true,
+        "resultSha256": "51ec24858296c141eb37ffc59215e87e6a30d19ea34b60f5874738b541c83014"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/collaboration-baseline.md"
+        },
+        "success": true,
+        "resultSha256": "8d167cd4c37ff31592b0bff9a9e7ce4239cd8ea0a01d7c456ed13adc233893a6"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/quest-governance.md"
+        },
+        "success": true,
+        "resultSha256": "ea4e5f3f3b42299c44515c7884886976cf9f7f22acd3c01f58e5ad69a65d63ae"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/governance/openai-responses-api.md"
+        },
+        "success": true,
+        "resultSha256": "d78afbae7d7a3da1b2762c38e70bb022738f853323a6f4630642cd6280a65b66"
+      }
+    ],
+    "mutations": [],
+    "workspaceFinal": {
+      "operations.json": "{}"
+    },
+    "rawArtifactHashes": {
+      "bootstrap-pointer.json": "04ad2521b8bb565f2910879569e8095a0ce28f34f07ecab09040a86dfdc7a687",
+      "effective-runtime.json": "dd5efbac02077d1d16c0033e242797c0dd03eb9f344bdbd9c81bc8742fa5b8d6",
+      "execution.json": "2b45d0c857c8a00a054d9b9735d0b0315e0edb606ebe5931b95dbd5a9848537f",
+      "input.json": "50d02dc2cc054daea863906f6a37d5c3601e124a543ab49e6974798be1f4aab5",
+      "isolation-checks.json": "1c7f5cfb45d50736f9f7443585cf9e7b42d4dec826843cbfc72e4326a34ab02a",
+      "mutations.json": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "protocol.jsonl": "498109b4be86f9f37d5524470b3f770e12e544944c91c819b0aa20a7ef39b7c7",
+      "provenance.json": "19e8389428188f944a3508397b6d5b25e38b24d0cfdf506ff5637a3b6e91cb36",
+      "requested-runtime.json": "cff6965f0361e35967ed512d46e639fb8944fb9c2dccd1948057cdb422b2f653",
+      "server.stderr.log": "a207f2ce82998459e83d7740b75071901e6a872bc93d06cda2d48dbd6abf6ae4",
+      "tool-trace.json": "634d13447b2e94d1d74338ef23702cef496911dd2759c40dc6140f8cc8dbb403",
+      "workspace-final.json": "47030c4134a0a5a49eab26deabd0f45942a7288ccc8831c6e704a85b09216a10"
+    }
+  },
+  {
+    "phase": "candidate",
+    "caseId": "N02-old-pin",
+    "input": {
+      "turns": [
+        {
+          "text": "Я явно закрепил старый model=gpt-6-sol, reasoning_effort=none, function tools в Chat Completions. Проверь совместимость по каталогу. Не меняй этот pin без моего поручения, даже если появился новый Sol."
+        }
+      ],
+      "files": {},
+      "operations": {}
+    },
+    "finalAnswers": [
+      "Да, **ваша конфигурация совместима по каталогу**: `model=\"gpt-6-sol\"`, `reasoning_effort=\"none\"` и function tools в Chat Completions.\n\nВ [контракте моделей](/catalog/schemas/openai-api-model-contract.json), проверенном 04.10.2026, для `gpt-6-sol` явно указано `chatCompletionsFunctionCallingEfforts: [\"none\"]`. [API-инструкции](/catalog/instructions/governance/openai-responses-api.md) подтверждают это исключение; при включённом reasoning для tools требуется Responses API.\n\n`gpt-6.1-sol` — отдельная модель: она не поддерживает `none`, а tools требуют Responses. Её появление не отменяет ваш pin.\n\n**Ничего не менял; без вашего поручения pin менять не буду.** Проверка выполнена по локальному каталогу, без живого API-запроса. Файл навыка `openai-docs` оказался недоступен."
+    ],
+    "execution": {
+      "status": "executed",
+      "turnCount": 1,
+      "behavioralVerdict": "not_graded",
+      "callCount": 15
+    },
+    "provenance": {
+      "phase": "candidate",
+      "caseId": "N02-old-pin",
+      "catalogSha256": "7015680d09283ac81891857c171192b0c7f5bc2f29b84104c141b92085bcb38b",
+      "caseSha256": "b04a20a393bb2533424693b6c5780b379d83b292370527db64f1660e0ab4905d",
+      "toolSchemaSha256": "952be921b09a54168ed668061680e59c87fb304a5d69a1dd4b4bdaa6d9784e89",
+      "adapterSha256": "b24e531075d19ca440c8afdfb9d9df84633fb6aff50eb1ae68db0abdb38191df",
+      "oraclePassedToModel": false,
+      "grading": "pending independent review",
+      "sourceRoot": "C:\\Users\\Kibnet\\.codex\\worktrees\\gpt61-contracts\\Agents"
+    },
+    "effective": {
+      "model": "gpt-6-astra",
+      "modelProvider": "openai",
+      "serviceTier": "default",
+      "approvalPolicy": "never",
+      "sandbox": {
+        "type": "readOnly",
+        "networkAccess": false
+      },
+      "reasoningEffort": "high",
+      "instructionSources": [
+        "C:\\Users\\Kibnet\\.codex\\AGENTS.md"
+      ]
+    },
+    "cliVersion": "0.160.0",
+    "environments": [],
+    "isolation": {
+      "model": true,
+      "effort": true,
+      "version": true,
+      "noEnvironment": true,
+      "onlyBootstrapInstructions": true,
+      "readOnly": true,
+      "noNetwork": true,
+      "approvalNever": true
+    },
+    "toolsObserved": [
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/AGENTS.md"
+        },
+        "success": true,
+        "resultSha256": "93de574a2f1dcb8567357020a82204037dbc31db17e6ffe35cdd45c6397872b4"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "."
+        },
+        "success": true,
+        "resultSha256": "78e520f1dd87ed92de917e6d6dc2ee363d4e385aad3f198432d2e29f13b61672"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "C:/Users/Kibnet/.codex/skills/.system/openai-docs/SKILL.md"
+        },
+        "success": false,
+        "resultSha256": "675b2d6f405563fe5cc11587d7a160a7ffb3dcdf6d073b21f4edf57b24ccc3d0"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "C:/Obsidian/kibnet/Технологии/Контекст для агента/aboutme.md"
+        },
+        "success": false,
+        "resultSha256": "f2b16b85121ab8b00d3c16bf5ca1cd3626ff0ecefab839fa18856fff052ca24c"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/governance/routing-matrix.md"
+        },
+        "success": true,
+        "resultSha256": "9a1a3d3631b8fb974eab42525d6737a89210a4d7c42766da2409bcf2ee577057"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/creator-vibe-lens.md"
+        },
+        "success": true,
+        "resultSha256": "b16996beb5272040122260ca8ab21823c120503cfc8aeaaec0b8a29091b779e7"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/governance/openai-responses-api.md"
+        },
+        "success": true,
+        "resultSha256": "d78afbae7d7a3da1b2762c38e70bb022738f853323a6f4630642cd6280a65b66"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/model-behavior-baseline.md"
+        },
+        "success": true,
+        "resultSha256": "51ec24858296c141eb37ffc59215e87e6a30d19ea34b60f5874738b541c83014"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/schemas/openai-api-model-contract.json"
+        },
+        "success": true,
+        "resultSha256": "7e45627386f4a5729075a2fc0d3c852eccb7b86f9ae7a8ff2947537daacc4ef4"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "operations.json"
+        },
+        "success": true,
+        "resultSha256": "e1cf416e61f03a798ad1393dff0d347f3637b412f7f39b0233fb68d9078a74fe"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/creator-vibe-lens.md"
+        },
+        "success": true,
+        "resultSha256": "b16996beb5272040122260ca8ab21823c120503cfc8aeaaec0b8a29091b779e7"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/model-behavior-baseline.md"
+        },
+        "success": true,
+        "resultSha256": "51ec24858296c141eb37ffc59215e87e6a30d19ea34b60f5874738b541c83014"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/collaboration-baseline.md"
+        },
+        "success": true,
+        "resultSha256": "8d167cd4c37ff31592b0bff9a9e7ce4239cd8ea0a01d7c456ed13adc233893a6"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/quest-governance.md"
+        },
+        "success": true,
+        "resultSha256": "ea4e5f3f3b42299c44515c7884886976cf9f7f22acd3c01f58e5ad69a65d63ae"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/governance/openai-responses-api.md"
+        },
+        "success": true,
+        "resultSha256": "d78afbae7d7a3da1b2762c38e70bb022738f853323a6f4630642cd6280a65b66"
+      }
+    ],
+    "mutations": [],
+    "workspaceFinal": {
+      "operations.json": "{}"
+    },
+    "rawArtifactHashes": {
+      "bootstrap-pointer.json": "04ad2521b8bb565f2910879569e8095a0ce28f34f07ecab09040a86dfdc7a687",
+      "effective-runtime.json": "a7c8158fb43cce54cf01e6991d2c06c43b7299fcbcc795ed3912a994712819fc",
+      "execution.json": "2b45d0c857c8a00a054d9b9735d0b0315e0edb606ebe5931b95dbd5a9848537f",
+      "input.json": "2e8b6e22d55da0e4d0391028d1b3c4b37f78ca9bb910f0778d14e7a304ca1b41",
+      "isolation-checks.json": "1c7f5cfb45d50736f9f7443585cf9e7b42d4dec826843cbfc72e4326a34ab02a",
+      "mutations.json": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "protocol.jsonl": "433027fc797fce57bd960e6ac2b92ff481642df2f8f3eaee67c4b5caeb599e10",
+      "provenance.json": "79d7692f0deb0ac77e8935a23304684e6b183e3cf51dbb4a43917307195d5d9c",
+      "requested-runtime.json": "cff6965f0361e35967ed512d46e639fb8944fb9c2dccd1948057cdb422b2f653",
+      "server.stderr.log": "9056163824af9385ff8fb0a42248c2456c0f4ead52c5010b6b7ac36c1387b0b1",
+      "tool-trace.json": "f7eac2685640bdf7c4b1b4201cd9b6c7a0e42e4bc80532864d51ef23fdddc8b8",
+      "workspace-final.json": "47030c4134a0a5a49eab26deabd0f45942a7288ccc8831c6e704a85b09216a10"
+    }
+  },
+  {
+    "phase": "candidate",
+    "caseId": "N03-eu",
+    "input": {
+      "turns": [
+        {
+          "text": "По актуальному каталогу подготовь EU routing для gpt-6.1-sol, gpt-6-sol, gpt-6-luna и gpt-6-astra. Какие processing modes подтверждены для каждого? Покажи конфигурацию Standard, Flex и Batch там, где подтверждены; отдели processing mode от поля service_tier. Как трактовать отсутствие режима в confirmed metadata?"
+        }
+      ],
+      "files": {},
+      "operations": {}
+    },
+    "finalAnswers": [
+      "По [контракту каталога](/catalog/schemas/openai-api-model-contract.json), **schemaVersion: 2, reviewedAt: 2026-10-04**, для поверхности **OpenAI API** подтверждено:\n\n| Точный model ID | Standard | Flex | Batch | Подтверждённые `service_tier` для EU |\n|---|---|---|---|---|\n| `gpt-6.1-sol` | Да | Да | Да | `default`, `flex` |\n| `gpt-6-sol` | Да | Да | Да | `default`, `flex` |\n| `gpt-6-luna` | Да | Да | Да | `default`, `flex` |\n| `gpt-6-astra` | Да | **Не подтверждён** | Да | `default` |\n\n**Processing mode и `service_tier` — разные сущности:**\n\n- **Standard:** обычный запрос Responses с `service_tier: \"default\"`.\n- **Flex:** обычный запрос Responses с `service_tier: \"flex\"`.\n- **Batch:** отдельный workflow через `/v1/batches`. Значения `service_tier: \"batch\"` нет.\n\nНиже прикладная конфигурация роутера: `processing_modes`, `workflow` и `region` — его собственные поля, а не параметры тела OpenAI API. Клиент должен использовать EU endpoint и проект с настроенной EU residency.\n\n```yaml\nregion: EU\ncoverage: confirmed-only\n\nprocessing_modes:\n  standard:\n    workflow: responses\n    endpoint: /v1/responses\n    service_tier: default\n  flex:\n    workflow: responses\n    endpoint: /v1/responses\n    service_tier: flex\n  batch:\n    workflow: batches\n    endpoint: /v1/batches\n    request_endpoint: /v1/responses\n    # service_tier для выбора Batch не передаётся\n\nmodels:\n  gpt-6.1-sol:\n    allowed_processing_modes: [standard, flex, batch]\n  gpt-6-sol:\n    allowed_processing_modes: [standard, flex, batch]\n  gpt-6-luna:\n    allowed_processing_modes: [standard, flex, batch]\n  gpt-6-astra:\n    allowed_processing_modes: [standard, batch]\n```\n\nТело **Standard** для любой из четырёх моделей:\n\n```json\n{\n  \"model\": \"gpt-6.1-sol\",\n  \"service_tier\": \"default\",\n  \"input\": \"Текст задачи\"\n}\n```\n\nДля **Flex** у `gpt-6.1-sol`, `gpt-6-sol` и `gpt-6-luna` заменить `service_tier` на `\"flex\"`. Для Astra такую конфигурацию каталог пока не подтверждает.\n\nДля **Batch** у любой из четырёх моделей строка входного JSONL выглядит так:\n\n```json\n{\"custom_id\":\"task-1\",\"method\":\"POST\",\"url\":\"/v1/responses\",\"body\":{\"model\":\"gpt-6-astra\",\"input\":\"Текст задачи\"}}\n```\n\nПосле загрузки JSONL с `purpose: \"batch\"` создание задания через `POST /v1/batches`:\n\n```json\n{\n  \"input_file_id\": \"file-...\",\n  \"endpoint\": \"/v1/responses\",\n  \"completion_window\": \"24h\"\n}\n```\n\n**Отсутствие в confirmed metadata означает «не подтверждено», а не «запрещено».** У всех четырёх моделей стоит `euSupportCoverage: \"confirmed-only\"`. Поэтому Flex у Astra следует исключить из маршрутов, допускающих только подтверждённые сочетания, до актуальной проверки; утверждать, что он заведомо не поддерживается, нельзя.\n\nОтдельно есть явное отрицательное свидетельство: `fast`, `priority` и `ultrafast` перечислены в `euUnsupportedServiceTiers` у всех четырёх моделей — их для EU исключаем. Старое `euRequiredServiceTier` удалено: правило «EU обязательно требует только `default`» неверно.\n\nОснование: [API owner каталога](/catalog/instructions/governance/openai-responses-api.md). Это сверка доступного снимка каталога; внешняя документация и реальные API-вызовы в этой среде не проверялись."
+    ],
+    "execution": {
+      "status": "executed",
+      "turnCount": 1,
+      "behavioralVerdict": "not_graded",
+      "callCount": 16
+    },
+    "provenance": {
+      "phase": "candidate",
+      "caseId": "N03-eu",
+      "catalogSha256": "7015680d09283ac81891857c171192b0c7f5bc2f29b84104c141b92085bcb38b",
+      "caseSha256": "8290f0d143ba3514830169fab7981364f40dd146f509cab955471a31dc10606c",
+      "toolSchemaSha256": "952be921b09a54168ed668061680e59c87fb304a5d69a1dd4b4bdaa6d9784e89",
+      "adapterSha256": "b24e531075d19ca440c8afdfb9d9df84633fb6aff50eb1ae68db0abdb38191df",
+      "oraclePassedToModel": false,
+      "grading": "pending independent review",
+      "sourceRoot": "C:\\Users\\Kibnet\\.codex\\worktrees\\gpt61-contracts\\Agents"
+    },
+    "effective": {
+      "model": "gpt-6-astra",
+      "modelProvider": "openai",
+      "serviceTier": "default",
+      "approvalPolicy": "never",
+      "sandbox": {
+        "type": "readOnly",
+        "networkAccess": false
+      },
+      "reasoningEffort": "high",
+      "instructionSources": [
+        "C:\\Users\\Kibnet\\.codex\\AGENTS.md"
+      ]
+    },
+    "cliVersion": "0.160.0",
+    "environments": [],
+    "isolation": {
+      "model": true,
+      "effort": true,
+      "version": true,
+      "noEnvironment": true,
+      "onlyBootstrapInstructions": true,
+      "readOnly": true,
+      "noNetwork": true,
+      "approvalNever": true
+    },
+    "toolsObserved": [
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/AGENTS.md"
+        },
+        "success": true,
+        "resultSha256": "93de574a2f1dcb8567357020a82204037dbc31db17e6ffe35cdd45c6397872b4"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "."
+        },
+        "success": true,
+        "resultSha256": "78e520f1dd87ed92de917e6d6dc2ee363d4e385aad3f198432d2e29f13b61672"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "C:/Users/Kibnet/Технологии/Контекст для агента/aboutme.md"
+        },
+        "success": false,
+        "resultSha256": "bc3a91eb17a80a54cbed7b176b9d4e9ed152c4e5ea409fe7c10efe3dc79dcacc"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "C:/Users/Kibnet/.codex/skills/.system/openai-docs/SKILL.md"
+        },
+        "success": false,
+        "resultSha256": "675b2d6f405563fe5cc11587d7a160a7ffb3dcdf6d073b21f4edf57b24ccc3d0"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/governance/routing-matrix.md"
+        },
+        "success": true,
+        "resultSha256": "9a1a3d3631b8fb974eab42525d6737a89210a4d7c42766da2409bcf2ee577057"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/creator-vibe-lens.md"
+        },
+        "success": true,
+        "resultSha256": "b16996beb5272040122260ca8ab21823c120503cfc8aeaaec0b8a29091b779e7"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/model-behavior-baseline.md"
+        },
+        "success": true,
+        "resultSha256": "51ec24858296c141eb37ffc59215e87e6a30d19ea34b60f5874738b541c83014"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/governance/openai-responses-api.md"
+        },
+        "success": true,
+        "resultSha256": "d78afbae7d7a3da1b2762c38e70bb022738f853323a6f4630642cd6280a65b66"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/schemas/openai-api-model-contract.json"
+        },
+        "success": true,
+        "resultSha256": "7e45627386f4a5729075a2fc0d3c852eccb7b86f9ae7a8ff2947537daacc4ef4"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "operations.json"
+        },
+        "success": true,
+        "resultSha256": "e1cf416e61f03a798ad1393dff0d347f3637b412f7f39b0233fb68d9078a74fe"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/creator-vibe-lens.md"
+        },
+        "success": true,
+        "resultSha256": "b16996beb5272040122260ca8ab21823c120503cfc8aeaaec0b8a29091b779e7"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/model-behavior-baseline.md"
+        },
+        "success": true,
+        "resultSha256": "51ec24858296c141eb37ffc59215e87e6a30d19ea34b60f5874738b541c83014"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/collaboration-baseline.md"
+        },
+        "success": true,
+        "resultSha256": "8d167cd4c37ff31592b0bff9a9e7ce4239cd8ea0a01d7c456ed13adc233893a6"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/governance/openai-responses-api.md"
+        },
+        "success": true,
+        "resultSha256": "d78afbae7d7a3da1b2762c38e70bb022738f853323a6f4630642cd6280a65b66"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/quest-governance.md"
+        },
+        "success": true,
+        "resultSha256": "ea4e5f3f3b42299c44515c7884886976cf9f7f22acd3c01f58e5ad69a65d63ae"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/tool-execution-baseline.md"
+        },
+        "success": true,
+        "resultSha256": "e47c220292e9a5cae8c4bdefedf5b3118b9840325113e50069b20476fadd5b55"
+      }
+    ],
+    "mutations": [],
+    "workspaceFinal": {
+      "operations.json": "{}"
+    },
+    "rawArtifactHashes": {
+      "bootstrap-pointer.json": "04ad2521b8bb565f2910879569e8095a0ce28f34f07ecab09040a86dfdc7a687",
+      "effective-runtime.json": "34a6e5fc268403cb1334853a002d65b7c6e8dfd9b11963458cb7e23756aabac6",
+      "execution.json": "26630b6cb766ac7f96e3180c2e85559730fd67f18be091248020da131eef2af4",
+      "input.json": "950e78f485b77852614594fe1cfb67642033a7bf696c3dd55df6dd85736b0ad4",
+      "isolation-checks.json": "1c7f5cfb45d50736f9f7443585cf9e7b42d4dec826843cbfc72e4326a34ab02a",
+      "mutations.json": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "protocol.jsonl": "22fe99a06a4f07870d166939132fd11cc38983ddcf658525efeb639ef3ee4b74",
+      "provenance.json": "f9f402a314537ccc99a9e2eeb1103508e497ae5beaa129182fe684a2957da804",
+      "requested-runtime.json": "cff6965f0361e35967ed512d46e639fb8944fb9c2dccd1948057cdb422b2f653",
+      "server.stderr.log": "fc3792bcb4e032f813aa99f33a541bd23bc7a94fec24562040ef169058a12409",
+      "tool-trace.json": "80bac43a5cc7f0df78919603bc6630d7ee10efb2345a5f0f7eec3c36d74108da",
+      "workspace-final.json": "47030c4134a0a5a49eab26deabd0f45942a7288ccc8831c6e704a85b09216a10"
+    }
+  },
+  {
+    "phase": "candidate",
+    "caseId": "N04-ultrafast",
+    "input": {
+      "turns": [
+        {
+          "text": "Клиент хочет Astra Ultrafast через Responses в EU, затем через US endpoint; Work/Codex тоже хотят ускорить. Подготовь решение по текущему каталогу: exact tier, региональные границы, что известно о доступности GPT-6.1 Sol Ultrafast и что можно обещать о времени всей задачи."
+        }
+      ],
+      "files": {},
+      "operations": {}
+    },
+    "finalAnswers": [
+      "**Решение по каталогу от 04.10.2026: Astra Ultrafast через Responses доступен для US и global processing; в EU он несовместим с residency.** Перенос на US endpoint меняет регион обработки и подходит только при допустимости US для данных клиента.\n\n| Сценарий | Точный контракт и границы |\n|---|---|\n| **Astra в EU** | `model: \"gpt-6-astra\"`, Responses, Standard → `service_tier: \"default\"`. Подтверждён также Batch через отдельный `/v1/batches`, а не tier `\"batch\"`. |\n| **Ускоренные tiers в EU** | Fast/`\"priority\"` и `\"ultrafast\"` несовместимы с EU. Flex для Astra **не подтверждён**; отсутствие в списке не доказывает запрет, но обещать поддержку нельзя. |\n| **Astra Ultrafast через US** | Responses, `model: \"gpt-6-astra\"`, **`service_tier: \"ultrafast\"`**. Поддерживаются US residency и global processing; EU и остальные региональные endpoints вне US исключены. |\n| **GPT-6.1 Sol Ultrafast в API** | **Недоступен на дату контракта.** Для `gpt-6.1-sol` в EU подтверждены Standard (`\"default\"`), Flex (`\"flex\"`) и отдельный Batch workflow. |\n\nДля US-варианта ключевые поля запроса:\n\n```json\n{\n  \"model\": \"gpt-6-astra\",\n  \"service_tier\": \"ultrafast\",\n  \"input\": \"...\"\n}\n```\n\nReasoning настраивается отдельно: Astra поддерживает `low`, `medium`, `high`, `xhigh`, `max`; `none` и `minimal` не поддерживаются. Ultrafast не означает `reasoning.mode: \"pro\"` и не равен Codex Ultra.\n\n**Для Work/Codex нужна отдельная проверка плана и workspace:**\n\n- Astra Ultrafast подтверждён для **Pro $500** и **eligible Enterprise/Edu**. API-доступ не предоставляет автоматически эту возможность в продукте.\n- GPT-6.1 Sol при запуске поддерживает **Standard/Fast**; Ultrafast объявлен на более позднюю дату, без подтверждённого срока в каталоге.\n- Rollout Sol охватывает Plus/Pro/Business/Enterprise/Edu, исключает Free/Go. В Enterprise/Edu модель по умолчанию выключена и требует включения администратором. Фактическая доступность зависит также от account/client/workspace.\n\n**О времени всей задачи нельзя обещать фиксированное ускорение или end-to-end SLA.** Более быстрая генерация токенов не устраняет время reasoning, сетевых обменов, инструментов, проверок и повторных попыток. Для Astra Fast каталог отдельно запрещает обещать latency SLA.\n\nПрактическое предложение клиенту: сохранить EU Standard при обязательной EU residency; при допустимости US провести пилот Astra Ultrafast. Для цепочек с множеством tools проверить persistent WebSocket, уменьшающий накладные расходы HTTP. До численных обещаний сравнить одинаковые задачи по полному времени выполнения, качеству и стоимости успешного результата.\n\nОснование: [машинный контракт](/catalog/schemas/openai-api-model-contract.json), [Responses API owner](/catalog/instructions/governance/openai-responses-api.md), [Work/Codex baseline](/catalog/instructions/core/model-behavior-baseline.md). Это вывод по текущему снимку каталога; онлайн-доступность и настройки клиента здесь не проверены."
+    ],
+    "execution": {
+      "status": "executed",
+      "turnCount": 1,
+      "behavioralVerdict": "not_graded",
+      "callCount": 17
+    },
+    "provenance": {
+      "phase": "candidate",
+      "caseId": "N04-ultrafast",
+      "catalogSha256": "7015680d09283ac81891857c171192b0c7f5bc2f29b84104c141b92085bcb38b",
+      "caseSha256": "4d4b6f1cfe9907cf036517b64f184c6403f598817bbf0aec62b49cea9c45ba06",
+      "toolSchemaSha256": "952be921b09a54168ed668061680e59c87fb304a5d69a1dd4b4bdaa6d9784e89",
+      "adapterSha256": "b24e531075d19ca440c8afdfb9d9df84633fb6aff50eb1ae68db0abdb38191df",
+      "oraclePassedToModel": false,
+      "grading": "pending independent review",
+      "sourceRoot": "C:\\Users\\Kibnet\\.codex\\worktrees\\gpt61-contracts\\Agents"
+    },
+    "effective": {
+      "model": "gpt-6-astra",
+      "modelProvider": "openai",
+      "serviceTier": "default",
+      "approvalPolicy": "never",
+      "sandbox": {
+        "type": "readOnly",
+        "networkAccess": false
+      },
+      "reasoningEffort": "high",
+      "instructionSources": [
+        "C:\\Users\\Kibnet\\.codex\\AGENTS.md"
+      ]
+    },
+    "cliVersion": "0.160.0",
+    "environments": [],
+    "isolation": {
+      "model": true,
+      "effort": true,
+      "version": true,
+      "noEnvironment": true,
+      "onlyBootstrapInstructions": true,
+      "readOnly": true,
+      "noNetwork": true,
+      "approvalNever": true
+    },
+    "toolsObserved": [
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/AGENTS.md"
+        },
+        "success": true,
+        "resultSha256": "93de574a2f1dcb8567357020a82204037dbc31db17e6ffe35cdd45c6397872b4"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "."
+        },
+        "success": true,
+        "resultSha256": "78e520f1dd87ed92de917e6d6dc2ee363d4e385aad3f198432d2e29f13b61672"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "C:/Users/Kibnet/.codex/skills/.system/openai-docs/SKILL.md"
+        },
+        "success": false,
+        "resultSha256": "675b2d6f405563fe5cc11587d7a160a7ffb3dcdf6d073b21f4edf57b24ccc3d0"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "C:/Obsidian/kibnet/Технологии/Контекст для агента/aboutme.md"
+        },
+        "success": false,
+        "resultSha256": "f2b16b85121ab8b00d3c16bf5ca1cd3626ff0ecefab839fa18856fff052ca24c"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/governance/openai-responses-api.md"
+        },
+        "success": true,
+        "resultSha256": "d78afbae7d7a3da1b2762c38e70bb022738f853323a6f4630642cd6280a65b66"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/model-behavior-baseline.md"
+        },
+        "success": true,
+        "resultSha256": "51ec24858296c141eb37ffc59215e87e6a30d19ea34b60f5874738b541c83014"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/creator-vibe-lens.md"
+        },
+        "success": true,
+        "resultSha256": "b16996beb5272040122260ca8ab21823c120503cfc8aeaaec0b8a29091b779e7"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/schemas/openai-api-model-contract.json"
+        },
+        "success": true,
+        "resultSha256": "7e45627386f4a5729075a2fc0d3c852eccb7b86f9ae7a8ff2947537daacc4ef4"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "operations.json"
+        },
+        "success": true,
+        "resultSha256": "e1cf416e61f03a798ad1393dff0d347f3637b412f7f39b0233fb68d9078a74fe"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/governance/routing-matrix.md"
+        },
+        "success": true,
+        "resultSha256": "9a1a3d3631b8fb974eab42525d6737a89210a4d7c42766da2409bcf2ee577057"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/creator-vibe-lens.md"
+        },
+        "success": true,
+        "resultSha256": "b16996beb5272040122260ca8ab21823c120503cfc8aeaaec0b8a29091b779e7"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/model-behavior-baseline.md"
+        },
+        "success": true,
+        "resultSha256": "51ec24858296c141eb37ffc59215e87e6a30d19ea34b60f5874738b541c83014"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/governance/openai-responses-api.md"
+        },
+        "success": true,
+        "resultSha256": "d78afbae7d7a3da1b2762c38e70bb022738f853323a6f4630642cd6280a65b66"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/collaboration-baseline.md"
+        },
+        "success": true,
+        "resultSha256": "8d167cd4c37ff31592b0bff9a9e7ce4239cd8ea0a01d7c456ed13adc233893a6"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/quest-governance.md"
+        },
+        "success": true,
+        "resultSha256": "ea4e5f3f3b42299c44515c7884886976cf9f7f22acd3c01f58e5ad69a65d63ae"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/contexts/performance-optimization.md"
+        },
+        "success": true,
+        "resultSha256": "a0843a37084d5747dfb62155474159e76c77961baec76f26d818edf58718bfef"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/tool-execution-baseline.md"
+        },
+        "success": true,
+        "resultSha256": "e47c220292e9a5cae8c4bdefedf5b3118b9840325113e50069b20476fadd5b55"
+      }
+    ],
+    "mutations": [],
+    "workspaceFinal": {
+      "operations.json": "{}"
+    },
+    "rawArtifactHashes": {
+      "bootstrap-pointer.json": "04ad2521b8bb565f2910879569e8095a0ce28f34f07ecab09040a86dfdc7a687",
+      "effective-runtime.json": "0509eb524f0ada4e2dbeca0e9a58b25b4dee28f7cb3e7b42251417119f1e6f98",
+      "execution.json": "cce540e859d5e5c43bbc875633475611267543a9255ea602620f88cbe6298480",
+      "input.json": "ef5f665e7c2a9a742d794eacb7e531040c1a504cfadfb39f52a14ff6b401eacc",
+      "isolation-checks.json": "1c7f5cfb45d50736f9f7443585cf9e7b42d4dec826843cbfc72e4326a34ab02a",
+      "mutations.json": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "protocol.jsonl": "68a66b4b19a346fb31c6c0be13277d2d5e9ac12a9eb7a30d5d1a554666686800",
+      "provenance.json": "c03624bd7017db5d7b2f567e3a8e088b0ff33a390241a42aec23488469944678",
+      "requested-runtime.json": "cff6965f0361e35967ed512d46e639fb8944fb9c2dccd1948057cdb422b2f653",
+      "server.stderr.log": "260b682b368e99a7ee3aa9c6de392124ef0192712dac3459d1f49bba4f81fd64",
+      "tool-trace.json": "89b4e80b53ffb728abbb94360d7c62df0949a2a9e1b333f124dbbe48a22892ee",
+      "workspace-final.json": "47030c4134a0a5a49eab26deabd0f45942a7288ccc8831c6e704a85b09216a10"
+    }
+  },
+  {
+    "phase": "candidate",
+    "caseId": "N05-multi-agent",
+    "input": {
+      "turns": [
+        {
+          "text": "Проектируем Responses multi-agent с gpt-6.1-sol. Дай контракт запроса и продолжения: поддерживаемые модели, beta enablement, кто исполняет hosted/developer tools, как replay сохраняет encrypted agent_message, attribution и call_id; как отличить финальный ответ root; compaction/limits, default concurrency; можно ли изолировать права агентов формулировкой их задания и совместить configuration_update?"
+        }
+      ],
+      "files": {},
+      "operations": {}
+    },
+    "finalAnswers": [
+      "**Для `gpt-6.1-sol` Responses multi-agent поддерживается в beta. Изолировать права формулировкой задания нельзя; совместить multi-agent с `configuration_update` нельзя.**\n\nНиже — контракт по доступному снимку каталога, проверенному **04.10.2026**. Навык openai-docs и live-документация в этой среде недоступны; точные beta-типы SDK перед реализацией нужно сверить с [Responses Multi-agent](https://developers.openai.com/api/docs/guides/responses-multi-agent).\n\n**Запрос и модели**\n\nПодтверждены:\n\n- `gpt-6.1-sol`;\n- `gpt-5.6-sol`, `gpt-5.6-terra`, `gpt-5.6-luna`.\n\nПоддержку остальных GPT-6 из принадлежности семейству не выводим. Alias `gpt-5.6` маршрутизируется в Sol семейства GPT-5.6.\n\nEnablement: beta Responses SDK с `responses_multi_agent=v1` либо HTTP-заголовок, плюс явное включение в теле:\n\n```http\nPOST /v1/responses\nOpenAI-Beta: responses_multi_agent=v1\nContent-Type: application/json\nAuthorization: Bearer ...\n```\n\nМинимальный пример для ручного replay:\n\n```json\n{\n  \"model\": \"gpt-6.1-sol\",\n  \"store\": false,\n  \"reasoning\": {\n    \"effort\": \"medium\"\n  },\n  \"multi_agent\": {\n    \"enabled\": true\n  },\n  \"include\": [\"reasoning.encrypted_content\"],\n  \"input\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"Исследуй независимые части задачи параллельно; root проверяет и синтезирует результат.\"\n    }\n  ]\n}\n```\n\nDeveloper tools добавляются обычным request-level `tools`. Для отдельных конечных пользователей передавайте стабильный privacy-preserving `safety_identifier`.\n\nУ GPT-6.1 Sol допустимы efforts `low`, `medium`, `high`, `xhigh`, `max`; default — `medium`. `none` и `minimal` не поддерживаются. Не передавайте `temperature`, `top_p`, `top_logprobs` и include `message.output_text.logprobs`. Tools требуют Responses API.\n\n**Кто исполняет инструменты**\n\n| Item | Исполнитель | Обязанность приложения |\n|---|---|---|\n| Hosted `multi_agent_call` / `multi_agent_call_output` | API | Сохранить items; не исполнять как функции и не создавать собственный hosted result |\n| Developer-defined `function_call` | Приложение | Проверить полномочия, исполнить инструмент, вернуть `function_call_output` с исходным `call_id` |\n| `agent_message` | Межагентный протокол API | Сохранить целиком, включая encrypted content и attribution |\n\nRoot отвечает за проверку и синтез результата. Возвращение работы subagent не означает завершение пользовательской задачи.\n\n**Продолжение и replay**\n\nДля stateful продолжения используйте `previous_response_id` либо conversation state. Для stateless/ZDR — полный manual replay и `include: [\"reasoning.encrypted_content\"]` **на каждом запросе**.\n\nИнварианты manual replay:\n\n1. Добавлять **весь** `response.output` к истории в исходном порядке.\n2. Сохранять reasoning, assistant messages, tool calls/results, hosted items и `agent_message`.\n3. Encrypted content передавать без преобразования: не расшифровывать, не заменять текстовым пересказом, не отбрасывать.\n4. Сохранять `call_id`, agent attribution, имеющийся `phase` и прочие поля протокола. DTO с whitelist только привычных полей опасен потерей beta-полей.\n5. После исполнения developer tools добавлять соответствующие outputs и продолжать цикл.\n\nСхематически:\n\n```text\nhistory += response.output          // полные items, исходный порядок\n\nдля каждого developer function_call:\n    проверить полномочия и выполнить\n    history += matching function_call_output\n\nresponse = Responses.create(\n    прежняя конфигурация запроса,\n    input = history\n)\n```\n\nРезультат функции связывается с вызовом через **`call_id`, не item `id`**:\n\n```json\n{\n  \"type\": \"function_call_output\",\n  \"call_id\": \"<исходный call_id>\",\n  \"output\": \"<результат>\"\n}\n```\n\nAttribution храните в исходных items и связанных записях исполнения; точную структуру полей берите из beta-схемы. Если используется Programmatic Tool Calling, дополнительно сохраняйте `caller`, включая `caller.type: \"program\"` и `caller.caller_id`.\n\n**Как распознать финал**\n\nСемантический предикат финального ответа:\n\n```text\ntype == \"message\"\nAND role == \"assistant\"\nAND agent attribution == \"/root\"\nAND phase == \"final_answer\"\n```\n\nЭто предикат, а не утверждение об имени JSON-поля attribution. Root `commentary`, final subagent и `multi_agent_call_output` финалом пользователя не являются. Не выбирайте просто последнее текстовое сообщение. Ошибки и incomplete responses обрабатывайте отдельно. При replay сохраняйте assistant `phase`; user messages его не добавляйте.\n\n**Compaction и ограничения**\n\n| Параметр / механизм | Контракт multi-agent |\n|---|---|\n| Server-side compaction | Включена implicit для каждого агента |\n| Standalone `/responses/compact` | Не поддерживается |\n| `reasoning.summary` | Не поддерживается |\n| `max_tool_calls` | Не поддерживается |\n| `max_concurrent_subagents` | Default **3** |\n| Что ограничивает concurrency | Активных descendants, root исключён |\n\nТри — ограничение одновременно активных потомков, а не общего числа созданных агентов за задачу. Оно не заменяет application-level бюджет времени, стоимости и side effects. Точную схему настройки concurrency сверяйте с используемой beta SDK.\n\n**Права и `configuration_update`**\n\nВсе subagents получают **общий набор request tools**. Задание «ты read-only reviewer» задаёт поведение, но не создаёт техническую границу доступа.\n\nДля разграничения прав нужен enforcement в application/tool backend: проверка доверенной attribution, разрешённой операции, ресурсов и полномочий перед исполнением. Текст задания и аргументы модели не могут сами выдавать права. Если требуются разные наборы доступных инструментов или credentials, проектируйте отдельные вызовы с собственными конфигурациями и orchestration приложения.\n\n`configuration_update` поддерживается только в совместимом **standard single-agent** режиме GPT-6; **multi-agent и pro исключены**. Кроме того, он несовместим с automatic compaction/truncation и standalone `/responses/compact`. Поэтому в этот multi-agent контракт updates не включаем.\n\nОснование: [API owner каталога](/catalog/instructions/governance/openai-responses-api.md), [machine contract моделей](/catalog/schemas/openai-api-model-contract.json). Официальные ссылки для проверки интеграции: [multi-agent](https://developers.openai.com/api/docs/guides/responses-multi-agent), [изменение reasoning](https://developers.openai.com/api/docs/guides/reasoning#change-reasoning-mid-conversation)."
+    ],
+    "execution": {
+      "status": "executed",
+      "turnCount": 1,
+      "behavioralVerdict": "not_graded",
+      "callCount": 15
+    },
+    "provenance": {
+      "phase": "candidate",
+      "caseId": "N05-multi-agent",
+      "catalogSha256": "7015680d09283ac81891857c171192b0c7f5bc2f29b84104c141b92085bcb38b",
+      "caseSha256": "effd4b4cbae08925d8d021e8c4383dff2373c350f4c67f9fb50626427e732c63",
+      "toolSchemaSha256": "952be921b09a54168ed668061680e59c87fb304a5d69a1dd4b4bdaa6d9784e89",
+      "adapterSha256": "b24e531075d19ca440c8afdfb9d9df84633fb6aff50eb1ae68db0abdb38191df",
+      "oraclePassedToModel": false,
+      "grading": "pending independent review",
+      "sourceRoot": "C:\\Users\\Kibnet\\.codex\\worktrees\\gpt61-contracts\\Agents"
+    },
+    "effective": {
+      "model": "gpt-6-astra",
+      "modelProvider": "openai",
+      "serviceTier": "default",
+      "approvalPolicy": "never",
+      "sandbox": {
+        "type": "readOnly",
+        "networkAccess": false
+      },
+      "reasoningEffort": "high",
+      "instructionSources": [
+        "C:\\Users\\Kibnet\\.codex\\AGENTS.md"
+      ]
+    },
+    "cliVersion": "0.160.0",
+    "environments": [],
+    "isolation": {
+      "model": true,
+      "effort": true,
+      "version": true,
+      "noEnvironment": true,
+      "onlyBootstrapInstructions": true,
+      "readOnly": true,
+      "noNetwork": true,
+      "approvalNever": true
+    },
+    "toolsObserved": [
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/AGENTS.md"
+        },
+        "success": true,
+        "resultSha256": "93de574a2f1dcb8567357020a82204037dbc31db17e6ffe35cdd45c6397872b4"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "C:/Obsidian/kibnet/Технологии/Контекст для агента/aboutme.md"
+        },
+        "success": false,
+        "resultSha256": "f2b16b85121ab8b00d3c16bf5ca1cd3626ff0ecefab839fa18856fff052ca24c"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "."
+        },
+        "success": true,
+        "resultSha256": "78e520f1dd87ed92de917e6d6dc2ee363d4e385aad3f198432d2e29f13b61672"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "C:/Users/Kibnet/.codex/skills/.system/openai-docs/SKILL.md"
+        },
+        "success": false,
+        "resultSha256": "675b2d6f405563fe5cc11587d7a160a7ffb3dcdf6d073b21f4edf57b24ccc3d0"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/governance/routing-matrix.md"
+        },
+        "success": true,
+        "resultSha256": "9a1a3d3631b8fb974eab42525d6737a89210a4d7c42766da2409bcf2ee577057"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/creator-vibe-lens.md"
+        },
+        "success": true,
+        "resultSha256": "b16996beb5272040122260ca8ab21823c120503cfc8aeaaec0b8a29091b779e7"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/model-behavior-baseline.md"
+        },
+        "success": true,
+        "resultSha256": "51ec24858296c141eb37ffc59215e87e6a30d19ea34b60f5874738b541c83014"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/governance/openai-responses-api.md"
+        },
+        "success": true,
+        "resultSha256": "d78afbae7d7a3da1b2762c38e70bb022738f853323a6f4630642cd6280a65b66"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "operations.json"
+        },
+        "success": true,
+        "resultSha256": "e1cf416e61f03a798ad1393dff0d347f3637b412f7f39b0233fb68d9078a74fe"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/creator-vibe-lens.md"
+        },
+        "success": true,
+        "resultSha256": "b16996beb5272040122260ca8ab21823c120503cfc8aeaaec0b8a29091b779e7"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/model-behavior-baseline.md"
+        },
+        "success": true,
+        "resultSha256": "51ec24858296c141eb37ffc59215e87e6a30d19ea34b60f5874738b541c83014"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/collaboration-baseline.md"
+        },
+        "success": true,
+        "resultSha256": "8d167cd4c37ff31592b0bff9a9e7ce4239cd8ea0a01d7c456ed13adc233893a6"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/quest-governance.md"
+        },
+        "success": true,
+        "resultSha256": "ea4e5f3f3b42299c44515c7884886976cf9f7f22acd3c01f58e5ad69a65d63ae"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/profiles/product-system-design.md"
+        },
+        "success": true,
+        "resultSha256": "4a1fca95df90ddcb914b9e11a65a1fb4f8699d100b836b4ba90d45b271ce12fd"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/schemas/openai-api-model-contract.json"
+        },
+        "success": true,
+        "resultSha256": "7e45627386f4a5729075a2fc0d3c852eccb7b86f9ae7a8ff2947537daacc4ef4"
+      }
+    ],
+    "mutations": [],
+    "workspaceFinal": {
+      "operations.json": "{}"
+    },
+    "rawArtifactHashes": {
+      "bootstrap-pointer.json": "04ad2521b8bb565f2910879569e8095a0ce28f34f07ecab09040a86dfdc7a687",
+      "effective-runtime.json": "d0256f5a833004a19fcaf1579f4409688fc33a172884b712127cd6a251cd9859",
+      "execution.json": "2b45d0c857c8a00a054d9b9735d0b0315e0edb606ebe5931b95dbd5a9848537f",
+      "input.json": "0a09806bdb07cf9bb9c86037b062ec3c863c9fb441c099fc8c27beb255ee8bae",
+      "isolation-checks.json": "1c7f5cfb45d50736f9f7443585cf9e7b42d4dec826843cbfc72e4326a34ab02a",
+      "mutations.json": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "protocol.jsonl": "1d1fd6957151019be74abe9e87895e6995a44f096004ac727a19855d78d8de7a",
+      "provenance.json": "3af4c8c739926a0094d0f781d6ad5f74d3980707addd3876949bb164e2a32de9",
+      "requested-runtime.json": "cff6965f0361e35967ed512d46e639fb8944fb9c2dccd1948057cdb422b2f653",
+      "server.stderr.log": "2aa4c7e0cbdc109caab8d04457adb6290a1f9766824db0c6d57944115acfb7a3",
+      "tool-trace.json": "c325eff007085faeca6f6209a820e603dc966abd8f54924139489d6f923c2b31",
+      "workspace-final.json": "47030c4134a0a5a49eab26deabd0f45942a7288ccc8831c6e704a85b09216a10"
+    }
+  },
+  {
+    "phase": "candidate",
+    "caseId": "N06-product-pin",
+    "input": {
+      "turns": [
+        {
+          "text": "Work workspace явно использует gpt-5.6-sol. GPT-6.1 Sol отсутствует в списке моделей. По каталогу предложи путь обновления, учитывая Free/Go и Enterprise/Edu, но не изменяй рабочий model pin или account settings без моего поручения."
+        }
+      ],
+      "files": {},
+      "operations": {}
+    },
+    "finalAnswers": [
+      "**Сейчас стоит сохранить `gpt-5.6-sol`.** По [каталогу](C:/Users/Kibnet/.codex/agents/instructions/core/model-behavior-baseline.md), явный pin — допустимый legacy-выбор. Целевой baseline GPT-6 Astra не предписывает его заменять; GPT-6.1 Sol рекомендуется для сложной повседневной и длительной работы только при фактической доступности.\n\nПуть обновления зависит от тарифа:\n\n| Тариф | Что предусматривает каталог |\n|---|---|\n| **Free / Go** | Не включены в стартовый rollout GPT-6.1 Sol. Обновление клиента само по себе не обеспечит доступ. Варианты — дождаться расширения доступности либо отдельно рассмотреть подходящий платный план. |\n| **Plus / Pro / Business** | Включены в rollout. Проверить доступность для конкретного аккаунта, клиента и workspace по [Models](https://learn.chatgpt.com/docs/models); отсутствие в списке ещё не устанавливает причину. |\n| **Enterprise / Edu** | Включены, но модель **по умолчанию выключена**. Для перехода необходимо включение администратором workspace и последующая проверка появления модели. |\n\nКогда GPT-6.1 Sol появится, рекомендую сначала сравнить её с текущей моделью на типичных задачах по качеству, времени и стоимости. Начать с доступного стандартного reasoning; повышение effort или скорости обосновать результатами. Замену рабочего pin выполнить только по отдельному поручению.\n\nУказанное в каталоге прекращение доступности **GPT-5.5 14 октября 2026 года** касается ChatGPT/Work/Codex при входе через ChatGPT. Оно не является основанием для срочной замены вашего **GPT-5.6 Sol** и не означает retirement в API.\n\nНастройки и pin не менял. Вывод основан на доступном снимке каталога и вашем описании workspace: онлайн-проверка и файл навыка `openai-docs` в этой среде недоступны."
+    ],
+    "execution": {
+      "status": "executed",
+      "turnCount": 1,
+      "behavioralVerdict": "not_graded",
+      "callCount": 10
+    },
+    "provenance": {
+      "phase": "candidate",
+      "caseId": "N06-product-pin",
+      "catalogSha256": "7015680d09283ac81891857c171192b0c7f5bc2f29b84104c141b92085bcb38b",
+      "caseSha256": "6343355e10220d678f54061ea20d2eb8cf6e7c200600a2ade09b24d3a74dc638",
+      "toolSchemaSha256": "952be921b09a54168ed668061680e59c87fb304a5d69a1dd4b4bdaa6d9784e89",
+      "adapterSha256": "b24e531075d19ca440c8afdfb9d9df84633fb6aff50eb1ae68db0abdb38191df",
+      "oraclePassedToModel": false,
+      "grading": "pending independent review",
+      "sourceRoot": "C:\\Users\\Kibnet\\.codex\\worktrees\\gpt61-contracts\\Agents"
+    },
+    "effective": {
+      "model": "gpt-6-astra",
+      "modelProvider": "openai",
+      "serviceTier": "default",
+      "approvalPolicy": "never",
+      "sandbox": {
+        "type": "readOnly",
+        "networkAccess": false
+      },
+      "reasoningEffort": "high",
+      "instructionSources": [
+        "C:\\Users\\Kibnet\\.codex\\AGENTS.md"
+      ]
+    },
+    "cliVersion": "0.160.0",
+    "environments": [],
+    "isolation": {
+      "model": true,
+      "effort": true,
+      "version": true,
+      "noEnvironment": true,
+      "onlyBootstrapInstructions": true,
+      "readOnly": true,
+      "noNetwork": true,
+      "approvalNever": true
+    },
+    "toolsObserved": [
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/AGENTS.md"
+        },
+        "success": true,
+        "resultSha256": "93de574a2f1dcb8567357020a82204037dbc31db17e6ffe35cdd45c6397872b4"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "."
+        },
+        "success": true,
+        "resultSha256": "78e520f1dd87ed92de917e6d6dc2ee363d4e385aad3f198432d2e29f13b61672"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "C:/Users/Kibnet/.codex/skills/.system/openai-docs/SKILL.md"
+        },
+        "success": false,
+        "resultSha256": "675b2d6f405563fe5cc11587d7a160a7ffb3dcdf6d073b21f4edf57b24ccc3d0"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "C:/Obsidian/kibnet/Технологии/Контекст для агента/aboutme.md"
+        },
+        "success": false,
+        "resultSha256": "f2b16b85121ab8b00d3c16bf5ca1cd3626ff0ecefab839fa18856fff052ca24c"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/governance/routing-matrix.md"
+        },
+        "success": true,
+        "resultSha256": "9a1a3d3631b8fb974eab42525d6737a89210a4d7c42766da2409bcf2ee577057"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/creator-vibe-lens.md"
+        },
+        "success": true,
+        "resultSha256": "b16996beb5272040122260ca8ab21823c120503cfc8aeaaec0b8a29091b779e7"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/model-behavior-baseline.md"
+        },
+        "success": true,
+        "resultSha256": "51ec24858296c141eb37ffc59215e87e6a30d19ea34b60f5874738b541c83014"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "operations.json"
+        },
+        "success": true,
+        "resultSha256": "e1cf416e61f03a798ad1393dff0d347f3637b412f7f39b0233fb68d9078a74fe"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/collaboration-baseline.md"
+        },
+        "success": true,
+        "resultSha256": "8d167cd4c37ff31592b0bff9a9e7ce4239cd8ea0a01d7c456ed13adc233893a6"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/creator-vibe-lens.md"
+        },
+        "success": true,
+        "resultSha256": "b16996beb5272040122260ca8ab21823c120503cfc8aeaaec0b8a29091b779e7"
+      }
+    ],
+    "mutations": [],
+    "workspaceFinal": {
+      "operations.json": "{}"
+    },
+    "rawArtifactHashes": {
+      "bootstrap-pointer.json": "04ad2521b8bb565f2910879569e8095a0ce28f34f07ecab09040a86dfdc7a687",
+      "effective-runtime.json": "a4e45f1f7fe8853304fe8f55fc989e1e7d439b401d6c525aedd2a24f8d3a366f",
+      "execution.json": "e25bdee780ffd59cffb4e453965a81538d3a46052c4302a7b5dadcd4b9eed720",
+      "input.json": "ae3e772c54057a8e42b54d02f71758d5e8e381f9ecbd7b01a14c08f81102c764",
+      "isolation-checks.json": "1c7f5cfb45d50736f9f7443585cf9e7b42d4dec826843cbfc72e4326a34ab02a",
+      "mutations.json": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "protocol.jsonl": "74298ed929de224876585b1a278f61264b6aeaf9d899af441d9f139539e81035",
+      "provenance.json": "1262fe6d641061eb18a7d6b06df72f9341d5d3fc3671625da6f89f854c0cde2e",
+      "requested-runtime.json": "cff6965f0361e35967ed512d46e639fb8944fb9c2dccd1948057cdb422b2f653",
+      "server.stderr.log": "dafb13c886103a1cd9262d5629f850f8a3ccc97da955c361837528c5b87b6e2f",
+      "tool-trace.json": "e2849af149af71d2edd610571c4e335d780ae6c3132fbbfc3c8c7226bb04bf06",
+      "workspace-final.json": "47030c4134a0a5a49eab26deabd0f45942a7288ccc8831c6e704a85b09216a10"
+    }
+  },
+  {
+    "phase": "candidate",
+    "caseId": "N07-sampling",
+    "input": {
+      "turns": [
+        {
+          "text": "Проверь gpt-6.1-sol high запрос с temperature=0.2, top_p=0.8, top_logprobs=5, Chat Completions logprobs=true и Responses include=[message.output_text.logprobs]. Дай минимально совместимую конфигурацию с тем же model/effort и объясни отличие от старого Sol none."
+        }
+      ],
+      "files": {},
+      "operations": {}
+    },
+    "finalAnswers": [
+      "**Запрос несовместим с `gpt-6.1-sol` при `high`.** Сам `high` поддерживается, но нужно удалить:\n\n| Где | Что удалить |\n|---|---|\n| Оба API | `temperature`, `top_p`, `top_logprobs` |\n| Chat Completions | `logprobs` |\n| Responses | `\"message.output_text.logprobs\"` из `include` |\n\nУдалить именно поля: замена значений на `0`, `false` или «дефолтные» не устраняет ограничение.\n\nМинимальный **Responses** запрос с прежними model/effort:\n\n```json\n{\n  \"model\": \"gpt-6.1-sol\",\n  \"reasoning\": { \"effort\": \"high\" },\n  \"input\": \"Ваш запрос\"\n}\n```\n\nМинимальный **Chat Completions** запрос без tools:\n\n```json\n{\n  \"model\": \"gpt-6.1-sol\",\n  \"reasoning_effort\": \"high\",\n  \"messages\": [\n    { \"role\": \"user\", \"content\": \"Ваш запрос\" }\n  ]\n}\n```\n\nУ старого **`gpt-6-sol` с `none`** перечисленные ограничения, обусловленные включённым reasoning, не применялись. Однако это исключение само по себе не гарантирует поддержку любого параметра конкретным endpoint/SDK. При `high` у старого Sol действуют те же запреты.\n\nУ **`gpt-6.1-sol` нет `none`**: доступны `low`, `medium`, `high`, `xhigh`, `max`, а перечисленные параметры запрещены на всех этих уровнях. Для tools нужен Responses; старый Sol допускал function calling через Chat Completions при `none`.\n\nПроверено по [контракту каталога](/catalog/schemas/openai-api-model-contract.json), сверённому 04.10.2026. Живой API-вызов не выполнялся: сеть и skill `openai-docs` в этой среде недоступны."
+    ],
+    "execution": {
+      "status": "executed",
+      "turnCount": 1,
+      "behavioralVerdict": "not_graded",
+      "callCount": 14
+    },
+    "provenance": {
+      "phase": "candidate",
+      "caseId": "N07-sampling",
+      "catalogSha256": "7015680d09283ac81891857c171192b0c7f5bc2f29b84104c141b92085bcb38b",
+      "caseSha256": "dce1d00d59e55854f0994cf0c6b51b19e26bd94891cd5bc1ef2807a1a85d9f7e",
+      "toolSchemaSha256": "952be921b09a54168ed668061680e59c87fb304a5d69a1dd4b4bdaa6d9784e89",
+      "adapterSha256": "b24e531075d19ca440c8afdfb9d9df84633fb6aff50eb1ae68db0abdb38191df",
+      "oraclePassedToModel": false,
+      "grading": "pending independent review",
+      "sourceRoot": "C:\\Users\\Kibnet\\.codex\\worktrees\\gpt61-contracts\\Agents"
+    },
+    "effective": {
+      "model": "gpt-6-astra",
+      "modelProvider": "openai",
+      "serviceTier": "default",
+      "approvalPolicy": "never",
+      "sandbox": {
+        "type": "readOnly",
+        "networkAccess": false
+      },
+      "reasoningEffort": "high",
+      "instructionSources": [
+        "C:\\Users\\Kibnet\\.codex\\AGENTS.md"
+      ]
+    },
+    "cliVersion": "0.160.0",
+    "environments": [],
+    "isolation": {
+      "model": true,
+      "effort": true,
+      "version": true,
+      "noEnvironment": true,
+      "onlyBootstrapInstructions": true,
+      "readOnly": true,
+      "noNetwork": true,
+      "approvalNever": true
+    },
+    "toolsObserved": [
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/AGENTS.md"
+        },
+        "success": true,
+        "resultSha256": "93de574a2f1dcb8567357020a82204037dbc31db17e6ffe35cdd45c6397872b4"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "."
+        },
+        "success": true,
+        "resultSha256": "78e520f1dd87ed92de917e6d6dc2ee363d4e385aad3f198432d2e29f13b61672"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "C:/Users/Kibnet/.codex/skills/.system/openai-docs/SKILL.md"
+        },
+        "success": false,
+        "resultSha256": "675b2d6f405563fe5cc11587d7a160a7ffb3dcdf6d073b21f4edf57b24ccc3d0"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "C:/Obsidian/kibnet/Технологии/Контекст для агента/aboutme.md"
+        },
+        "success": false,
+        "resultSha256": "f2b16b85121ab8b00d3c16bf5ca1cd3626ff0ecefab839fa18856fff052ca24c"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/governance/routing-matrix.md"
+        },
+        "success": true,
+        "resultSha256": "9a1a3d3631b8fb974eab42525d6737a89210a4d7c42766da2409bcf2ee577057"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/creator-vibe-lens.md"
+        },
+        "success": true,
+        "resultSha256": "b16996beb5272040122260ca8ab21823c120503cfc8aeaaec0b8a29091b779e7"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/model-behavior-baseline.md"
+        },
+        "success": true,
+        "resultSha256": "51ec24858296c141eb37ffc59215e87e6a30d19ea34b60f5874738b541c83014"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/governance/openai-responses-api.md"
+        },
+        "success": true,
+        "resultSha256": "d78afbae7d7a3da1b2762c38e70bb022738f853323a6f4630642cd6280a65b66"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/schemas/openai-api-model-contract.json"
+        },
+        "success": true,
+        "resultSha256": "7e45627386f4a5729075a2fc0d3c852eccb7b86f9ae7a8ff2947537daacc4ef4"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "operations.json"
+        },
+        "success": true,
+        "resultSha256": "e1cf416e61f03a798ad1393dff0d347f3637b412f7f39b0233fb68d9078a74fe"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/creator-vibe-lens.md"
+        },
+        "success": true,
+        "resultSha256": "b16996beb5272040122260ca8ab21823c120503cfc8aeaaec0b8a29091b779e7"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/model-behavior-baseline.md"
+        },
+        "success": true,
+        "resultSha256": "51ec24858296c141eb37ffc59215e87e6a30d19ea34b60f5874738b541c83014"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/collaboration-baseline.md"
+        },
+        "success": true,
+        "resultSha256": "8d167cd4c37ff31592b0bff9a9e7ce4239cd8ea0a01d7c456ed13adc233893a6"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/governance/openai-responses-api.md"
+        },
+        "success": true,
+        "resultSha256": "d78afbae7d7a3da1b2762c38e70bb022738f853323a6f4630642cd6280a65b66"
+      }
+    ],
+    "mutations": [],
+    "workspaceFinal": {
+      "operations.json": "{}"
+    },
+    "rawArtifactHashes": {
+      "bootstrap-pointer.json": "04ad2521b8bb565f2910879569e8095a0ce28f34f07ecab09040a86dfdc7a687",
+      "effective-runtime.json": "cd7ff758dc4f9f5968cbd0f6c452cc348ea61420cf54824e912a609039d23444",
+      "execution.json": "6151e567eec66ab0c4860df681cfc388acd6fbc8592a0b11e3a1292cf298226e",
+      "input.json": "3b955ad1b7f31b5cb7709082c023bccfc57c1d1dc0fff3f4adf0a4580397902a",
+      "isolation-checks.json": "1c7f5cfb45d50736f9f7443585cf9e7b42d4dec826843cbfc72e4326a34ab02a",
+      "mutations.json": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "protocol.jsonl": "de73a66921df4ec7ada2c24bc7d2237eccd1473261ff4299778e14a24e66243f",
+      "provenance.json": "603fc8c5ff797adc1b24fd6a7cc4815a0e326675bdbc016850070c4f7b7c9f18",
+      "requested-runtime.json": "cff6965f0361e35967ed512d46e639fb8944fb9c2dccd1948057cdb422b2f653",
+      "server.stderr.log": "b718953e6063db681b66001ad6498a0af632c10cbf10dba4e424ef0fc441bf7c",
+      "tool-trace.json": "0402570cc5cdb7a2b82ebb863e923333d504d3ccd72ee71bc650241edfd889c7",
+      "workspace-final.json": "47030c4134a0a5a49eab26deabd0f45942a7288ccc8831c6e704a85b09216a10"
+    }
+  },
+  {
+    "phase": "candidate",
+    "caseId": "N08-retirement-vision",
+    "input": {
+      "turns": [
+        {
+          "text": "У нас закреплён gpt-5.5 в ChatGPT, Work, Codex с ChatGPT sign-in и отдельно в API. Кроме того, visual acceptance Sol/Luna был измерен до 25 сентября. По текущим инструкциям составь план: даты и границы retirement, какие оценки перепроверить, что делать с прежним текстовым Astra smoke. Сейчас прошу только план."
+        }
+      ],
+      "files": {},
+      "operations": {}
+    },
+    "finalAnswers": [
+      "По текущему каталогу **retirement gpt-5.5 наступает 14 октября 2026 года для ChatGPT, Work и Codex с ChatGPT sign-in. Эта дата не распространяется на OpenAI API.** Ниже — только план; настройки и pins не менялись.\n\n| Поверхность | Граница retirement | План |\n|---|---|---|\n| ChatGPT | 14.10.2026 | Заранее проверить доступную замену и ключевые сценарии |\n| Work | 14.10.2026 | Проверить доступность модели для аккаунта, workspace и административные настройки |\n| Codex с ChatGPT sign-in | 14.10.2026 | Проверить способ входа, доступные модели и фактический fallback |\n| OpenAI API | Отдельный жизненный цикл; дата retirement здесь не установлена | Сохранить pin `gpt-5.5`, отдельно проверить актуальные API deprecations |\n\nТочное время отключения и часовой пояс каталог не сообщает. Практический срок готовности — **до 13 октября включительно**, без расчёта на работу модели в течение 14-го.\n\n1. **Зафиксировать исходную конфигурацию.** Для каждой поверхности записать выбранную модель, reasoning level, speed tier и fallback; для API — точный model ID и существенные параметры запроса. Подготовить предложение замены с результатами проверок. Baseline Astra сам по себе не разрешает менять явные pins.\n\n2. **Выбрать кандидатов по задачам и доступности.** Для Work/Codex рассмотреть GPT-6.1 Sol для сложной повседневной и длительной работы, Astra — для высокой цены ошибки, Luna — для ограниченных задач с проверяемым результатом. GPT-6.1 Sol и прежний GPT-6 Sol учитывать отдельно. Проверить тариф и rollout: для Enterprise/Edu может потребоваться включение администратором. Доступность и настройки одной поверхности не переносить на другую.\n\n3. **Перепроверить visual acceptance прежних GPT-6 Sol/Luna.** В каталоге указан upstream image-encoding fix от **25 сентября 2026 года**. Поэтому:\n   - сохранить прежние результаты с датами и конфигурацией;\n   - пересмотреть прежде всего старые failures и выводы о непригодности моделей для vision;\n   - повторить затронутые image-based acceptance-проверки на фактическом текущем runtime с сопоставимыми изображениями, состояниями и критериями;\n   - обновить сравнительные рейтинги и решения о выборе модели, которые опирались на эти результаты.\n\n   Fix не доказывает, что каждый прежний failure устранён. Новое visual evidence должно включать просмотр нужного изображения актуального артефакта; текстовый отчёт или неподходящий кадр недостаточны.\n\n4. **Сохранить прежний текстовый Astra smoke как историческое текстовое evidence.** Указать, какой runtime и какие сценарии он проверял. **Не засчитывать его как vision evidence** и не использовать для подтверждения Sol/Luna. Для актуального текстового поведения повторить релевантный smoke при смене модели или инструкций; для visual acceptance провести отдельную проверку с изображениями.\n\n5. **Перед переключением сопоставить результаты.** На репрезентативных задачах оценить качество, полноту, latency, расход токенов и стоимость успешной задачи с учётом исправлений. После будущего переключения проверить реально активную модель и обычный пользовательский путь. API-миграцию планировать отдельно, если она понадобится.\n\nОснование: [model-behavior-baseline](/catalog/instructions/core/model-behavior-baseline.md) и [API owner](/catalog/instructions/governance/openai-responses-api.md). Это план по доступному снимку инструкций: live-документация и доступность моделей в ваших аккаунтах сейчас не проверены; файл skill `openai-docs` недоступен."
+    ],
+    "execution": {
+      "status": "executed",
+      "turnCount": 1,
+      "behavioralVerdict": "not_graded",
+      "callCount": 12
+    },
+    "provenance": {
+      "phase": "candidate",
+      "caseId": "N08-retirement-vision",
+      "catalogSha256": "7015680d09283ac81891857c171192b0c7f5bc2f29b84104c141b92085bcb38b",
+      "caseSha256": "a69247f464b5cd75afac7de0bcd6c69469861d90cf329e68ae13919cea50cd1a",
+      "toolSchemaSha256": "952be921b09a54168ed668061680e59c87fb304a5d69a1dd4b4bdaa6d9784e89",
+      "adapterSha256": "b24e531075d19ca440c8afdfb9d9df84633fb6aff50eb1ae68db0abdb38191df",
+      "oraclePassedToModel": false,
+      "grading": "pending independent review",
+      "sourceRoot": "C:\\Users\\Kibnet\\.codex\\worktrees\\gpt61-contracts\\Agents"
+    },
+    "effective": {
+      "model": "gpt-6-astra",
+      "modelProvider": "openai",
+      "serviceTier": "default",
+      "approvalPolicy": "never",
+      "sandbox": {
+        "type": "readOnly",
+        "networkAccess": false
+      },
+      "reasoningEffort": "high",
+      "instructionSources": [
+        "C:\\Users\\Kibnet\\.codex\\AGENTS.md"
+      ]
+    },
+    "cliVersion": "0.160.0",
+    "environments": [],
+    "isolation": {
+      "model": true,
+      "effort": true,
+      "version": true,
+      "noEnvironment": true,
+      "onlyBootstrapInstructions": true,
+      "readOnly": true,
+      "noNetwork": true,
+      "approvalNever": true
+    },
+    "toolsObserved": [
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/AGENTS.md"
+        },
+        "success": true,
+        "resultSha256": "93de574a2f1dcb8567357020a82204037dbc31db17e6ffe35cdd45c6397872b4"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "."
+        },
+        "success": true,
+        "resultSha256": "78e520f1dd87ed92de917e6d6dc2ee363d4e385aad3f198432d2e29f13b61672"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "C:/Obsidian/kibnet/Технологии/Контекст для агента/aboutme.md"
+        },
+        "success": false,
+        "resultSha256": "f2b16b85121ab8b00d3c16bf5ca1cd3626ff0ecefab839fa18856fff052ca24c"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "C:/Users/Kibnet/.codex/skills/.system/openai-docs/SKILL.md"
+        },
+        "success": false,
+        "resultSha256": "675b2d6f405563fe5cc11587d7a160a7ffb3dcdf6d073b21f4edf57b24ccc3d0"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/governance/routing-matrix.md"
+        },
+        "success": true,
+        "resultSha256": "9a1a3d3631b8fb974eab42525d6737a89210a4d7c42766da2409bcf2ee577057"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/creator-vibe-lens.md"
+        },
+        "success": true,
+        "resultSha256": "b16996beb5272040122260ca8ab21823c120503cfc8aeaaec0b8a29091b779e7"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/model-behavior-baseline.md"
+        },
+        "success": true,
+        "resultSha256": "51ec24858296c141eb37ffc59215e87e6a30d19ea34b60f5874738b541c83014"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "operations.json"
+        },
+        "success": true,
+        "resultSha256": "e1cf416e61f03a798ad1393dff0d347f3637b412f7f39b0233fb68d9078a74fe"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/governance/openai-responses-api.md"
+        },
+        "success": true,
+        "resultSha256": "d78afbae7d7a3da1b2762c38e70bb022738f853323a6f4630642cd6280a65b66"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/collaboration-baseline.md"
+        },
+        "success": true,
+        "resultSha256": "8d167cd4c37ff31592b0bff9a9e7ce4239cd8ea0a01d7c456ed13adc233893a6"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/quest-governance.md"
+        },
+        "success": true,
+        "resultSha256": "ea4e5f3f3b42299c44515c7884886976cf9f7f22acd3c01f58e5ad69a65d63ae"
+      },
+      {
+        "tool": "fixture_read",
+        "arguments": {
+          "path": "catalog/instructions/core/testing-baseline.md"
+        },
+        "success": true,
+        "resultSha256": "194eb8bafd9ef7ea4f6242e6d370039e0e7e1c2d4b3a2123714ed7f497ecf165"
+      }
+    ],
+    "mutations": [],
+    "workspaceFinal": {
+      "operations.json": "{}"
+    },
+    "rawArtifactHashes": {
+      "bootstrap-pointer.json": "04ad2521b8bb565f2910879569e8095a0ce28f34f07ecab09040a86dfdc7a687",
+      "effective-runtime.json": "c4dcfce4ef432a96e37545a7d23a9851d4765fc44abf27b056d2a7202c29e773",
+      "execution.json": "3bc8418e0f1efdd62e12a1813046cfc51da1aa4e144a2838fc913e5cb890e7ca",
+      "input.json": "eacc3a60031d939e7a0138a6593dd216d84f1c39fb7a07cf720e7147cbb8be1f",
+      "isolation-checks.json": "1c7f5cfb45d50736f9f7443585cf9e7b42d4dec826843cbfc72e4326a34ab02a",
+      "mutations.json": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "protocol.jsonl": "a14b28ba3f13c5030c9ff1d0213a50416c5a0fbcf865fd2280b49a732528de05",
+      "provenance.json": "75a2c87beafe8cb318933f1474713e211fec1f3d66b6fed2a70fd17bfc52b194",
+      "requested-runtime.json": "cff6965f0361e35967ed512d46e639fb8944fb9c2dccd1948057cdb422b2f653",
+      "server.stderr.log": "efdb0cbb8be75111bbaf7f228a08bc06d7f074897774eee60979c1237b06f848",
+      "tool-trace.json": "df86f1ccfea31bb75f9044590632eea2e47e5b4da6864305c1d293c75c5ca8bf",
+      "workspace-final.json": "47030c4134a0a5a49eab26deabd0f45942a7288ccc8831c6e704a85b09216a10"
+    }
+  }
+]
