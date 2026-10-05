@@ -1,0 +1,21 @@
+Candidate full suite:
+PASS Changed module invalidates approval before backup
+PASS Captured module test reaches controlled commit barrier
+PASS Captured module executes original contract after disk replacement
+PASS Install preserves BOM, CRLF, comments and exact unmanaged bytes
+PASS Upgrade cannot replace a preexisting reviewer with a new template
+Checks 96 failures 0
+INFO: analyzer contracts
+INFO: privacy contracts
+PASS: agent operations contracts (319 assertions)
+PASS: все сценарии test-validate-instructions пройдены
+
+New model boundary negative mutations:
+PASS: удалена model control boundary: Критерии выбора модели применять только при доступном и разрешённом механизме управления
+PASS: удалена model control boundary: Инструкции сами по себе не переключают модель текущего чата
+PASS: удалена model control boundary: requested model/effort не доказывают фактически применённые настройки
+
+Active static:
+INFO: Проверка каталога: C:\Projects\My\Agents
+PASS: static outcome source/fixture contracts (37 guards, 0 negative mutations). Behavioral smoke NOT evaluated.
+INFO: Проверка завершена успешно

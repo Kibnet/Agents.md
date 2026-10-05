@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "scenarios": [
+    {
+      "id": "R01",
+      "contracts": [
+        "model-control-boundary"
+      ],
+      "variants": [
+        {
+          "id": "fixed-root",
+          "input": "cases/R01-fixed-root.json",
+          "oracle": "oracles/R01-fixed-root.json"
+        }
+      ]
+    },
+    {
+      "id": "R02",
+      "contracts": [
+        "model-control-boundary"
+      ],
+      "variants": [
+        {
+          "id": "child-effective",
+          "input": "cases/R02-child-effective.json",
+          "oracle": "oracles/R02-child-effective.json"
+        }
+      ]
+    },
+    {
+      "id": "R03",
+      "contracts": [
+        "model-control-boundary"
+      ],
+      "variants": [
+        {
+          "id": "api-selection",
+          "input": "cases/R03-api-selection.json",
+          "oracle": "oracles/R03-api-selection.json"
+        }
+      ]
+    }
+  ],
+  "heldOut": []
+}

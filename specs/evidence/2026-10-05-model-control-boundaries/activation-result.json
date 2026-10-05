@@ -1,0 +1,86 @@
+{
+  "status": "activated",
+  "files": [
+    {
+      "path": "CHANGELOG.md",
+      "actualSha256": "b2e7e684b856c2e474984040f067ac6b6f2f4496e63ffa75e2bfa97a0e84ac50",
+      "canonicalMatch": true,
+      "byteMatch": false
+    },
+    {
+      "path": "README.md",
+      "actualSha256": "b31b0bc3a2d79cd33dc95fb437d8ad25d8b9d05c3d597712cee63f743e5670f4",
+      "canonicalMatch": true,
+      "byteMatch": true
+    },
+    {
+      "path": "instructions/core/model-behavior-baseline.md",
+      "actualSha256": "eb9d410e5e594df92b8ff60b1b288d33c871b83802bbc81aa0f4c7ea180413df",
+      "canonicalMatch": true,
+      "byteMatch": false
+    },
+    {
+      "path": "scripts/test-validate-instructions.ps1",
+      "actualSha256": "15fc5d0fda80b442d135c883d74ec6f1e143210934a4f8409fb9fcf92ebbdb01",
+      "canonicalMatch": true,
+      "byteMatch": false
+    },
+    {
+      "path": "scripts/validate-instructions.ps1",
+      "actualSha256": "db9dba1a3c17db10b6b396787df71eaf397cb3054f4c874a5a744b5da5f371e3",
+      "canonicalMatch": true,
+      "byteMatch": false
+    },
+    {
+      "path": "scripts/fixtures/model-control-boundaries/README.md",
+      "actualSha256": "5d417103b8463cff22aae01115845b8febd31a3a0483a92f3467b7ce4013b51f",
+      "canonicalMatch": true,
+      "byteMatch": true
+    },
+    {
+      "path": "scripts/fixtures/model-control-boundaries/cases/R01-fixed-root.json",
+      "actualSha256": "349d827e9335fdb9dcad6fd15e64ce20b40eefd950e52e1ede1dd04c28e34d2d",
+      "canonicalMatch": true,
+      "byteMatch": true
+    },
+    {
+      "path": "scripts/fixtures/model-control-boundaries/cases/R02-child-effective.json",
+      "actualSha256": "f2c7dc521ee5fdb7a1f88f0ff29e100fe5d5726b3411a8d6e8e513269161fdae",
+      "canonicalMatch": true,
+      "byteMatch": true
+    },
+    {
+      "path": "scripts/fixtures/model-control-boundaries/cases/R03-api-selection.json",
+      "actualSha256": "b20841afb52928403b129fb454b203554f67a9da01bbcf9e107207fc345d6538",
+      "canonicalMatch": true,
+      "byteMatch": true
+    },
+    {
+      "path": "scripts/fixtures/model-control-boundaries/manifest.json",
+      "actualSha256": "d605d8ccb5e4190c396b38c620129e3d51b39b7fca3674d897b7a457d3c508fd",
+      "canonicalMatch": true,
+      "byteMatch": true
+    },
+    {
+      "path": "scripts/fixtures/model-control-boundaries/oracles/R01-fixed-root.json",
+      "actualSha256": "cbdd8f433517b2bcfe434e70ea3a90cdaec042d216088f4b47fd73905044f131",
+      "canonicalMatch": true,
+      "byteMatch": true
+    },
+    {
+      "path": "scripts/fixtures/model-control-boundaries/oracles/R02-child-effective.json",
+      "actualSha256": "97e0e59038027a5feacd605cf85ab3c52b77f603a13dc72c238a8e3d4f28a77e",
+      "canonicalMatch": true,
+      "byteMatch": true
+    },
+    {
+      "path": "scripts/fixtures/model-control-boundaries/oracles/R03-api-selection.json",
+      "actualSha256": "0601c82bd80dd225c6bf2e574be2f4317fd7df6dd2ec44bc4f28d7ba3c433789",
+      "canonicalMatch": true,
+      "byteMatch": true
+    }
+  ],
+  "canonicalMatches": 13,
+  "byteMatches": 9,
+  "rollbackRule": "Restore exact beforeBase64 only if current raw hash equals actualSha256. Preserve concurrent edits; absent preimage means remove only matching owned postimage."
+}

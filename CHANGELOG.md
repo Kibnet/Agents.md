@@ -2,6 +2,14 @@
 
 All notable changes to this instruction catalog are documented in this file.
 
+## [6.0.1] - 2026-10-05
+
+### Fixed
+
+- Clarify that workload recommendations do not switch the current chat model. Apply selection and fallback only through available, authorized launch controls.
+- Preserve model pins and distinguish child inheritance, requested overrides and effective runtime evidence; keep ordinary work on the selected model.
+- Add paired boundary scenarios and static regression guards. Simulation evidence verifies instructions and virtual actions, not live model routing.
+
 ## [6.0.0] - 2026-10-04
 
 ### Added

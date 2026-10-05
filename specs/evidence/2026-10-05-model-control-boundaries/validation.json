@@ -1,0 +1,100 @@
+{
+  "date": "2026-10-05",
+  "baselineHead": "5c59da2adbf0224dd5c6f73876d56ca5b259f2a1",
+  "scope": "Same-outcome runtime boundary clarification; no automatic router or user configuration changes.",
+  "checks": [
+    {
+      "command": "candidate validator against unchanged active owner",
+      "exitCode": 1,
+      "status": "EXPECTED-FAIL",
+      "detail": "Exactly three missing model-control guards before correction."
+    },
+    {
+      "command": "candidate pwsh -File scripts/validate-instructions.ps1 (final)",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "command": "pwsh -File scripts/test-validate-instructions.ps1",
+      "exitCode": 0,
+      "status": "PASS",
+      "operationalAssertions": 319,
+      "installerRemediationChecks": 96,
+      "telemetryAssertions": 136,
+      "markdownAssertions": 43,
+      "outcomeGuards": 37,
+      "outcomeNegativeMutations": 57,
+      "newModelBoundaryNegativeMutations": 3
+    },
+    {
+      "command": "runtime backend units",
+      "status": "PASS",
+      "tests": 14
+    },
+    {
+      "command": "STORM units",
+      "status": "PASS",
+      "tests": 37
+    },
+    {
+      "command": "final audit_pairs.py with retained baseline",
+      "status": "PASS",
+      "cases": 3,
+      "pairExecutions": 6,
+      "failures": 0
+    },
+    {
+      "command": "candidate git diff --check",
+      "status": "PASS",
+      "exitCode": 0
+    },
+    {
+      "command": "active pwsh -File scripts/validate-instructions.ps1",
+      "status": "PASS",
+      "exitCode": 0
+    },
+    {
+      "command": "active final static after evidence README links",
+      "status": "PASS",
+      "exitCode": 0
+    }
+  ],
+  "semantic": {
+    "baseline": "2/3 PASS",
+    "initialCandidate": "2/3 PASS",
+    "finalCandidate": "3/3 PASS",
+    "fixedFinding": "HIGH/A1: virtual/user model metadata attributed to actual runtime; fixed with source qualification, unchanged oracle.",
+    "retainedExecutions": 9
+  },
+  "runtime": {
+    "cli": "0.160.0",
+    "model": "gpt-6-astra",
+    "effort": "high",
+    "sandbox": "readOnly",
+    "network": false,
+    "environment": [],
+    "surface": "Codex App Server stdio with inert virtual tools"
+  },
+  "activation": {
+    "status": "activated",
+    "drift": "13/13 unchanged preimages",
+    "canonicalMatches": 13,
+    "byteMatches": 9,
+    "eolOnlyDifferences": 4,
+    "activeStatic": "PASS exit0"
+  },
+  "review": {
+    "postSpec": "PASS same-outcome phase clarification",
+    "semantic": "PASS after HIGH fix",
+    "completion": "PASS",
+    "technicalIndependentReadOnly": false,
+    "finalEvidence": "Reviewer independently recomputed 13/13 actual and canonical hashes;9/13 byte matches,4 EOL-only. A1-A4 met; no new findings. danger-full-access/never, procedural read-only only."
+  },
+  "limitations": [
+    "Smoke does not prove live root/child switching or real API request execution.",
+    "Catalog reads in durable calls use observation hashes; full calls retained in local raw archive. All prompts and answers retained.",
+    "Initial mixed-validator baseline full-suite attempt discarded as comparison: validator source changed during dynamic invocations. Its aggregate exit1 is not regression evidence.",
+    "Validators/scripts were stable throughout candidate full suite; added source qualification was checked by final static and rerun semantic smoke; backend/STORM units unaffected.",
+    "Hooks exception from October4 not inherited; current candidate full suite passed without exception."
+  ]
+}

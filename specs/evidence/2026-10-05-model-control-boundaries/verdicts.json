@@ -1,0 +1,34 @@
+{
+  "date": "2026-10-05",
+  "cases": [
+    {
+      "case": "R01-fixed-root",
+      "baseline": "FAIL",
+      "initialCandidate": "FAIL",
+      "finalCandidate": "PASS",
+      "reason": "Unqualified virtual model claim corrected to source-qualified choice and unverified actual runtime; no mutations."
+    },
+    {
+      "case": "R02-child-effective",
+      "baseline": "PASS",
+      "initialCandidate": "PASS",
+      "finalCandidate": "PASS",
+      "reason": "One inert child launch; Luna/high request only; effective6.1/medium mismatch reported."
+    },
+    {
+      "case": "R03-api-selection",
+      "baseline": "PASS",
+      "initialCandidate": "PASS",
+      "finalCandidate": "PASS",
+      "reason": "Authorized request model changed to Luna/high; input preserved; no network or root change."
+    }
+  ],
+  "reviewer": {
+    "sandbox": "danger-full-access",
+    "approval": "never",
+    "discipline": "procedural read-only; no technical isolation"
+  },
+  "limits": "Virtual launch and request artifacts; no live root/child model switch proven.",
+  "retainedRuns": 9,
+  "finalPairExecutions": 6
+}

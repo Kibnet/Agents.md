@@ -295,6 +295,21 @@ $textGuards = @(
         Description = "surface/runtime evidence rule"
     },
     @{
+        Path = "instructions/core/model-behavior-baseline.md"
+        Pattern = 'Критерии выбора модели применять только при доступном и разрешённом механизме управления'
+        Description = "model selection requires control capability"
+    },
+    @{
+        Path = "instructions/core/model-behavior-baseline.md"
+        Pattern = 'Инструкции сами по себе не переключают модель текущего чата'
+        Description = "current chat model is host controlled"
+    },
+    @{
+        Path = "instructions/core/model-behavior-baseline.md"
+        Pattern = 'requested model/effort не доказывают фактически применённые настройки'
+        Description = "model request requires effective runtime evidence"
+    },
+    @{
         Path = "instructions/core/collaboration-baseline.md"
         Pattern = 'Для просьб ответить, объяснить, спланировать, диагностировать, сделать review или сообщить status'
         Description = "read-only authorization boundary"

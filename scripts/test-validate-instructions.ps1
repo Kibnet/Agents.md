@@ -194,6 +194,24 @@ try {
         Set-Content -Path $modelBaselineFile -Value $original -Encoding UTF8
     }
 
+    foreach ($anchor in @(
+        'Критерии выбора модели применять только при доступном и разрешённом механизме управления',
+        'Инструкции сами по себе не переключают модель текущего чата',
+        'requested model/effort не доказывают фактически применённые настройки'
+    )) {
+        try {
+            $modified = $original.Replace($anchor, 'REMOVED_MODEL_CONTROL_BOUNDARY')
+            if ($modified -ceq $original) { throw "Model control fixture did not mutate the source" }
+            Set-Content -Path $modelBaselineFile -Value $modified -Encoding UTF8
+            if (-not (Invoke-Validation -ScenarioName "удалена model control boundary: $anchor" -ScenarioPath $scenarioRoot -ShouldPass $false)) {
+                $failed = $true
+            }
+        }
+        finally {
+            Set-Content -Path $modelBaselineFile -Value $original -Encoding UTF8
+        }
+    }
+
     # Machine facts are mutated structurally, independent of prose spelling.
     $modelDataPath = Join-Path $scenarioRoot 'schemas/openai-api-model-contract.json'
     $modelOriginal = Get-Content -LiteralPath $modelDataPath -Raw

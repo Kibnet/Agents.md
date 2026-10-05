@@ -121,6 +121,8 @@ Central stack применяет [creator-vibe-lens.md](instructions/core/creato
 
 Machine contract обновлён до schema 2: EU processing modes и wire service tiers разделены; `euRequiredServiceTier` удалён. Потребители schema 1 должны перейти на подтверждённые списки и `euSupportCoverage`, не превращая Batch в service tier. Исторические SPEC/smoke snapshots сохраняют schema 1.
 
+Модель текущего чата задаёт клиент; AGENTS.md не переключает её. Workload criteria — рекомендации для человека и правила для разрешённых запусков с явным selector: субагента, отдельного процесса или API-запроса. Наследование, override и фактическая модель проверяются по контракту инструмента и returned metadata; simulation smoke не доказывает живое переключение. Канонические границы — [model-behavior-baseline](instructions/core/model-behavior-baseline.md); управление picker и child config — [Models](https://learn.chatgpt.com/docs/models) и [Subagents](https://learn.chatgpt.com/docs/agent-configuration/subagents).
+
 ---
 
 # Структура репозитория
