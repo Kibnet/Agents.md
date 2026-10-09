@@ -4,12 +4,40 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference='Stop'
 $repo=Split-Path -Parent $PSScriptRoot
 if([string]::IsNullOrWhiteSpace($EvidenceDirectory)){$EvidenceDirectory=Join-Path ([IO.Path]::GetTempPath()) ('agent-telemetry-remediation-'+[Guid]::NewGuid().ToString('N'))}
+$EvidenceDirectory=[IO.Path]::GetFullPath($EvidenceDirectory)
+if(Test-Path -LiteralPath $EvidenceDirectory){throw 'Evidence directory must be fresh'}
+foreach($excludedRoot in @($repo,'C:\Projects\My\Agents','C:\Users\Kibnet\.codex\agents','C:\Projects\Education\Unlimotion Space\Tasks','C:\Obsidian\kibnet')){
+ $excluded=[IO.Path]::GetFullPath($excludedRoot).TrimEnd('\','/')
+ if($EvidenceDirectory -eq $excluded -or $EvidenceDirectory.StartsWith($excluded+[IO.Path]::DirectorySeparatorChar,[StringComparison]::OrdinalIgnoreCase) -or $excluded.StartsWith($EvidenceDirectory.TrimEnd('\','/')+[IO.Path]::DirectorySeparatorChar,[StringComparison]::OrdinalIgnoreCase)){throw 'Evidence overlaps excluded root'}
+}
+$ancestor=Split-Path -Parent $EvidenceDirectory
+while($ancestor){if((Test-Path -LiteralPath $ancestor) -and ((Get-Item -LiteralPath $ancestor).Attributes -band [IO.FileAttributes]::ReparsePoint)){throw 'Reparse evidence ancestor rejected'};$ancestor=Split-Path -Parent $ancestor}
 [void][IO.Directory]::CreateDirectory($EvidenceDirectory)
-$work=Join-Path $EvidenceDirectory ('fixtures-'+[Guid]::NewGuid().ToString('N'))
+Write-Host "EVIDENCE: $EvidenceDirectory"
+$script:EvidenceHashes=@{}
+$script:TimingObservations=[ordered]@{cold=@{executed=$false;status='not-executed'};nextProcess=@{executed=$false;status='not-executed'};contention=@{executed=$false;status='not-executed'}}
+$fixtureParent=[IO.Path]::GetFullPath([IO.Path]::GetTempPath()).TrimEnd('\','/')+[IO.Path]::DirectorySeparatorChar
+$work=Join-Path $fixtureParent ('atf-'+[Guid]::NewGuid().ToString('N'))
 [void][IO.Directory]::CreateDirectory($work)
 $results=[Collections.Generic.List[object]]::new()
 $foreignChecks=[Collections.Generic.List[object]]::new()
 $salt='a'*64
+$publicationFailed=$false
+function Remove-TelemetryFixtures {
+ $resolved=[IO.Path]::GetFullPath($work)
+ if(-not $resolved.StartsWith($fixtureParent,[StringComparison]::OrdinalIgnoreCase) -or [IO.Path]::GetFileName($resolved) -notmatch '^atf-[0-9a-f]{32}$'){throw 'Unsafe fixture cleanup path'}
+ if(-not(Test-Path -LiteralPath $resolved)){return}
+ if((Get-Item -LiteralPath $resolved).Attributes -band [IO.FileAttributes]::ReparsePoint){throw 'Fixture root replaced by reparse point'}
+ $pending=[Collections.Generic.Queue[string]]::new();$pending.Enqueue($resolved)
+ while($pending.Count){
+  foreach($child in Get-ChildItem -LiteralPath $pending.Dequeue() -Force){
+   if($child.Attributes -band [IO.FileAttributes]::ReparsePoint){
+    if($child.Attributes -band [IO.FileAttributes]::Directory){[IO.Directory]::Delete($child.FullName,$false)}else{[IO.File]::Delete($child.FullName)}
+   }elseif($child.PSIsContainer){$pending.Enqueue($child.FullName)}
+  }
+ }
+ [IO.Directory]::Delete($resolved,$true)
+}
 function Assert([bool]$Value,[string]$Name){$results.Add([pscustomobject]@{name=$Name;passed=$Value});if(-not $Value){throw "FAIL: $Name"}}
 function Load-Functions([string]$Path){$errors=$null;$ast=[Management.Automation.Language.Parser]::ParseFile($Path,[ref]$null,[ref]$errors);if($errors.Count){throw $errors[0]};foreach($f in $ast.FindAll({param($n)$n -is [Management.Automation.Language.FunctionDefinitionAst]},$false)){. ([scriptblock]::Create('function script:'+$f.Name+' '+$f.Body.Extent.Text))}}
 function Store([string]$Path){return [AgentOperations.SafeStore]::new($Path,$salt,[Diagnostics.Stopwatch]::StartNew(),1500)}
@@ -17,13 +45,67 @@ function Fresh([string]$Name){$p=Join-Path $work $Name;[void][IO.Directory]::Cre
 function Event([DateTimeOffset]$Time){return (@{timestamp=$Time.ToString('o');category='test'}|ConvertTo-Json -Compress)}
 function Attempt([scriptblock]$Body){try{& $Body;return $false}catch{return $true}}
 function Hash([string]$Path){return (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash}
+function Publish-TestEvidence {
+ param([string]$Path,[object]$Data,[scriptblock]$BeforeCommit)
+ $Path=[IO.Path]::GetFullPath($Path);$prefix=[IO.Path]::GetFullPath($EvidenceDirectory).TrimEnd('\','/')+[IO.Path]::DirectorySeparatorChar
+ if(-not $Path.StartsWith($prefix,[StringComparison]::OrdinalIgnoreCase)){throw 'Evidence path escaped owned root'}
+ $parent=Split-Path -Parent $Path
+ while($parent){if((Get-Item -LiteralPath $parent).Attributes -band [IO.FileAttributes]::ReparsePoint){throw 'Reparse evidence parent rejected'};if($parent.TrimEnd('\','/') -eq $prefix.TrimEnd('\','/')){break};$parent=Split-Path -Parent $parent}
+ if(Test-Path -LiteralPath $Path){
+  if((Get-Item -LiteralPath $Path).Attributes -band [IO.FileAttributes]::ReparsePoint){throw 'Reparse evidence leaf rejected'}
+  if(-not $script:EvidenceHashes.ContainsKey($Path) -or (Get-FileHash -LiteralPath $Path).Hash -ne $script:EvidenceHashes[$Path]){throw 'Evidence postimage drift; refusing overwrite'}
+ }
+ $pending=$Path+'.pending-'+[Guid]::NewGuid().ToString('N')
+ $bytes=[Text.Encoding]::UTF8.GetBytes(($Data|ConvertTo-Json -Depth 40)+[Environment]::NewLine)
+ $stream=[IO.File]::Open($pending,[IO.FileMode]::CreateNew,[IO.FileAccess]::Write,[IO.FileShare]::None)
+ try{$stream.Write($bytes);$stream.Flush($true)}finally{$stream.Dispose()}
+ try{
+  if($BeforeCommit){& $BeforeCommit}
+  # Private, single-writer evidence root. This drift recheck is not an OS compare-and-swap primitive.
+  if(Test-Path -LiteralPath $Path){
+   if((Get-Item -LiteralPath $Path).Attributes -band [IO.FileAttributes]::ReparsePoint){throw 'Reparse evidence leaf at commit'}
+   if(-not $script:EvidenceHashes.ContainsKey($Path) -or (Get-FileHash -LiteralPath $Path).Hash -ne $script:EvidenceHashes[$Path]){throw 'Evidence postimage drift at commit; refusing overwrite'}
+  }elseif($script:EvidenceHashes.ContainsKey($Path)){throw 'Owned evidence disappeared at commit'}
+  [IO.File]::Move($pending,$Path,$script:EvidenceHashes.ContainsKey($Path));$script:EvidenceHashes[$Path]=(Get-FileHash -LiteralPath $Path).Hash
+ }
+ finally{if(Test-Path -LiteralPath $pending){[IO.File]::Delete($pending)}}
+}
+function Invoke-TimingProcess {
+ param([string[]]$Arguments,[string]$Name,[int]$WatchdogMilliseconds=20000,[string]$SourcePath)
+ $process=[Diagnostics.Process]::new();$process.StartInfo.FileName=(Get-Command pwsh -ErrorAction Stop).Source
+ $process.StartInfo.UseShellExecute=$false;$process.StartInfo.CreateNoWindow=$true
+ $process.StartInfo.RedirectStandardOutput=$true;$process.StartInfo.RedirectStandardError=$true
+ foreach($argument in $Arguments){$process.StartInfo.ArgumentList.Add($argument)}
+ $watch=[Diagnostics.Stopwatch]::StartNew();$timedOut=$false;$confirmed=$false;$drained=$false;$out='';$err='';$exit=-1;$pidValue=$null;$failure=$null
+ try{
+  [void]$process.Start();$pidValue=$process.Id
+  $stdout=$process.StandardOutput.ReadToEndAsync();$stderr=$process.StandardError.ReadToEndAsync()
+  $confirmed=$process.WaitForExit($WatchdogMilliseconds)
+  if(-not $confirmed){$timedOut=$true;try{$process.Kill($true);$confirmed=$process.WaitForExit(5000)}catch{$failure=$_.Exception.Message}}
+  if($confirmed){
+   $exit=$process.ExitCode
+   $drained=[Threading.Tasks.Task]::WhenAll([Threading.Tasks.Task[]]@($stdout,$stderr)).Wait(5000)
+   if($drained){$out=$stdout.GetAwaiter().GetResult();$err=$stderr.GetAwaiter().GetResult()}else{$failure='Output drain did not complete'}
+  }else{$failure='Owned child exit unresolved'}
+ }catch{$failure=$_.Exception.Message}
+ finally{$watch.Stop();$process.Dispose()}
+ $status=if($failure -or -not $confirmed -or -not $drained){'failed'}elseif($timedOut){'timeout'}elseif($exit -ne 0){'failed'}else{'completed'}
+ if($status -ne 'completed' -and $exit -eq 0){$exit=-1}
+ $record=[pscustomobject]@{name=$Name;executed=($null -ne $pidValue);status=$status;timedOut=$timedOut;exitConfirmed=$confirmed;outputDrained=$drained;processId=$pidValue;exit=$exit;milliseconds=$watch.Elapsed.TotalMilliseconds;stdout=$out;stderr=$err;failure=$failure;watchdogMilliseconds=$WatchdogMilliseconds;sourceSha256=if($SourcePath){(Get-FileHash -LiteralPath $SourcePath).Hash}else{$null}}
+ Publish-TestEvidence (Join-Path $EvidenceDirectory ('invocation-'+[Guid]::NewGuid().ToString('N')+'.json')) $record
+ if(-not $confirmed){throw "Owned child unresolved; receipt retained. $failure"}
+ return $record
+}
 function Run-Hook([string]$Hook,[string]$Root,[string]$Name){
  $payload=Join-Path $work "$Name-input.json"; $manifest=Join-Path $work "$Name-manifest.json"
  $version=if($Hook -eq $candidateHook){'3.2.0'}else{'3.1.0'}
  @{hook_event_name='PostToolUse';tool_name='shell_command';tool_input=@{command='rg absent .'};tool_response=@{exit_code=1;stderr=''};cwd=$work;session_id='test'}|ConvertTo-Json -Depth 10|Set-Content $payload
  @{schemaVersion=1;owner='agent-operations';runtimeVersion=$version;telemetrySalt=$salt;activationChallenge=('b'*32);runtimeChecksums=@{hook=(Hash $Hook).ToLowerInvariant()}}|ConvertTo-Json -Depth 5|Set-Content $manifest
- $sw=[Diagnostics.Stopwatch]::StartNew();$stdout=& pwsh -NoProfile -File $Hook -InputPath $payload -TelemetryRoot $Root -InstallManifestPath $manifest 2> (Join-Path $work "$Name-stderr.txt");$exit=$LASTEXITCODE;$sw.Stop()
- return [pscustomobject]@{exit=$exit;milliseconds=$sw.Elapsed.TotalMilliseconds;stdout=($stdout -join "`n");stderr=([IO.File]::ReadAllText((Join-Path $work "$Name-stderr.txt")))}
+ $record=Invoke-TimingProcess -Arguments @('-NoProfile','-File',[IO.Path]::GetFullPath($Hook),'-InputPath',$payload,'-TelemetryRoot',$Root,'-InstallManifestPath',$manifest) -Name $Name -SourcePath $Hook
+ $slot=switch($Name){'cold-hook'{'cold'};'next-hook'{'nextProcess'};'contended-hook'{'contention'};default{$Name}}
+ $script:TimingObservations[$slot]=$record
+ Publish-TestEvidence (Join-Path $EvidenceDirectory 'latency.json') $script:TimingObservations
+ return $record
 }
 $candidateHook=Join-Path $repo 'scripts/hooks/agent-operations-hook.ps1'
 try {
@@ -160,13 +242,28 @@ try {
  Assert ($historicSummary.compatibility.applicable -and -not $historicSummary.compatibility.passed -and -not $historicSummary.compatibility.isQualityGate -and $historicSummary.compatibility.status -eq 'historical-counts-differ') 'historical count mismatch is informational'
  Assert ($historicSummary.compatibility.delta.toolCalls -eq ($historicSummary.compatibility.actual.toolCalls-$historicSummary.compatibility.expected.toolCalls)) 'historical comparison retains numeric deltas'
  if(-not $ClassificationOnly){
+ $startup=Invoke-TimingProcess -Arguments @('-NoProfile','-Command','exit 0') -Name 'startup-control'
+ $script:TimingObservations['startupControl']=$startup
+ Publish-TestEvidence (Join-Path $EvidenceDirectory 'latency.json') $script:TimingObservations
+ Assert ($startup.status -eq 'completed') 'startup control completed; no subtraction from cold elapsed'
  $cold=Run-Hook $candidateHook (Fresh 'cold-hook') 'cold-hook';Assert ($cold.exit -eq 0) 'cold hook exit zero';Assert ($cold.stdout -match 'ripgrep') 'warning survives telemetry skip';Assert ($cold.milliseconds -lt 5000) 'cold hook within host timeout'
  $warm=Run-Hook $candidateHook (Join-Path $work 'cold-hook') 'next-hook';Assert ($warm.exit -eq 0) 'subsequent process hook exit zero'
  $s=Store (Join-Path $work 'cold-hook');try{$contended=Run-Hook $candidateHook (Join-Path $work 'cold-hook') 'contended-hook'}finally{$s.Dispose()};Assert ($contended.exit -eq 0 -and $contended.stdout -match 'ripgrep') 'contended hook preserves warning and exits zero'
- @{nativeInitMs=$compile.Elapsed.TotalMilliseconds;cold=$cold;nextProcess=$warm;contention=$contended;inProcessContentionMs=$busy.Elapsed.TotalMilliseconds;nearLimitMaintenanceMs=$maintenance.Elapsed.TotalMilliseconds}|ConvertTo-Json -Depth 10|Set-Content (Join-Path $EvidenceDirectory 'latency.json')
+ $script:TimingObservations['nativeInitMs']=$compile.Elapsed.TotalMilliseconds
+ $script:TimingObservations['inProcessContentionMs']=$busy.Elapsed.TotalMilliseconds
+ $script:TimingObservations['nearLimitMaintenanceMs']=$maintenance.Elapsed.TotalMilliseconds
+ Publish-TestEvidence (Join-Path $EvidenceDirectory 'latency.json') $script:TimingObservations
  }
 } finally {
- $results|ConvertTo-Json -Depth 5|Set-Content (Join-Path $EvidenceDirectory 'assertions.json')
- $foreignChecks|ConvertTo-Json -Depth 5|Set-Content (Join-Path $EvidenceDirectory 'foreign-file-hashes.json')
+ # One publication failure must neither replace the primary assertion nor discard the other receipts.
+ foreach($publication in @(@{name='latency.json';data=$script:TimingObservations},@{name='assertions.json';data=$results.ToArray()},@{name='foreign-file-hashes.json';data=$foreignChecks.ToArray()})){
+  try{Publish-TestEvidence (Join-Path $EvidenceDirectory $publication.name) $publication.data}
+  catch{$publicationFailed=$true;[Console]::Error.WriteLine('Evidence publication failed ('+$publication.name+'): '+$_.Exception.Message)}
+ }
+ $fixtureCleaned=$false
+ try{Remove-TelemetryFixtures;$fixtureCleaned=-not(Test-Path -LiteralPath $work)}catch{$publicationFailed=$true;[Console]::Error.WriteLine('Fixture cleanup failed: '+$_.Exception.Message)}
+ try{Publish-TestEvidence (Join-Path $EvidenceDirectory 'fixture-state.json') @{fixtureRoot=$work;fixtureCleaned=$fixtureCleaned;publicationFailed=$publicationFailed}}
+ catch{$publicationFailed=$true;[Console]::Error.WriteLine('Fixture state publication failed: '+$_.Exception.Message)}
 }
+if($publicationFailed){throw 'FAIL: retained evidence or fixture cleanup incomplete'}
 Write-Host ("PASS: telemetry remediation {0} assertions; evidence {1}" -f $results.Count,$EvidenceDirectory)

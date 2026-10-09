@@ -1,7 +1,8 @@
 [CmdletBinding()]
 param(
     [ValidateSet("All", "Hooks", "Installer", "Analyzer", "Privacy")]
-    [string]$Area = "All"
+    [string]$Area = "All",
+    [string]$EvidenceDirectory
 )
 
 Set-StrictMode -Version Latest
@@ -23,6 +24,30 @@ $tempBase = [System.IO.Path]::GetFullPath([System.IO.Path]::GetTempPath()).TrimE
     [System.IO.Path]::AltDirectorySeparatorChar
 ) + [System.IO.Path]::DirectorySeparatorChar
 $testRoot = Join-Path $tempBase ("agent-operations-tests-" + [guid]::NewGuid().ToString("N"))
+
+if ([string]::IsNullOrWhiteSpace($EvidenceDirectory)) {
+    $EvidenceDirectory = Join-Path $tempBase ("agent-operations-evidence-" + [guid]::NewGuid().ToString("N"))
+}
+$EvidenceDirectory = [IO.Path]::GetFullPath($EvidenceDirectory)
+if (Test-Path -LiteralPath $EvidenceDirectory) { throw 'Retained evidence directory must be fresh' }
+foreach ($excludedRoot in @($repositoryRoot, $testRoot, 'C:\Projects\My\Agents', 'C:\Users\Kibnet\.codex\agents', 'C:\Projects\Education\Unlimotion Space\Tasks', 'C:\Obsidian\kibnet')) {
+    $excluded = [IO.Path]::GetFullPath($excludedRoot).TrimEnd('\','/')
+    if ($EvidenceDirectory -eq $excluded -or $EvidenceDirectory.StartsWith($excluded+[IO.Path]::DirectorySeparatorChar,[StringComparison]::OrdinalIgnoreCase) -or $excluded.StartsWith($EvidenceDirectory.TrimEnd('\','/')+[IO.Path]::DirectorySeparatorChar,[StringComparison]::OrdinalIgnoreCase)) { throw 'Retained evidence overlaps excluded root' }
+}
+$ancestor = Split-Path -Parent $EvidenceDirectory
+while ($ancestor) {
+    if ((Test-Path -LiteralPath $ancestor) -and ((Get-Item -LiteralPath $ancestor).Attributes -band [IO.FileAttributes]::ReparsePoint)) { throw 'Reparse evidence ancestor rejected' }
+    $ancestor = Split-Path -Parent $ancestor
+}
+[void][IO.Directory]::CreateDirectory($EvidenceDirectory)
+Write-Host "EVIDENCE: $EvidenceDirectory"
+$script:EvidenceHashes = @{}
+$helperErrors=$null
+$helperAst=[Management.Automation.Language.Parser]::ParseFile((Join-Path $PSScriptRoot 'test-agent-operations-telemetry-remediation.ps1'),[ref]$null,[ref]$helperErrors)
+if ($helperErrors.Count) { throw $helperErrors[0] }
+foreach ($definition in $helperAst.FindAll({param($node) $node -is [Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -in @('Publish-TestEvidence','Invoke-TimingProcess')},$false)) {
+    . ([scriptblock]::Create($definition.Extent.Text))
+}
 [void](New-Item -ItemType Directory -Path $testRoot)
 
 $script:Failed = $false
@@ -191,9 +216,60 @@ function Get-AllPropertyNames {
     return @($names)
 }
 
+function Get-FixtureWarningKeys {
+    param([string]$Root)
+    $path=Join-Path $Root '.agent-operations-store.json'
+    if (-not (Test-Path -LiteralPath $path)) { return }
+    $envelope=[IO.File]::ReadAllText($path)|ConvertFrom-Json
+    $ledger=$envelope.Payload|ConvertFrom-Json
+    foreach($warning in $ledger.Warnings){$warning.Key}
+}
+
+function Test-RetainedEvidence {
+    $source=Join-Path $testRoot 'retention-source'
+    foreach($relative in @('scripts/test-agent-operations.ps1','scripts/test-agent-operations-telemetry-remediation.ps1','scripts/lib/AgentOperations.Contracts.psm1','scripts/hooks/agent-operations-hook.ps1')){
+        $destination=Join-Path $source $relative
+        [void][IO.Directory]::CreateDirectory((Split-Path -Parent $destination))
+        [IO.File]::Copy((Join-Path $repositoryRoot $relative),$destination,$false)
+    }
+    $fixtureScript=Join-Path $source 'scripts/test-agent-operations.ps1'
+    $fixtureText=[IO.File]::ReadAllText($fixtureScript)
+    $marker='(?m)^    # RETENTION-REGRESSION-ENTRY\r?$'
+    if(([regex]::Matches($fixtureText,$marker)).Count -ne 1){throw 'Retention fixture requires one injection boundary'}
+    # Only the disposable harness copy fails; the real cleanup/finally and hook are preserved.
+    [IO.File]::WriteAllText($fixtureScript,[regex]::Replace($fixtureText,$marker,"    throw 'controlled retained evidence assertion'"))
+    $retained=Join-Path $EvidenceDirectory 'retention-child'
+    $run=Invoke-TimingProcess -Arguments @('-NoProfile','-File',$fixtureScript,'-Area','Hooks','-EvidenceDirectory',$retained) -Name 'forced-ordinary-harness-failure' -SourcePath $fixtureScript
+    Assert-True ($run.exit -ne 0 -and -not $run.timedOut -and $run.stdout -match 'controlled retained evidence assertion') 'Ordinary harness reports injected failure, not an unrelated exception'
+    $state=Get-Content -LiteralPath (Join-Path $retained 'suite-state.json') -Raw|ConvertFrom-Json
+    Assert-True ($state.fixtureCleaned -and -not (Test-Path -LiteralPath $state.fixtureRoot)) 'Ordinary harness removed disposable fixtures after failure'
+    $observation=Get-Content -LiteralPath (Join-Path $retained 'native-warmup.json') -Raw|ConvertFrom-Json
+    Assert-True ($observation.nativeLoaded -and $observation.milliseconds -ge 0) 'Executed receipt remains readable after ordinary exit and cleanup'
+    Assert-True ($run.stdout -match [regex]::Escape("EVIDENCE: $retained")) 'Ordinary harness emits absolute retained path'
+    $timeout=Invoke-TimingProcess -Arguments @('-NoProfile','-Command','Start-Sleep -Seconds 30') -Name 'controlled-watchdog-timeout' -WatchdogMilliseconds 250
+    Assert-True ($timeout.timedOut -and $timeout.exitConfirmed -and $timeout.status -eq 'timeout' -and $timeout.exit -ne 0) 'Diagnostic watchdog fails and confirms its child exit'
+    $timeoutReceipts=@(Get-ChildItem -LiteralPath $EvidenceDirectory -File -Filter 'invocation-*.json' | ForEach-Object {Get-Content -LiteralPath $_.FullName -Raw|ConvertFrom-Json} | Where-Object name -eq 'controlled-watchdog-timeout')
+    Assert-True ($timeoutReceipts.Count -eq 1 -and $timeoutReceipts[0].timedOut -and $timeoutReceipts[0].milliseconds -ge 250) 'Timeout receipt is retained with elapsed time and failure'
+    $driftPath=Join-Path $EvidenceDirectory 'publication-drift.json'
+    Publish-TestEvidence $driftPath @{version='owned'}
+    $driftRejected=$false
+    try{Publish-TestEvidence $driftPath @{version='replacement'} -BeforeCommit {[IO.File]::WriteAllText($driftPath,'foreign sentinel')}}
+    catch{$driftRejected=$_.Exception.Message -match 'postimage drift at commit'}
+    Assert-True ($driftRejected -and [IO.File]::ReadAllText($driftPath) -eq 'foreign sentinel') 'Publication commit drift preserves replacement bytes and rejects overwrite'
+}
+
 function Test-Hooks {
     Write-Host "INFO: hook contracts" -ForegroundColor Cyan
     $telemetry = Join-Path $testRoot "hook-telemetry"
+
+    # This fixture explicitly tests a warm durable store. Fresh-process cold timing remains mandatory below.
+    $warmup = Invoke-HookFixture -Payload ([pscustomobject]@{
+        hook_event_name='PreToolUse'; turn_id='warmup-only'; tool_name='Bash'; tool_input=[pscustomobject]@{command='git status'}
+    }) -TelemetryRoot (Join-Path $testRoot 'native-warmup')
+    Publish-TestEvidence (Join-Path $EvidenceDirectory 'native-warmup.json') @{milliseconds=$warmup.Duration.TotalMilliseconds;json=$warmup.Json;nativeLoaded=($null -ne ('AgentOperations.SafeStore' -as [type]))}
+    # RETENTION-REGRESSION-ENTRY
+    Test-RetainedEvidence
+    Assert-True ($null -ne ('AgentOperations.SafeStore' -as [type]) -and $null -ne $warmup.Json) 'Warm fixture native initialization completed'
 
     $bad = Invoke-HookFixture -Payload ([pscustomobject]@{
         hook_event_name = "PreToolUse"
@@ -202,7 +278,9 @@ function Test-Hooks {
         tool_input = [pscustomobject]@{ command = 'rg TODO src\*.cs' }
     }) -TelemetryRoot $telemetry
     Assert-True -Condition ($null -ne $bad.Json.PSObject.Properties["hookSpecificOutput"]) -Message "raw rg path glob should produce model-visible context"
-    Assert-True -Condition ($bad.Duration.TotalSeconds -le 2) -Message "hook fixture should complete within two seconds"
+    Assert-True -Condition ($bad.Duration.TotalSeconds -le 2) -Message "warm hook fixture should complete within two seconds"
+    Assert-Equal @(Get-FixtureWarningKeys $telemetry).Count 1 'First warm warning persisted exactly one key'
+    Publish-TestEvidence (Join-Path $EvidenceDirectory 'durable-first.json') @{milliseconds=$bad.Duration.TotalMilliseconds;json=$bad.Json;keys=@(Get-FixtureWarningKeys $telemetry)}
 
     $duplicate = Invoke-HookFixture -Payload ([pscustomobject]@{
         hook_event_name = "PreToolUse"
@@ -211,6 +289,24 @@ function Test-Hooks {
         tool_input = [pscustomobject]@{ command = 'rg TODO src\*.cs' }
     }) -TelemetryRoot $telemetry
     Assert-Equal -Actual @($duplicate.Json.PSObject.Properties).Count -Expected 0 -Message "duplicate warning in one turn should be suppressed"
+    Assert-Equal @(Get-FixtureWarningKeys $telemetry).Count 1 'Suppressed repeat did not duplicate the key'
+    $otherTurn=Invoke-HookFixture -Payload ([pscustomobject]@{hook_event_name='PreToolUse';turn_id='turn-other';tool_name='Bash';tool_input=[pscustomobject]@{command='rg TODO src\*.cs'}}) -TelemetryRoot $telemetry
+    Assert-True ($null -ne $otherTurn.Json.PSObject.Properties['hookSpecificOutput']) 'Different turn still receives warning'
+    Assert-Equal @(Get-FixtureWarningKeys $telemetry).Count 2 'Different turn persisted a distinct key'
+
+    $skipRoot=Join-Path $testRoot 'controlled-skip'
+    $ownedStore=[AgentOperations.SafeStore]::new($skipRoot,'0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef',[Diagnostics.Stopwatch]::StartNew(),1500)
+    $skipPayload=[pscustomobject]@{hook_event_name='PreToolUse';turn_id='skip-turn';tool_name='Bash';tool_input=[pscustomobject]@{command='rg TODO src\*.cs'}}
+    try{$skipped=Invoke-HookFixture -Payload $skipPayload -TelemetryRoot $skipRoot}
+    finally{$ownedStore.Dispose()}
+    Assert-True ($null -ne $skipped.Json.PSObject.Properties['hookSpecificOutput']) 'Owned lock contention preserves valid warning'
+    Assert-Equal @(Get-FixtureWarningKeys $skipRoot).Count 0 'Skipped warning did not claim a durable key'
+    $restored=Invoke-HookFixture -Payload $skipPayload -TelemetryRoot $skipRoot
+    Assert-True ($null -ne $restored.Json.PSObject.Properties['hookSpecificOutput']) 'Warning restored after owned lock release'
+    Assert-Equal @(Get-FixtureWarningKeys $skipRoot).Count 1 'Released store records the key'
+    $restoredRepeat=Invoke-HookFixture -Payload $skipPayload -TelemetryRoot $skipRoot
+    Assert-Equal @($restoredRepeat.Json.PSObject.Properties).Count 0 'Released store suppresses subsequent duplicate'
+    Publish-TestEvidence (Join-Path $EvidenceDirectory 'skip-recovery.json') @{skipped=$skipped.Json;restored=$restored.Json;repeat=$restoredRepeat.Json;keys=@(Get-FixtureWarningKeys $skipRoot)}
 
     $safe = Invoke-HookFixture -Payload ([pscustomobject]@{
         hook_event_name = "PreToolUse"
@@ -327,7 +423,7 @@ function Test-Hooks {
     Assert-True -Condition (-not (Test-Path -LiteralPath (Join-Path $foreignManifestTelemetry "agent-operations.jsonl"))) -Message "telemetry must reject a foreign or checksum-unbound manifest even when its salt is syntactically valid"
 
     # The native store has exclusive-create ownership and handle-based maintenance.
-    & pwsh -NoProfile -File (Join-Path $PSScriptRoot 'test-agent-operations-telemetry-remediation.ps1') -EvidenceDirectory (Join-Path $testRoot 'telemetry-remediation')
+    & pwsh -NoProfile -File (Join-Path $PSScriptRoot 'test-agent-operations-telemetry-remediation.ps1') -EvidenceDirectory (Join-Path $EvidenceDirectory 'telemetry-remediation')
     Assert-Equal $LASTEXITCODE 0 'Native telemetry remediation behavioral suite'
 
     $concurrentRoot = Join-Path $testRoot "concurrent-telemetry"
@@ -365,12 +461,21 @@ function Test-Hooks {
         $jobs | Remove-Job -Force -ErrorAction SilentlyContinue
     }
     $concurrentLog = Join-Path $concurrentRoot "agent-operations.jsonl"
-    $concurrentLines = if (Test-Path -LiteralPath $concurrentLog) { @(Get-Content -LiteralPath $concurrentLog) } else { @() }
+    $concurrentLines = @(if (Test-Path -LiteralPath $concurrentLog) { Get-Content -LiteralPath $concurrentLog })
     Assert-True -Condition ($concurrentLines.Count -le 12) -Message 'Contention may skip telemetry within the cooperative budget'
     [void](Invoke-HookFixture -Payload ([pscustomobject]@{
         hook_event_name='PostToolUse'; tool_name='Bash'; tool_input=[pscustomobject]@{command='git status'}; tool_response=[pscustomobject]@{exit_code=0}
     }) -TelemetryRoot $concurrentRoot -InstallManifestPath $concurrentManifest)
     Assert-Equal @(Get-Content -LiteralPath $concurrentLog).Count ($concurrentLines.Count + 1) 'Serial telemetry recovers after contention'
+    $cardinalityRoot=Join-Path $testRoot 'log-cardinality'
+    $cardinalityLog=Join-Path $cardinalityRoot 'agent-operations.jsonl'
+    $emptyLines=@(if(Test-Path -LiteralPath $cardinalityLog){Get-Content -LiteralPath $cardinalityLog})
+    Assert-Equal $emptyLines.Count 0 'Absent log is an empty collection under StrictMode'
+    [void](Invoke-HookFixture -Payload ([pscustomobject]@{hook_event_name='PostToolUse';tool_name='Bash';tool_input=[pscustomobject]@{command='git status'};tool_response=[pscustomobject]@{exit_code=0}}) -TelemetryRoot $cardinalityRoot)
+    $oneLine=@(if(Test-Path -LiteralPath $cardinalityLog){Get-Content -LiteralPath $cardinalityLog})
+    Assert-Equal $oneLine.Count 1 'Real single telemetry record remains an array under StrictMode'
+    Assert-True ($null -ne ($oneLine[0]|ConvertFrom-Json)) 'Single real record is valid JSON'
+    Publish-TestEvidence (Join-Path $EvidenceDirectory 'cardinality.json') @{empty=$emptyLines.Count;single=$oneLine.Count;concurrent=$concurrentLines.Count;serialAfterContention=@(Get-Content -LiteralPath $concurrentLog).Count}
     foreach ($line in $concurrentLines) {
         $parsedConcurrentRecord = $null
         try { $parsedConcurrentRecord = $line | ConvertFrom-Json } catch { }
@@ -1446,7 +1551,11 @@ catch {
     Write-Host $_.ScriptStackTrace -ForegroundColor DarkRed
 }
 finally {
-    try { Remove-TestRoot } catch { Write-Host ("WARN: test cleanup failed: {0}" -f $_.Exception.Message) -ForegroundColor Yellow }
+    $fixtureCleaned=$false
+    try { Remove-TestRoot; $fixtureCleaned=-not(Test-Path -LiteralPath $testRoot) }
+    catch { $script:Failed=$true; Write-Host ("FAIL: test cleanup failed: {0}" -f $_.Exception.Message) -ForegroundColor Red }
+    try{Publish-TestEvidence (Join-Path $EvidenceDirectory 'suite-state.json') @{fixtureRoot=$testRoot;fixtureCleaned=$fixtureCleaned;failed=$script:Failed;passed=$script:Passed;area=$Area}}
+    catch{$script:Failed=$true;Write-Host ("FAIL: retained evidence publication: {0}" -f $_.Exception.Message) -ForegroundColor Red}
 }
 
 if ($script:Failed) {
