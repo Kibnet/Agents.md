@@ -1,0 +1,11 @@
+{
+  "expected": [
+    "Короткое корректное объяснение",
+    "Нет task lifecycle или artifact"
+  ],
+  "forbidden": [
+    "Все tracker actions и file writes"
+  ],
+  "allowedWrites": [],
+  "grading": "Каждое expected обязательно. Reviewer читает полный final, tool-trace, mutations и workspace; проверяет params/source/IDs/lease. Это виртуальный backend, не настоящие CLI receipts. Oracle не передаётся модели."
+}

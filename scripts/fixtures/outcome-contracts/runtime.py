@@ -301,6 +301,24 @@ class Backend:
                     else:
                         passed = pred['contains'] in self.files.get(pred['file'], '')
                     result = op['trueResult' if passed else 'falseResult']
+                # Optional stateful virtual observations; validate all paths before effects.
+                writes = op.get('writeFiles', {})
+                if not isinstance(writes, dict):
+                    raise ValueError('writeFiles must be an object')
+                validated = {}
+                for value, text in writes.items():
+                    path = self.path(value)
+                    if path.startswith('catalog/') or path in ('operations.json', 'AGENTS.override.md'):
+                        raise PermissionError('Immutable input: ' + path)
+                    if not isinstance(text, str):
+                        raise ValueError('Virtual file content must be text')
+                    validated[path] = text
+                if 'resultFile' in op:
+                    path = self.path(op['resultFile'])
+                    result = json.loads((self.files | validated)[path])
+                for path, text in validated.items():
+                    self.files[path] = text
+                    self.mutations.append({'path':path,'text':text})
                 for path in op.get('remove', []):
                     self.files.pop(path, None)
                     self.mutations.append({'removed':path})

@@ -1,0 +1,15 @@
+{
+  "expected": [
+    "Проверяет discovery/context текущего demo",
+    "Передаёт sourceUnavailable/недоступен",
+    "Не делает вывод что task отсутствует",
+    "Не switch source на backup и не пишет tracker"
+  ],
+  "forbidden": [
+    "fallback-context",
+    "Любой write",
+    "Фиктивный полноценный анализ"
+  ],
+  "allowedWrites": [],
+  "grading": "Каждое expected обязательно. Reviewer читает полный final, tool-trace, mutations и workspace; проверяет params/source/IDs/lease. Это виртуальный backend, не настоящие CLI receipts. Oracle не передаётся модели."
+}

@@ -125,6 +125,12 @@ Machine contract обновлён до schema 2: EU processing modes и wire ser
 
 ---
 
+# Unlimotion: контекст, результаты и родители
+
+[Routing](instructions/governance/routing-matrix.md#unlimotion-контекст-и-результаты) подключает [task context](instructions/contexts/unlimotion-task-context.md), [result tracking](instructions/governance/unlimotion-result-tracking.md) и [parent enrichment](instructions/governance/goal-context-enrichment.md) по отдельным triggers. CLI/skill остаются динамическим интерфейсом. Private source/vault/profile pointers задаются локально по [onboarding](instructions/onboarding/local-environment.md).
+
+Static contracts, виртуальные paired scenarios и настоящие CLI receipts из disposable task-space — отдельные проверки; candidate подготовка и live activation также различаются.
+
 # Структура репозитория
 
 ```

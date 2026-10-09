@@ -49,6 +49,14 @@ $requiredPaths = @(
     "instructions/contexts/debug-dotnet-mcp-coreclr.md",
     "instructions/contexts/performance-optimization.md",
     "instructions/contexts/session-insights-context.md",
+    "instructions/contexts/unlimotion-task-context.md",
+    "instructions/governance/unlimotion-result-tracking.md",
+    "instructions/governance/goal-context-enrichment.md",
+    "scripts/test-unlimotion-contracts.ps1",
+    "scripts/test-unlimotion-cli-contracts.ps1",
+    "scripts/fixtures/unlimotion-outcomes/manifest.json",
+    "scripts/fixtures/unlimotion-outcomes/static_contracts.py",
+    "scripts/fixtures/unlimotion-outcomes/cli_contracts.py",
     "instructions/contexts/testing-dotnet.md",
     "instructions/contexts/testing-frontend.md",
     "instructions/profiles/dotnet-backend-api.md",
@@ -860,6 +868,13 @@ else {
     & pwsh -NoProfile -File $outcomeChecker -RootPath $resolvedRoot -ValidateOnly
     if ($LASTEXITCODE -ne 0) { Add-Error 'Static outcome contracts или fixture manifest не прошли проверку' }
 }
+
+$unlimotionChecker = Join-Path $PSScriptRoot 'test-unlimotion-contracts.ps1'
+if (Test-Path -LiteralPath $unlimotionChecker) {
+    & pwsh -NoProfile -File $unlimotionChecker -RootPath $resolvedRoot -ValidateOnly
+    if ($LASTEXITCODE -ne 0) { Add-Error 'Unlimotion static contracts failed' }
+}
+else { Add-Error 'Unlimotion static checker missing' }
 
 if ($errors.Count -gt 0) {
     Add-Info "Проверка завершена с ошибками: $($errors.Count)"

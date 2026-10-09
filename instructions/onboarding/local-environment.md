@@ -57,6 +57,19 @@ Telemetry runtime 3.2.0 использует только Windows local NTFS. Un
 
 Analyzer metrics относятся к selected-stratified-sample; recall/FPR не являются population estimate и не доказывают причинное снижение ошибок. TCP endpoint preflight имеет `level=tcp-connect`; он не доказывает HTTP/auth/TLS readiness — эти проверки добавляет consumer.
 
+## Локальные pointers для tracker/knowledge
+
+Для workflow Unlimotion задавать private-local task-space, vault root и current profile pointer через пользовательские инструкции или локальный onboarding; переносимый каталог содержит только placeholders. Проверить доступность pointers и установленного `unlimotion-cli` skill/CLI по [task-context](../contexts/unlimotion-task-context.md). Отсутствие pointer не разрешает выбирать другой источник. Установка skill/CLI требует собственного разрешения и не входит в подключение этих owners.
+
+| Pointer | Локальное значение |
+| --- | --- |
+| Task-space scope | `<absolute-authorized-task-space>` |
+| Vault root | `<absolute-private-knowledge-root>` |
+| Personal quick context | `<current-user-provided-profile-pointer>` |
+| Night protocol, если применим | `<current-user-provided-protocol-pointer>` |
+
+Не переносить заполненные private paths/profile в Git или публичные fixtures.
+
 ## Связанные документы
 
 - [AGENTS.md](../../AGENTS.md)

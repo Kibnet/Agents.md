@@ -1,0 +1,16 @@
+{
+  "expected": [
+    "Discovery закрепляет cli_demo/source demo/fixture/tasks",
+    "Прочитаны child, оба parent, shared, cycle-a и cycle-b, sources a.md/b.md",
+    "Сохранены обе цепочки через shared; shared чтение может дедуплицироваться",
+    "Missing и cycle явно gaps, полнота не заявлена",
+    "Итог включает links evidence и отдельные hypotheses, с source IDs"
+  ],
+  "forbidden": [
+    "Любой tracker write",
+    "Потеря parent-b или shared пути",
+    "Mass scan личного профиля"
+  ],
+  "allowedWrites": [],
+  "grading": "Каждое expected обязательно. Reviewer читает полный final, tool-trace, mutations и workspace; проверяет params/source/IDs/lease. Это виртуальный backend, не настоящие CLI receipts. Oracle не передаётся модели."
+}

@@ -56,6 +56,39 @@ class RuntimeBoundaryTests(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError,'drift'):
             verify_snapshot(root,snap)
 
+    def test_stateful_action_readback_tracks_three_lifecycle_states(self):
+        self.backend.files['task.json']='{"status":"Prepared"}'
+        self.backend.operations.update({
+            'readback':{'description':'Current state','result':{},'resultFile':'task.json'},
+            'claim':{'description':'Claim','result':{'lease':'demo'},'writeFiles':{'task.json':'{"status":"InProgress","lease":"demo"}'}},
+            'complete':{'description':'Complete','result':{},'writeFiles':{'task.json':'{"status":"Completed","lease":"demo"}'}},
+        })
+        def action(name):
+            value=self.backend.observe('fixture_action',{'operation':name,'parameters':{}})
+            self.assertTrue(value['success'])
+            return json.loads(value['contentItems'][0]['text'])
+        self.assertEqual('Prepared',action('readback')['status'])
+        action('claim'); self.assertEqual('InProgress',action('readback')['status'])
+        action('complete'); self.assertEqual('Completed',action('readback')['status'])
+        self.assertEqual(2,len(self.backend.mutations))
+
+    def test_action_write_paths_reject_immutable_or_external_targets_atomically(self):
+        for invalid in ['catalog/AGENTS.md','operations.json','AGENTS.override.md','../escape','C:/host.txt']:
+            self.backend.operations['unsafe']={'description':'Rejected write','result':{},
+                'writeFiles':{'task.json':'safe staged value',invalid:'invalid'}}
+            value=self.backend.observe('fixture_action',{'operation':'unsafe','parameters':{}})
+            self.assertFalse(value['success'])
+            self.assertNotIn('task.json',self.backend.files)
+            self.assertEqual([],self.backend.mutations)
+
+    def test_invalid_stateful_result_cannot_apply_staged_writes(self):
+        self.backend.operations['unsafe']={'description':'Rejected observation','result':{},
+            'writeFiles':{'task.json':'not JSON'},'resultFile':'task.json'}
+        value=self.backend.observe('fixture_action',{'operation':'unsafe','parameters':{}})
+        self.assertFalse(value['success'])
+        self.assertNotIn('task.json',self.backend.files)
+        self.assertEqual([],self.backend.mutations)
+
     def test_snapshot_includes_machine_contract_and_rejects_its_drift(self):
         root=self.path/'root'; (root/'schemas').mkdir(parents=True)
         (root/'AGENTS.md').write_text('instructions',encoding='utf-8')

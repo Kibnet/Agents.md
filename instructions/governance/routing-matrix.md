@@ -138,6 +138,16 @@ Get-ChildItem instructions/profiles
 | Ветки, pull request и GitHub Releases | `github-delivery-policy`; для PR title/squash также `commit-message-policy`; для релизов также `versioning-policy` |
 | Подключение каталога в потребительский репозиторий | `onboarding/quick-start`, `onboarding/AGENTS.consumer.template`, `onboarding/AGENTS.override.template` |
 
+## Unlimotion: контекст и результаты
+
+| Trigger | Подключить owner |
+| --- | --- |
+| ID/link задачи, обзор tracker или подтверждённое task-space | [unlimotion-task-context](../contexts/unlimotion-task-context.md) |
+| Агентское поручение с самостоятельным deliverable / tracker result lifecycle | [unlimotion-result-tracking](./unlimotion-result-tracking.md), затем task-context при сопоставлении задаче |
+| Проверенный факт полезен смысловому parent | [goal-context-enrichment](./goal-context-enrichment.md), task-context для всех ветвей |
+
+Эти owners дополняют core/task stack и не заменяют technology/testing context. Pure code task без tracker authority не получает live writes; короткая консультация без deliverable не запускает task lifecycle. Private pointers берутся из текущего user/local onboarding. Конфликтная модель остаётся в этом документе.
+
 ## Быстрые примеры маршрутов
 
 Во всех примерах ниже `creator-vibe-lens` и `model-behavior-baseline` подключаются как обязательные core owners и не повторяются в строках для краткости.

@@ -2,6 +2,19 @@
 
 All notable changes to this instruction catalog are documented in this file.
 
+## [6.1.0] - 2026-10-07
+
+### Added
+
+- Add narrow owners for Unlimotion source/all-parent context, authorized result lifecycle and semantic parent enrichment; preserve existing authority and QUEST boundaries.
+- Add sanitized paired S1–S5 scenarios and separate disposable installed-CLI receipts, negative/stale/lease/recovery checks.
+
+### Migration / Activation
+
+- Keep durable warm-store checks separate from cold hook timing, preserve fail-open contention/recovery and real zero/one/many log cardinality. Retain test observations outside fixture cleanup and bound owned diagnostic children without relaxing runtime timeouts.
+
+- Candidate validation does not activate a live catalog. Keep private pointers local and CLI/help dynamic. Activate only with separate authority, matching preimages, reviewed candidate gates and active-path critical checks; rollback only matching postimages.
+
 ## [6.0.1] - 2026-10-05
 
 ### Fixed

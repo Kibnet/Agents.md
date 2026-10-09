@@ -485,6 +485,9 @@ else {
     }
 }
 
+& pwsh -NoProfile -File (Join-Path $root 'scripts/test-unlimotion-contracts.ps1') -RootPath $root
+if ($LASTEXITCODE -ne 0) { $failed = $true }
+
 if ($failed) {
     exit 1
 }

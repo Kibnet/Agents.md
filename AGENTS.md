@@ -25,6 +25,10 @@
 7. Для STORM product workflow, BDD/Gherkin behavior layer и команд `/storm:*` использовать [instructions/profiles/storm-product-development.md](instructions/profiles/storm-product-development.md).
 8. Для OpenAI Responses API, exact model/tier routing, persisted reasoning, Programmatic Tool Calling и Responses multi-agent использовать [instructions/governance/openai-responses-api.md](instructions/governance/openai-responses-api.md) только по соответствующему триггеру.
 
+## Unlimotion
+
+Узкие triggers для task context, agent results и parent enrichment определены в [routing-matrix](instructions/governance/routing-matrix.md#unlimotion-контекст-и-результаты). Локальные pointers на tracker/vault остаются вне переносимого каталога.
+
 ## Routing
 
 Каноническая матрица маршрутизации и алгоритм выбора документов:
