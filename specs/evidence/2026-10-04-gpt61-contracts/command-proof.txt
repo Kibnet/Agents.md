@@ -1,8 +1,0 @@
-PASS Install preserves BOM, CRLF, comments and exact unmanaged bytes
-PASS Upgrade cannot replace a preexisting reviewer with a new template
-Checks 96 failures 0
-PASS: creator-vibe explicit boundary ослаблен
-PASS: catalog Markdown contracts (43 assertions)
-PASS: static outcome source/fixture contracts (37 guards, 57 negative mutations). Behavioral smoke NOT evaluated.
-INFO: Windows operational suite пропущен явным CI split; его запускает отдельный windows-latest job
-PASS: все сценарии test-validate-instructions пройдены

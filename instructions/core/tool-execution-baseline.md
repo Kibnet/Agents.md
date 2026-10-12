@@ -37,7 +37,7 @@
 
 ## MAY
 
-- Использовать read-only preflight template из `templates/codex/local-environment/`.
+- Использовать текстовый read-only preflight checklist из `templates/codex/local-environment/README.md`; исполнимые команды и setup actions принадлежат конкретному consumer-проекту.
 - Подключать targeted session-derived runbook после обязательного baseline, если задача повторяет известную проблему.
 
 ## Команды

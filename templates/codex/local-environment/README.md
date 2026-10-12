@@ -1,22 +1,13 @@
-# Local environment template
+# Local environment checklist
 
-`preflight.ps1` — read-only PowerShell template для ранней проверки локального toolchain consumer-репозитория.
+Текстовая инструкция read-only preflight для consumer-репозитория. Исполнимый `preflight.ps1` не поставляется; точные commands и actions задаются рядом с кодом проекта по [local-environment owner](../../../instructions/onboarding/local-environment.md).
 
-## Подключение
+## Проверка
 
-1. Скопируйте или вызовите script из repo-specific action.
-2. Передайте только фактические required/optional commands, paths и endpoints проекта.
-3. Создайте local environment через поддерживаемую Codex Desktop поверхность и свяжите его action с script; не создавайте `.codex` config по недокументированной схеме и не предполагайте CLI support.
-4. Запустите preflight, targeted tests, full tests и build в отдельном smoke change.
+1. Установите фактические required/optional commands, SDK/runtime/workloads, paths, browser/native dependencies и разрешённые endpoints проекта.
+2. Выполните read-only discovery/проверки версии и доступности. Missing required dependency — failure, optional dependency — warning. Отделяйте auth/network blocker от product failure.
+3. Не устанавливайте tools, certificates, browser или credentials без отдельного разрешения. Не храните secrets, private endpoints и author-specific paths в versioned шаблоне.
+4. Setup/actions подключайте через поддерживаемую host поверхность; не изобретайте undocumented config schema и не заявляйте CLI support без подтверждённого contract.
+5. Сохраняйте machine-readable summary и краткий human-readable результат, commands, длительность, progress/log и repo-specific timeout strategy. Затем выполняйте targeted/full tests и build проекта в их разрешённом scope.
 
-```powershell
-& .\preflight.ps1 `
-  -RequiredCommand @("git", "pwsh", "dotnet") `
-  -OptionalCommand @("node", "rg") `
-  -RequiredPath @(".") `
-  -OutputFormat Json
-```
-
-Template ничего не устанавливает и не меняет конфигурацию машины. Network checks выполняются только для явно переданных `-Endpoint`.
-
-Endpoint сохраняет `kind=endpoint`, schema 1 и явно указывает `level=tcp-connect`. PASS подтверждает только установление TCP-соединения. HTTP-ответ, TLS и авторизация проверяются отдельными consumer-specific checks; доступный TCP-порт не доказывает готовность приложения.
+Network checks выполняйте только для явно переданных endpoints. TCP-connect подтверждает только соединение; HTTP-ответ, TLS и авторизация требуют отдельных consumer checks. Доступный TCP-порт не доказывает готовность приложения. Указывайте уровень проверки и границы evidence.

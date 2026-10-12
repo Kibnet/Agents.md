@@ -41,7 +41,8 @@ $env:AGENTS_ROOT = "/path/to/agents-catalog"
 # 2) При необходимости создать AGENTS.override.md
 # 3) Для QUEST выбрать central template по риску задачи
 # 4) Проверить, что ссылки на центральный каталог валидны
-# 5) При необходимости подключить templates\codex\local-environment\preflight.ps1 через поддерживаемый Codex Desktop local-environment flow
+# 5) Проверить среду по templates/codex/local-environment/README.md;
+#    точные read-only commands и local-environment actions задать в consumer-проекте
 
 # 6) Опционально установить полный external creator-vibe
 python "$env:USERPROFILE\.codex\skills\.system\skill-installer\scripts\install-skill-from-github.py" `

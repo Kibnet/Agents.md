@@ -25,10 +25,6 @@
 7. Сформируй ranked backlog с объяснениями и `unranked_items` с ID/reason/blockers. Supports-only EN получает support_without_dependency; EN→…→ST включает стоимость один раз. Складывать можно own_effort, но не повторяющийся package cost_star. При равных priority/value/cost выбирай ascending ID.
 8. Обнови `docs/product/reports/ranking.md`.
 
-Можно использовать:
+Выполни логическую проверку и расчёт по [STORM contract](../../instructions/profiles/storm-product-development.md) и [schema](../../schemas/storm-artifacts.schema.json), либо используй явно доступный consumer tool. Каталог не поставляет CLI; укажи способ проверки и не заявляй execution без evidence.
 
-```bash
-python <AGENTS_ROOT>/scripts/storm/rank-backlog.py docs/product/storm.json --out docs/product/reports/ranking.md
-```
-
-`--write-json` обновляет только ranking после полной проверки; сохраняй extension fields, порядок коллекций и прежний process audit. Ошибки контракта не должны менять input или существующий report.
+Запись в `storm.json` допускается только в разрешённом artifact scope и обновляет лишь ranking после полной проверки; сохраняй extension fields, порядок коллекций и прежний process audit. Ошибки контракта не должны менять input или существующий report.

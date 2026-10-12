@@ -95,7 +95,7 @@
 - Для Gherkin предпочитать короткие сценарии: один начальный context, одно событие, один проверяемый outcome; длинные процедурные сценарии разделять на несколько examples.
 - Нормализовать повторяющиеся step texts; одинаковый текст шага не должен расходиться по смыслу между `Given`, `When` и `Then`.
 - Использовать [schemas/storm-artifacts.schema.json](../../schemas/storm-artifacts.schema.json) как machine-readable reference для структуры `storm.json`.
-- Использовать scripts без внешних Python dependencies; если Python runtime недоступен, выполнить logical validation manually and report the limitation.
+- Выполнять логическую проверку и расчёты по schema и контракту ниже либо использовать явно доступный consumer tool. Bundled STORM CLI не поставляется; наличие schema не доказывает execution или автоматическую валидацию. Указать способ проверки и его ограничения.
 
 ## MAY
 
@@ -106,20 +106,7 @@
 
 ## Команды
 
-```powershell
-# Прочитать профиль и command templates
-Get-Content -Raw instructions\profiles\storm-product-development.md
-Get-ChildItem prompts\storm
-
-# Создать starter artifact в consumer-репозитории
-Copy-Item <AGENTS_ROOT>\templates\storm\storm.json .\docs\product\storm.json
-
-# Проверить STORM artifact
-python <AGENTS_ROOT>\scripts\storm\validate-artifacts.py .\docs\product\storm.json
-
-# Построить ranking report
-python <AGENTS_ROOT>\scripts\storm\rank-backlog.py .\docs\product\storm.json --out .\docs\product\reports\ranking.md
-```
+Проверить `storm.json` по schema и shared artifact/planning contract; вычислить ranking по правилам ниже и явно указать, выполнена ли логическая проверка или реальный consumer tool.
 
 ## Канонические команды STORM
 
@@ -188,9 +175,9 @@ Canonical `storm.json` содержит:
 
 Schema starter: `metadata.schema_version = 1.2.0`; корректный `1.1.0` без enablers читается. Отсутствующие optional collections равны []; explicit null/object/string вместо массива — contract error. Не создавать placeholder IDs для отсутствующих EN.
 
-Оба CLI используют [storm_model.py](../../scripts/storm/storm_model.py) до расчёта или записи. Поддерживается ограниченное schema subset: локальные разрешимые JSON Pointer `$ref`, `type` (включая array of types), `required`, `properties`, `items`, `enum`, `pattern`, `minimum`, `maximum`, `additionalProperties`. `$defs` — container; проверяются все definitions. Допустимые annotations `$schema`, `$id`, `title`, `description`, `$comment`, `default`, `examples` не меняют validation. Неизвестные validation keywords и external refs дают schema self-check error; имена внутри properties/$defs — имена данных. Полная JSON Schema совместимость не заявляется.
+Перед расчётом или записью проверить schema и typed artifact contract. Каталог задаёт нормативный контракт; реализация CLI не поставляется. Поддерживается ограниченное schema subset: локальные разрешимые JSON Pointer `$ref`, `type` (включая array of types), `required`, `properties`, `items`, `enum`, `pattern`, `minimum`, `maximum`, `additionalProperties`. `$defs` — container; проверяются все definitions. Допустимые annotations `$schema`, `$id`, `title`, `description`, `$comment`, `default`, `examples` не меняют validation. Неизвестные validation keywords и external refs считаются ошибкой проверки schema; имена внутри properties/$defs — имена данных. Полная JSON Schema совместимость не заявляется.
 
-- Root/required/collections/nested types проверяются перед semantics. NaN/Infinity, nonfinite calculations и bool/string/null вместо number отвергаются. Ошибка чтения/JSON даёт exit 2, contract error — exit 1 с field path без traceback и output writes.
+- Root/required/collections/nested types проверяются перед semantics. NaN/Infinity, nonfinite calculations и bool/string/null вместо number отвергаются. При ошибке чтения/JSON или контракта указать field path и не записывать derived output; exit codes удалённого CLI не заявляются.
 - ST/CN/EN IDs уникальны и разрешимы. Допустимые statuses перечислены в MUST выше; неизвестный status — error. Retired ST/CN/EN = deprecated/superseded/removed; retired scenarios = deprecated/superseded.
 - Optional `enablers[]`: required id EN-*, title, status, provenance, confidence; optional priority, dependencies, supports, linked_tests, linked_code, evidence. Priority/effort использует контракт ST; EN own value всегда 0, включая extension reach/impact.
 - Top-level `from -> to` означает «from предшествует to»; embedded `item.dependencies=[X]` означает `X -> item`. Edges дедуплицируются. Dangling refs, self-loops и все cycles проверяются до status filtering.
@@ -200,15 +187,11 @@ Schema starter: `metadata.schema_version = 1.2.0`; корректный `1.1.0` 
 - RICE missing reach/impact → 1; missing priority.confidence → item.confidence, иначе 0.5. Explicit reach/impact >=0 и confidence 0..1, включая 0. Defaults применяются только при отсутствии; explicit effort должен быть >0 и имеет приоритет над decomposition.
 - Effort decomposition: architecture_blast_radius/verification_complexity default 1; dependency_overhead/scenario_automation_cost/step_reuse_penalty/migration_or_rollout_risk default 0. Все components >=0; total floor 0.1 объясняется в report. Невалидный component отвергается даже при explicit effort.
 - Closure суммирует уникальные неоплаченные ST/EN. Условная оплата не меняет artifact statuses; складывать можно own_effort, но не повторённый package cost_star. CN paths видны в explanations. При равных priority/value/cost выбирается ascending ID.
-- Validator read-only печатает `metrics_version: 2` в Metrics stdout. `--write-json` ranker меняет только ranking после полной проверки и сохраняет extension fields, порядок коллекций и legacy audit. `unranked_items` — CLI/Markdown report, не автоматически записываемое top-level поле; ranking остаётся array.
+- Логическая проверка выполняется read-only и указывает `metrics_version: 2` в отчёте. Запись ranking допускается только после полной проверки и в разрешённом artifact scope; сохранить extension fields, порядок коллекций и legacy audit. `unranked_items` относится к отчёту, не автоматически записываемому top-level полю; ranking остаётся array. Не выдавать ручной расчёт за исполнение CLI.
 
 Миграция: исправить field paths из diagnostics, явно определить отсутствующие EN/зависимости/statuses и typed numeric values. Прежние ошибочные формы больше не принимаются; не заменять нули defaults и не скрывать blockers. Downgrade не удаляет новые EN/graph semantics автоматически; восстановление старого artifact требует отдельного scope/VCS backup.
 
-Обязательная проверка при изменениях STORM/schema (Python 3.11/3.14, stdlib):
-
-```powershell
-python -m unittest discover -s scripts/storm/tests -p "test_*.py"
-```
+При изменениях STORM/schema обязательны проверка структуры/ссылок, сохранения typed/graph/ranking/audit контрактов и matched before/after behavioral scenarios по [review-loops](../governance/review-loops.md). Инструменты проверки предоставляет рабочая среда; результаты/ограничения сохраняются в локальной SPEC. Для изменений consumer code/tests остаются его обязательные testing/CI gates.
 
 ## Quality Audit
 

@@ -30,19 +30,19 @@
 
 ## MAY
 
-- Расширять central `preflight.ps1` параметрами consumer repo без копирования общих правил.
+- Использовать central текстовый checklist для выбора repo-specific preflight commands; каталог не поставляет executable preflight.
 - Проверять network endpoints только когда они явно переданы пользователем или repo config.
 
 ## Команды
 
-```powershell
-& .\templates\codex\local-environment\preflight.ps1 `
-  -RequiredCommand @("git", "pwsh", "dotnet") `
-  -RequiredPath @(".")
-```
+Проверить фактические команды/SDK/paths проекта по [текстовому preflight checklist](../../templates/codex/local-environment/README.md), затем выполнить read-only команды из его локального environment contract. Отчёт должен отличать missing required dependency, optional warning, auth/network blocker и product failure.
 
 
-## Состояния и область активации
+## Состояния ранее установленной внешней интеграции
+
+Следующие правила относятся только к реально существующему и отдельно согласованному operational runtime. Каталог не поставляет installer/probe/analyzer/hook implementation и их config. Удаление исходников из поставки не удаляет и не мигрирует installed integration. При source-script dependency active обновление требует отдельного reference preflight и migration scope.
+
+### Состояния и область активации
 
 | Действие | Согласованный scope / evidence | Результат |
 | --- | --- | --- |

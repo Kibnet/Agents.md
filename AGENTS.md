@@ -55,21 +55,17 @@
 
 ## Quality Gate каталога
 
-Перед завершением изменений запускай:
+Перед завершением изменений каталога проверь:
 
-```powershell
-pwsh -File scripts/validate-instructions.ps1
-pwsh -File scripts/test-validate-instructions.ps1
-```
+- структуру документов и замыкание относительных ссылок;
+- сохранение нормативных форматов, маршрутизации и содержательных правил;
+- фактический состав стандартного Git archive: только инструкции и необходимые формы;
+- релевантные before/after behavioral scenarios и review по [review-loops](instructions/governance/review-loops.md).
 
-При изменении STORM/scripts/schema дополнительно выполнить:
-
-```powershell
-python -m unittest discover -s scripts/storm/tests -p "test_*.py"
-```
+Проверки выполняются инструментами рабочей среды агента; собственные validators, CLI и тестовый стенд каталог не поставляет. Сохраняй команды, результаты и ограничения проверки в локальной SPEC/evidence. Это не отменяет tests/build/CI для кода проектов-потребителей.
 
 ## Документы управления
 
 - [instructions/governance/document-contract.md](instructions/governance/document-contract.md)
 - [instructions/governance/versioning-policy.md](instructions/governance/versioning-policy.md)
-- [CHANGELOG.md](CHANGELOG.md)
+- История изменений: Git history и release notes выбранной версии.

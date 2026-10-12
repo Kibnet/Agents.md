@@ -1,9 +1,0 @@
-{
-  "turns": [
-    {
-      "text": "Work workspace явно использует gpt-5.6-sol. GPT-6.1 Sol отсутствует в списке моделей. По каталогу предложи путь обновления, учитывая Free/Go и Enterprise/Edu, но не изменяй рабочий model pin или account settings без моего поручения."
-    }
-  ],
-  "files": {},
-  "operations": {}
-}

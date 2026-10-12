@@ -52,4 +52,4 @@ refactor(nac-rabbit): simplify connection retry logic
 - [AGENTS.md](../../AGENTS.md)
 - [instructions/governance/github-delivery-policy.md](./github-delivery-policy.md)
 - [instructions/governance/versioning-policy.md](./versioning-policy.md)
-- [CHANGELOG.md](../../CHANGELOG.md)
+- История изменений каталога: Git history и release notes по [versioning-policy](./versioning-policy.md).

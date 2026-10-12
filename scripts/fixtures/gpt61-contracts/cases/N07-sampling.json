@@ -1,9 +1,0 @@
-{
-  "turns": [
-    {
-      "text": "Проверь gpt-6.1-sol high запрос с temperature=0.2, top_p=0.8, top_logprobs=5, Chat Completions logprobs=true и Responses include=[message.output_text.logprobs]. Дай минимально совместимую конфигурацию с тем же model/effort и объясни отличие от старого Sol none."
-    }
-  ],
-  "files": {},
-  "operations": {}
-}

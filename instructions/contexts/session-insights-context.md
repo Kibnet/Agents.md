@@ -10,7 +10,7 @@
 ## Когда не применять
 
 - Запрос короткий, self-contained и не требует истории, repo context или предпочтений пользователя.
-- В текущем repo нет `session-insights/`.
+- В текущем проекте нет доступного локального runbook или индекса истории. Отсутствие истории допустимо и не требует создавать каталог.
 - Единственная причина загрузки - любопытство агента, а не задача.
 - Требуется полный пользовательский профиль, но пользователь не просил персональный контекст явно.
 
@@ -19,7 +19,9 @@
 - Считать session-derived сведения подсказками, а не authoritative текущим состоянием repo.
 - Выбор текущего первичного источника и проверку отсутствия данных/доступа выполнять по `tool-execution-baseline`. Прошлое разрешение из другой сессии не создаёт полномочия для нового материала, адресата или materially другого риска.
 - Перед действием проверять drift-prone факты в текущем workspace: файлы, команды, test runner, paths, branch, auth, CI, tool availability.
-- Начинать lookup с `session-insights/README.md`, затем выбирать только релевантные файлы или секции.
+- Считать историю проекта необязательной и локальной: central catalog не поставляет личные runbooks автора. Использовать доступный и относящийся к текущему проекту источник; не обходить home или другие репозитории в поисках замены.
+- Если в текущем проекте есть `session-insights/README.md`, начинать lookup с него, затем выбирать только релевантные файлы или секции. Другой project-local индекс использовать по явному указателю проекта.
+- При отсутствии runbook продолжать по текущим project files, scripts и CI; если historical context существенен, кратко обозначить gap. Не выдумывать lessons и не создавать историю без поручения.
 - По умолчанию загружать не больше 1-3 session-derived источников для одной задачи.
 - Не загружать полный `USER_PROFILE_FROM_CODEX_SESSIONS.md` без явного запроса пользователя про его предпочтения, стиль работы или факты о нём.
 - Не stage/commit файлы, помеченные как `private-local`.
@@ -45,6 +47,8 @@
 
 ## Команды
 
+Примеры ниже выполняются в проекте, где уже есть локальный `session-insights/`, а не в распакованном central catalog. Имена cookbook ниже — примеры optional источников; отсутствие конкретного файла допустимо.
+
 ```powershell
 # First-hop index
 Get-Content session-insights/README.md
@@ -65,5 +69,3 @@ rg -n "<absolute-user-home-path>|<credential-path>" session-insights instruction
 - [instructions/governance/document-contract.md](../governance/document-contract.md)
 - [instructions/governance/review-loops.md](../governance/review-loops.md)
 - [instructions/core/tool-execution-baseline.md](../core/tool-execution-baseline.md)
-- [session-insights/README.md](../../session-insights/README.md)
-- [specs/2026-06-05-session-insights-agent-context-delivery.md](../../specs/2026-06-05-session-insights-agent-context-delivery.md)

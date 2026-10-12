@@ -1,9 +1,0 @@
-{
-  "turns": [
-    {
-      "text": "По актуальному каталогу подготовь EU routing для gpt-6.1-sol, gpt-6-sol, gpt-6-luna и gpt-6-astra. Какие processing modes подтверждены для каждого? Покажи конфигурацию Standard, Flex и Batch там, где подтверждены; отдели processing mode от поля service_tier. Как трактовать отсутствие режима в confirmed metadata?"
-    }
-  ],
-  "files": {},
-  "operations": {}
-}

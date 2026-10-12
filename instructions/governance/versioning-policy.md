@@ -11,14 +11,14 @@
 
 ## MUST
 
-- Вести `CHANGELOG.md` для всех значимых изменений.
+- Фиксировать все значимые изменения и влияние на потребителей в versioned журнале. Для этого каталога журналом служат Git history и release notes; отдельный `CHANGELOG.md` в поставку не входит. В проекте-потребителе соблюдать его существующий changelog/release contract.
 - Использовать SemVer (`MAJOR.MINOR.PATCH`) для версий каталога.
 - Любые изменения каталога проводить через Quest SPEC gate.
 - Для breaking changes увеличивать `MAJOR`.
 
 ## SHOULD
 
-- Отражать причину версии и влияние на потребителей в changelog.
+- Отражать причину версии и влияние на потребителей в журнале изменений выбранного проекта.
 - Группировать изменения по блокам: `Added`, `Changed`, `Removed`.
 
 ## MAY
@@ -28,9 +28,8 @@
 ## Команды
 
 ```powershell
-# Проверка перед фиксацией версии
-pwsh -File scripts/validate-instructions.ps1
-pwsh -File scripts/test-validate-instructions.ps1
+# Проверки структуры, ссылок, форматов и поведения выполняются в рабочей среде;
+# их результаты сохраняются в локальной SPEC перед фиксацией версии.
 
 # Просмотр изменений
 git status --short
@@ -46,7 +45,7 @@ git diff --stat
 ## Связанные документы
 
 - [AGENTS.md](../../AGENTS.md)
-- [CHANGELOG.md](../../CHANGELOG.md)
+- История каталога: Git history и release notes соответствующей версии.
 - [instructions/core/quest-governance.md](../core/quest-governance.md)
 - [instructions/governance/commit-message-policy.md](./commit-message-policy.md)
 - [instructions/governance/github-delivery-policy.md](./github-delivery-policy.md)

@@ -9,3 +9,8 @@ session-insights/FLAKY_SLOW_TESTS_REGISTRY.md
 .artifacts/agent-operations-*/
 .agent-operations-gold-set.json
 .agent-operations-evidence-map.json
+
+# Рабочая история и evidence остаются локальными
+/specs/
+/session-insights/
+/.artifacts/

@@ -25,8 +25,4 @@
 5. Предложи изменения в профиле/templates/schema/scripts, не меняя canonical catalog в artifact-only audit; реализация таких изменений требует отдельного delivery/QUEST scope.
 6. Обнови `docs/product/reports/process-audit.md` по canonical template и `storm.json.process_audit`; не подменяй поведением metrics сведения о фактически запущенных tests.
 
-Можно использовать:
-
-```bash
-python <AGENTS_ROOT>/scripts/storm/validate-artifacts.py docs/product/storm.json
-```
+Выполни логическую проверку и расчёт по [STORM contract](../../instructions/profiles/storm-product-development.md) и [schema](../../schemas/storm-artifacts.schema.json), либо используй явно доступный consumer tool. Каталог не поставляет CLI; укажи способ проверки и не заявляй execution без evidence.

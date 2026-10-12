@@ -118,4 +118,4 @@ git tag --list "v*"
 - [instructions/governance/commit-message-policy.md](./commit-message-policy.md)
 - [instructions/governance/routing-matrix.md](./routing-matrix.md)
 - [instructions/governance/versioning-policy.md](./versioning-policy.md)
-- [CHANGELOG.md](../../CHANGELOG.md)
+- История изменений каталога: Git history и release notes по [versioning-policy](./versioning-policy.md).
