@@ -12,12 +12,12 @@
 
 - Сохранить смысл шаблона: локальный файл должен быть указателем, а не копией центральных правил.
 - Указать путь к центральному `AGENTS.md` через каталог-переменную (например, `<AGENTS_ROOT>\AGENTS.md`).
-- Явно подсказать, что для `QUEST` рабочие spec-файлы создаются локально, а canonical template всегда берётся из `<AGENTS_ROOT>\templates\specs\_template.md` либо `_template-small.md` по central quest-governance.
+- Явно подсказать, что для `QUEST` рабочие spec-файлы создаются локально, а форму и canonical template выбирает central [quest-governance](../core/quest-governance.md) из `<AGENTS_ROOT>\templates\specs\`; pointer не закрепляет одну форму для всех задач.
 - Явно подсказать, что локальный `AGENTS.override.md` применяется только после central stack как дополнительные локальные инструкции поверх него и не заменяет central `AGENTS.md`.
 
 ## SHOULD
 
-- Добавить краткий раздел с project-specific профилем по умолчанию.
+- Добавить project-specific профиль по умолчанию только при фактическом триггере по routing-matrix.
 
 ## MAY
 
@@ -35,7 +35,7 @@
 Для QUEST-задач:
 
 - рабочие spec-файлы создаются в локальном `.\specs\`
-- canonical template всегда берётся из `<AGENTS_ROOT>\templates\specs\_template.md` либо `_template-small.md` по central quest-governance
+- форма и canonical template выбираются по `<AGENTS_ROOT>\instructions\core\quest-governance.md` из `<AGENTS_ROOT>\templates\specs\`; фазовые границы и SPEC-вложения — по central quest-mode
 
 Порядок применения:
 1. Центральный `AGENTS.md` -> central stack

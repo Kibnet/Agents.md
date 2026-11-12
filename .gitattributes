@@ -53,6 +53,7 @@
 /instructions/governance/document-contract.md -export-ignore
 /instructions/governance/github-delivery-policy.md -export-ignore
 /instructions/governance/goal-context-enrichment.md -export-ignore
+/instructions/governance/model-surface-reference.md -export-ignore
 /instructions/governance/openai-responses-api.md -export-ignore
 /instructions/governance/refactoring-policy.md -export-ignore
 /instructions/governance/review-loops.md -export-ignore

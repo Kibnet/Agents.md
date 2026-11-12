@@ -1,9 +1,11 @@
 # <Название изменения>
 
+Имена owner-документов в этой SPEC разрешаются от корня центрального каталога текущего instruction stack, а не от каталога локальной SPEC: `routing-matrix` — `instructions/governance/routing-matrix.md`, `quest-mode` — `instructions/core/quest-mode.md`, `model-behavior-baseline` — `instructions/core/model-behavior-baseline.md`.
+
 Expanded SPEC: форма и applicability — `quest-governance`, severity/disposition и review — `review-loops`. Для допустимой short SPEC использовать `_template-small.md`; этот expanded audit к ней не добавляется.
 
 ## 0. Метаданные
-- Тип (профиль):
+- Тип; применимые profiles/contexts по `routing-matrix`:
 - Владелец:
 - Масштаб: small / medium / large
 - Целевое семейство / behavior baseline:
@@ -13,6 +15,7 @@ Expanded SPEC: форма и applicability — `quest-governance`, severity/disp
 - Целевой релиз / ветка:
 - Ограничения:
 - Связанные ссылки:
+- Планировочные вложения (путь/назначение, если нужны) по `quest-mode`:
 
 Если секция не применима, явно укажите `Не применимо` и короткую причину, вместо заполнения нерелевантными деталями.
 
@@ -22,7 +25,7 @@ Expanded SPEC: форма и applicability — `quest-governance`, severity/disp
 Outcome contract:
 - Исходное поручение / симптом и точка применения результата:
 - Success means:
-- Итоговый артефакт / output:
+- Итоговый артефакт / output; при существенном различии — источник идеи/референс, база реализации и место поставки по `model-behavior-baseline`:
 - Stop rules:
 
 ## 2. Текущее состояние (AS-IS)
@@ -51,8 +54,8 @@ Outcome contract:
 ### 6.2 Детальный дизайн
 - потоки данных
 - контракты / API
-- output contract / evidence rules
-- visual planning artifact для UI-facing изменений: wireframe/render/storyboard/annotated screenshot или `Не применимо` с причиной
+- output contract / evidence rules; независимое основание ожидаемого результата по model-behavior-baseline
+- visual planning artifact для UI-facing изменений по model-behavior-baseline: достаточная встроенная схема либо вложение по quest-mode; `Не применимо` — с причиной
 - UI test video evidence для UI automation задач: `до`/`после` artifacts из автоматизированных UI test runs или `Не применимо` / fallback с причиной
 - границы сохранения поведения / допустимые изменения контракта (если применимо)
 - обработка ошибок
