@@ -47,17 +47,17 @@
 - `PASS` запрещён после исправлений по review, пока не выполнен `Fix and re-review` по затронутым областям.
 - Это no-evidence/no-pass rule: отсутствие concrete evidence не может завершаться `PASS`.
 - В expanded `Нет находок` допустимо только если заполнены `Depth checklist` и `No-findings justification`.
-- В full `post-SPEC review-loop` фиксировать `Scope reviewed`: путь spec, instruction stack, selected profile, open questions и planned changed files.
+- В full `post-SPEC review-loop` фиксировать `Scope reviewed`: путь spec, instruction stack, applicable profiles/contexts (либо отсутствие триггера), open questions и planned changed files.
 - В full `post-SPEC review-loop` проверять как минимум: полноту границ, противоречия, пропущенные acceptance criteria, скрытые риски, альтернативы, недоопределённые решения, outcome-first contract, output/evidence contract, stop rules и отсутствие лишних абсолютных правил для judgement calls.
 - Для model/prompt/instruction migration в full `post-SPEC review-loop` отдельно проверять: смешение standard ChatGPT, Work/Codex и API contracts; неподтверждённую availability; дублирование owner-правил; broad brevity rules; необоснованные `max` / Pro / Ultra; потерю обязательной полноты final answer; отсутствие representative before/after behavioral smoke.
 - В full `post-SPEC review-loop` проверять `Pre-Approval Rework Prevention Gate`: user-observable scenarios, decision ledger, acceptance-to-test mapping, expected user objections и применимость role-based review.
-- Для UI-facing задач в full `post-SPEC review-loop` проверять, что spec содержит доступный reviewer visual planning artifact (wireframe, render, storyboard, annotated screenshot или эквивалент) либо явное `Не применимо` с причиной и fallback layout/state description.
+- Для UI-facing задач в full `post-SPEC review-loop` проверять достаточность и доступность visual planning artifact по [model-behavior-baseline](../core/model-behavior-baseline.md), а допустимость отдельных SPEC-вложений — по [quest-mode](../core/quest-mode.md); не требовать отдельного изображения, если встроенная схема передаёт нужные состояния/взаимодействия.
 - Нерешённый blocker текущей фазы не позволяет запрашивать утверждение SPEC как готовой или завершать EXEC как выполненный. `ASK-HUMAN` означает точный вопрос о существенном решении, а не `PASS` и не разрешение зависимого действия.
 - В full `post-EXEC review-loop` фиксировать `Scope reviewed`: approved spec, `git status --short`, `git diff --stat`, relevant diff, tests/validation evidence и docs/changelog impact.
 - В full `post-EXEC review-loop` проверять как минимум: отклонения от спеки, регрессии, пропущенные тесты, критичные edge cases, небезопасные допущения, устаревшие или ложные комментарии, скрытые функциональные изменения под видом refactor, неподтверждённые performance tradeoff, неподдержанные factual claims, отсутствие нужной validation evidence и незавершённые follow-up, которые на самом деле нужно исправить сейчас.
 - Для semantic model/prompt/instruction changes и migration требовать before/after behavioral smoke на одинаковой effective model, surface, reasoning и sandbox конфигурации с одними representative scenarios. Static validator, semantic scan и cross-model benchmark дополняют, но не заменяют этот smoke. Для механической правки ссылки/опечатки без изменения смысла достаточно релевантных static checks, если отдельный обязательный контракт не требует большего; основание классификации фиксировать.
 - Если изменяемый каталог или конфигурация подключены к активной agent session через junction, symlink или global pointer, выполнять authoring и candidate validation из изолированного checkout; перед активацией сверять drift active checkout, применять один подготовленный change set, иметь проверяемый rollback и повторять critical checks уже на активном пути.
-- В `post-EXEC review-loop` любой формы сверять evidence с контрактом `model-behavior-baseline.md`: исходный пользовательский сценарий и обычный путь, реально просмотренное визуальное состояние и reference fidelity, подтверждённый уровень persistence/install готовности. Несоответствующее evidence не закрывает обязательный AC.
+- В `post-EXEC review-loop` любой формы сверять evidence с контрактом `model-behavior-baseline.md`: исходный пользовательский сценарий и обычный путь, независимое основание ожидаемого результата, реально просмотренное визуальное состояние и reference fidelity, подтверждённый уровень persistence/install готовности. Предпосылки решений и полномочия сверять по collaboration owner; approval не заменяет проверку фактов. Несоответствующее evidence не закрывает обязательный AC.
 - В full `post-EXEC review-loop` проверять `User-Observable Completion Gate`: implementation/diff соответствует user-observable scenarios, validation соответствует acceptance-to-test matrix, а expected user objections закрыты или имеют disposition без нарушения обязательного контракта.
 - В full `post-EXEC review-loop` проверять отсутствие unrelated changes в `git status --short` и relevant diff; если unrelated changes есть, явно отделить их от текущей задачи.
 - Для задач, где применялся `ui-automation-testing`, в full `post-EXEC review-loop` проверять наличие `до`/`после` video evidence из автоматизированных UI test runs либо явный fallback с объективной причиной, командой проверки и next-best evidence.
@@ -85,7 +85,7 @@ Short использует общую таблицу пяти проверок �
 ```markdown
 ### Post-SPEC Review
 - Статус: PASS / NEEDS-FIX / ASK-HUMAN
-- Scope reviewed: spec path, instruction stack, selected profile, open questions, planned changed files
+- Scope reviewed: spec path, instruction stack, applicable profiles/contexts (либо отсутствие триггера), open questions, planned changed files
 - Decision: можно запрашивать подтверждение / нужно исправить / нужен выбор пользователя
 - Review passes:
   - Scope/Evidence pass:

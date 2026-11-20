@@ -18,8 +18,8 @@
 - До классификации каждой задачи подключать `instructions/core/creator-vibe-lens.md` как lightweight interpretive owner; полный skill `creator-vibe` загружать только по его creative/human-experience trigger.
 - Для каждой задачи подключать `instructions/core/model-behavior-baseline.md` как обязательный поведенческий контракт каталога. Поведенческий ориентир и рекомендации по моделям определяет этот owner.
 - Для каждой `tool-heavy` задачи подключать `instructions/core/tool-execution-baseline.md` до первого значимого tool call; этот owner добавляется поверх task-type core и не конкурирует с выбранным context.
-- Для каждой задачи фиксировать core stack и context текущего этапа; profiles выбирать по stack/domain/change-type триггерам ниже.
-- Выбирать один основной stack profile, необходимые domain profiles и один профиль типа изменения (если нужен). Каждый domain profile требует конкретного триггера и уникального контракта. Лимита «два файла» нет; минимизировать дублирование, не исключать нужную норму ради количества.
+- Для каждой задачи фиксировать core stack и основной context текущего этапа; добавлять contexts только для необходимых отличающихся контрактов (например, tracker + testing). Profiles выбирать по stack/domain/change-type триггерам ниже; отсутствие применимого триггера допускает stack без profile.
+- При применимых триггерах выбирать один основной stack profile, необходимые domain profiles и один профиль типа изменения (если нужен). Каждый domain profile требует конкретного триггера и уникального контракта. Лимита «два файла» нет; минимизировать дублирование, не исключать нужную норму ради количества.
 - Для аналитических задач без выраженного технологического стека допускается использовать один профиль сценария без `stack profile`, если результатом являются process artifacts, а не код.
 - Summary-документы (`AGENTS.md`, `README.md`) считать только точками входа и обзором; они не вводят отдельную conflict model поверх owner-документов.
 - Локальный `AGENTS.override.md` в репозитории-потребителе применять только после central stack как дополнительные локальные инструкции поверх него; он не заменяет central stack и может только ужесточать MUST.
@@ -50,7 +50,7 @@ Get-ChildItem instructions/profiles
    - `catalog-governance`, `consumer-onboarding`, `delivery-task`, `guided-artifact-workflow`.
 3. Подключить `model-behavior-baseline` и базовый набор (`core`) по типу задачи.
 4. Если задача `tool-heavy`, добавить `tool-execution-baseline`.
-5. Выбрать один `context` по типу выполнения.
+5. Выбрать основной `context` текущего этапа и необходимые дополняющие contexts с отдельными фактическими триггерами; не исключать tracker, testing или visual контракт ради лимита в один файл.
 6. Выбрать один профиль технологического стека (`stack profile`), если задача привязана к реализации в конкретном стеке.
 7. Добавить domain profiles по фактическим зависимостям и один change-type overlay либо сценарный профиль без стека. Например, Avalonia + RavenDB + UI automation требует dotnet-desktop-client, dotnet-ravendb и ui-automation-testing: UI, данные и проверка окна имеют разные контракты.
 8. Добавить governance overlays по триггерам задачи.
@@ -132,6 +132,7 @@ Get-ChildItem instructions/profiles
 | Целенаправленное массовое комментирование / cleanup комментариев | `commenting-policy` |
 | QUEST: фаза SPEC | `quest-mode`, `spec-linter`, `spec-rubric`, `review-loops` |
 | QUEST: фаза EXEC | `quest-mode`, `review-loops` |
+| Выбор/миграция модели, reasoning/speed tier, product availability или пересмотр исторических model evals | [model-surface-reference](./model-surface-reference.md); текущие факты проверять по первоисточникам |
 | OpenAI Responses API, API model/tier routing, persisted reasoning, `reasoning.context`, Programmatic Tool Calling или Responses multi-agent | `openai-responses-api`; для проектирования подсистемы также `product-system-design` |
 | Прошлые Codex-сессии, частые ошибки агента, known repo runbooks, пользовательские workflow preferences | `session-insights-context` |
 | Коммиты и changelog | `commit-message-policy`, `versioning-policy` |
@@ -143,7 +144,7 @@ Get-ChildItem instructions/profiles
 | Trigger | Подключить owner |
 | --- | --- |
 | ID/link задачи, обзор tracker или подтверждённое task-space | [unlimotion-task-context](../contexts/unlimotion-task-context.md) |
-| Агентское поручение с самостоятельным deliverable / tracker result lifecycle | [unlimotion-result-tracking](./unlimotion-result-tracking.md), затем task-context при сопоставлении задаче |
+| Самостоятельный deliverable с подтверждённой связью с задачей tracker либо явное поручение пользователя вести tracker result lifecycle | [unlimotion-result-tracking](./unlimotion-result-tracking.md), затем task-context при сопоставлении задаче |
 | Проверенный факт полезен смысловому parent | [goal-context-enrichment](./goal-context-enrichment.md), task-context для всех ветвей |
 
 Эти owners дополняют core/task stack и не заменяют technology/testing context. Pure code task без tracker authority не получает live writes; короткая консультация без deliverable не запускает task lifecycle. Private pointers берутся из текущего user/local onboarding. Конфликтная модель остаётся в этом документе.

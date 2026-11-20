@@ -14,14 +14,14 @@
 - Выбрать схему подключения: local pointer как portable default либо global pointer при проверенном native host loading. В обоих случаях проверить canonical root и применить optional local override после central stack.
 - Для local схемы создать `AGENTS.md` по consumer template и указать источник, например `$env:AGENTS_ROOT\AGENTS.md`. Global-only не требует дублирующего local pointer, но не гарантирует загрузку на другом host/CI.
 - Если нужны проектные уточнения, добавлять только `AGENTS.override.md` как дополнительные локальные инструкции поверх central stack; этот файл не заменяет central `AGENTS.md` и может только ужесточать `MUST`.
-- Проверить фактическую загрузку выбранной схемы; pointer не должен дублировать центральные правила.
+- Проверить фактическую загрузку выбранной схемы и содержимое установленного local/global pointer, а не только template в репозитории. Pointer направляет к owner выбора QUEST-формы и не закрепляет expanded для всех задач; существующие локальные сведения и личные pointers сохраняются, центральные правила не копируются.
 - Для `QUEST`-задач сохранять рабочие spec-файлы в локальном `./specs/` репозитория-потребителя.
 - Для QUEST выбирать central `_template-small.md` либо `_template.md` в `templates/specs/` по `quest-governance.md`; рабочие specs остаются локальными.
 - Для repo-specific SDK/runtime/browser/native dependencies создать проверяемый local-environment preflight по central contract, не скрыто устанавливая toolchain.
 
 ## SHOULD
 
-- Добавлять краткое описание, какой профиль использовать по умолчанию в этом репозитории.
+- Добавлять краткое описание профиля по умолчанию только при наличии применимого триггера по routing-matrix.
 - Проверять актуальность ссылок при обновлении центрального каталога.
 - Если creative/human-experience задачи должны загружать полный `creator-vibe`, устанавливать его отдельно через системный `skill-installer` с pinned upstream commit; отсутствие полного skill не ломает lightweight central owner.
 
@@ -65,6 +65,8 @@ $env:AGENTS_ROOT = "$PWD\.agents-catalog"
 
 ## Связанные документы
 
+- [QUEST: выбор формы](../core/quest-governance.md)
+- [QUEST: фаза и вложения](../core/quest-mode.md)
 - [AGENTS.md](../../AGENTS.md)
 - [instructions/core/creator-vibe-lens.md](../core/creator-vibe-lens.md)
 - [instructions/onboarding/AGENTS.consumer.template.md](./AGENTS.consumer.template.md)
