@@ -16,7 +16,7 @@
   - порядка сборки central instruction stack;
   - модели разрешения конфликтов между документами.
 - До классификации каждой задачи подключать `instructions/core/creator-vibe-lens.md` как lightweight interpretive owner; полный skill `creator-vibe` загружать только по его creative/human-experience trigger.
-- Для каждой задачи подключать `instructions/core/model-behavior-baseline.md` как обязательный core baseline оптимизации под `GPT-6 Astra`, не подменяя им проверку фактической surface/runtime availability.
+- Для каждой задачи подключать `instructions/core/model-behavior-baseline.md` как обязательный поведенческий контракт каталога. Поведенческий ориентир и рекомендации по моделям определяет этот owner.
 - Для каждой `tool-heavy` задачи подключать `instructions/core/tool-execution-baseline.md` до первого значимого tool call; этот owner добавляется поверх task-type core и не конкурирует с выбранным context.
 - Для каждой задачи фиксировать core stack и основной context текущего этапа; добавлять contexts только для необходимых отличающихся контрактов (например, tracker + testing). Profiles выбирать по stack/domain/change-type триггерам ниже; отсутствие применимого триггера допускает stack без profile.
 - При применимых триггерах выбирать один основной stack profile, необходимые domain profiles и один профиль типа изменения (если нужен). Каждый domain profile требует конкретного триггера и уникального контракта. Лимита «два файла» нет; минимизировать дублирование, не исключать нужную норму ради количества.
